@@ -10,11 +10,26 @@ import org.springframework.http.HttpStatus;
 @Getter
 @AllArgsConstructor
 public enum ErrorCode {
-    ALREADY_EXIST (HttpStatus.BAD_REQUEST,"같은 데이터가 이미 존재합니다"),
+
+    //400 BAD_REQUEST
+
+    //404 NOT FOUND
     NOT_FOUND(HttpStatus.NOT_FOUND,"데이터가 존재하지 않습니다"),
-    INCORRECT_QUERY_REQUEST(HttpStatus.BAD_REQUEST,"잘못된 쿼리 요청입니다"),
+
+    //409 CONFLICT
+    ALREADY_EXIST (HttpStatus.CONFLICT,"같은 데이터가 이미 존재합니다"),
+
+    //500 INTERNAL_SERVER_ERROR
+
+    //403 FORBIDDEN
     FORBIDDEN(HttpStatus.FORBIDDEN,"해당 데이터에 대한 권한이 없습니다"),
+
+    //401 UNAUTHORIZED
     UNAUTHORIZED (HttpStatus.UNAUTHORIZED, "인증이 필요합니다");
+
+    /**
+     * 필요한 에러코드 작성
+     */
 
 
     private final HttpStatus httpStatus;

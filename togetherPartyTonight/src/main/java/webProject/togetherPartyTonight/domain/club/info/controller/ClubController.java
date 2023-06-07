@@ -7,9 +7,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import webProject.togetherPartyTonight.domain.club.info.dto.NewClubRequest;
+import webProject.togetherPartyTonight.domain.club.info.dto.ClubRequestDto;
+import webProject.togetherPartyTonight.domain.club.info.dto.ClubResponseDto;
 import webProject.togetherPartyTonight.domain.club.info.service.ClubService;
-import webProject.togetherPartyTonight.global.common.DefaultResponse;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -25,8 +25,8 @@ public class ClubController {
      * 모임 추가 api
      */
     @PostMapping("")
-    public ResponseEntity<DefaultResponse> addClub (@RequestBody NewClubRequest clubRequest, HttpServletRequest request) {
-        log.info(request.getMethod()+" "+request.getRequestURI());
+    public ResponseEntity<ClubResponseDto> addClub (@RequestBody ClubRequestDto clubRequest, HttpServletRequest request) {
+        logger.info(request.getMethod()+" "+request.getRequestURI());
         return new ResponseEntity<>(clubService.addClub(clubRequest), HttpStatus.OK);
     }
 
@@ -34,8 +34,8 @@ public class ClubController {
      * 모임 상세 조회 api
      */
     @GetMapping("/{id}")
-    public ResponseEntity<DefaultResponse> getClub(@PathVariable Long id, HttpServletRequest request) {
-        log.info(request.getMethod()+" "+request.getRequestURI());
+    public ResponseEntity<ClubResponseDto> getClub(@PathVariable Long id, HttpServletRequest request) {
+        logger.info(request.getMethod()+" "+request.getRequestURI());
         return new ResponseEntity<>(clubService.getClub(id),HttpStatus.OK);
     }
 
@@ -43,18 +43,19 @@ public class ClubController {
      * 모임 삭제 api
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<DefaultResponse> deleteClub(@PathVariable Long id, HttpServletRequest request) {
-        log.info(request.getMethod()+" "+request.getRequestURI());
-        return new ResponseEntity<>(clubService.deleteClub(id),HttpStatus.OK);
+    public ResponseEntity<?> deleteClub(@PathVariable Long id, HttpServletRequest request) {
+        logger.info(request.getMethod()+" "+request.getRequestURI());
+        clubService.deleteClub(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     /**
      * 모임 수정 api
      */
     @PutMapping("/{id}")
-    public  ResponseEntity<DefaultResponse> modifyClub(
-            @PathVariable Long id,@RequestBody NewClubRequest newClubRequest, HttpServletRequest request) {
-        log.info(request.getMethod() + " " + request.getRequestURI());
+    public  ResponseEntity<ClubResponseDto> modifyClub(
+            @PathVariable Long id, @RequestBody ClubRequestDto newClubRequest, HttpServletRequest request) {
+        logger.info(request.getMethod() + " " + request.getRequestURI());
         return new ResponseEntity<>(clubService.modifyClub(id, newClubRequest), HttpStatus.OK);
     }
 }

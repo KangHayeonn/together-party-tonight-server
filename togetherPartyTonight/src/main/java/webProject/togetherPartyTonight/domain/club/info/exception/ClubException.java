@@ -5,8 +5,11 @@ import lombok.Getter;
 import webProject.togetherPartyTonight.global.error.ErrorCode;
 
 @Getter
-@AllArgsConstructor
 public class ClubException extends RuntimeException{
     private ErrorCode errorCode;
 
+    public ClubException(ErrorCode errorCode) {
+        super(errorCode.getMessage());
+        this.errorCode= errorCode;
+    }
 }

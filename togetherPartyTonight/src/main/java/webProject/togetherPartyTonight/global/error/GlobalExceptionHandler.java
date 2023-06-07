@@ -1,6 +1,8 @@
 package webProject.togetherPartyTonight.global.error;
 
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -18,16 +20,17 @@ public class GlobalExceptionHandler {
      * @param e 예외 종류
      * @return 정형화된 ErrorResponse
      */
+    Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> memberException (UserException e) {
-        log.error("user exception : {}",e.getErrorCode().getMessage());
+        logger.error("user exception : {}",e.getErrorCode().getMessage());
         return ErrorResponse.toResponse(e.getErrorCode());
     }
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> clubException (ClubException e) {
-        log.error("club exception : {}",e.getErrorCode().getMessage());
+        logger.error("club exception : {}",e.getErrorCode().getMessage());
         return ErrorResponse.toResponse(e.getErrorCode());
     }
 }

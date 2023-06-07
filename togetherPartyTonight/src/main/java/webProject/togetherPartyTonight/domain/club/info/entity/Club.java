@@ -1,9 +1,8 @@
 package webProject.togetherPartyTonight.domain.club.info.entity;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import webProject.togetherPartyTonight.domain.club.info.dto.NewClubRequest;
+import lombok.*;
+import org.springframework.data.geo.Point;
+import webProject.togetherPartyTonight.domain.club.info.dto.ClubRequestDto;
 
 import javax.persistence.*;
 import java.awt.*;
@@ -13,12 +12,14 @@ import java.time.LocalDateTime;
 @Setter
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Club {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "master_id", nullable = false)
+    @Column(name = "master_id")//, nullable = false)
     //FK
     private Long masterId;
 
@@ -37,33 +38,34 @@ public class Club {
     @Column(name = "club_details", nullable = false)
     private String clubDetails;
 
-    @Column(name = "club_tags",columnDefinition = "json", nullable = false)
+    @Column(name = "club_tags",columnDefinition = "json")// nullable = false)
     private String clubTags;
 
-    @Column(name = "club_point", columnDefinition = "point", nullable = false)
-    private Point clubPoint;
+//    @Column(name = "club_point", columnDefinition = "point") // nullable = false)
+//    private Point clubPoint;
 
     @Column(name = "club_state", nullable = false)
     private String clubState;
 
-    @Column(name = "created_date", nullable = false)
+    @Column(name = "created_date") //, nullable = false)
     private LocalDateTime createdDate;
 
-    @Column (name="modified_date", nullable = false)
+    @Column (name="modified_date") //, nullable = false)
     private LocalDateTime modifiedDate;
 
-    public Club (NewClubRequest clubRequest) {
-        //this.masterId =
+    public Club toEntity (ClubRequestDto clubRequest) {
         this.name= clubRequest.getName();
         this.clubState=clubRequest.getClubState();
-        //this.clubPoint=
         this.clubCategory=clubRequest.getClubCategory();
         this.clubDetails= clubRequest.getClubDetails();
-        //this.clubTags = clubRequest.getClubTags();
         this.maximum = clubRequest.getMaximum();
         this.minimum= clubRequest.getMinimum();
         this.createdDate= LocalDateTime.now();
         this.modifiedDate= LocalDateTime.now();
+        //this.clubTags = clubRequest.getClubTags();
+        //this.clubPoint=
+        //this.masterId =
+        return this;
     }
 
 

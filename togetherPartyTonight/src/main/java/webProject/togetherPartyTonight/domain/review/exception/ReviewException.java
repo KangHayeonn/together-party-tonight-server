@@ -5,7 +5,11 @@ import lombok.Getter;
 import webProject.togetherPartyTonight.global.error.ErrorCode;
 
 @Getter
-@AllArgsConstructor
 public class ReviewException extends RuntimeException{
     private ErrorCode errorCode;
+
+    public ReviewException(ErrorCode errorCode) {
+        super(errorCode.getMessage());
+        this.errorCode= errorCode;
+    }
 }
