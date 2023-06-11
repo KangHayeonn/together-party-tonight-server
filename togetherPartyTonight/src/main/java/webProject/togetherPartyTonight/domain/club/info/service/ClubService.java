@@ -20,14 +20,11 @@ public class ClubService {
     private final ClubRepository clubRepository;
     public void addClub (ClubRequestDto clubRequest) {
         Club club = new Club(clubRequest);
-        System.out.println("club.getClubPoint() = " + club.getClubPoint());
-        System.out.println("club.getAddress() = " + club.getAddress());
-        System.out.println("clubRequest = " + club.getClubTags());
-//        try {
+        try {
             clubRepository.save(club);
-//        } catch (Exception e) {
-//            throw new ClubException(ErrorCode.INTERNAL_SERVER_ERROR);
-//        }
+        } catch (Exception e) {
+            throw new ClubException(ErrorCode.INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
