@@ -20,6 +20,7 @@ public enum ErrorCode {
     ALREADY_EXIST (HttpStatus.CONFLICT,"같은 데이터가 이미 존재합니다"),
 
     //500 INTERNAL_SERVER_ERROR
+    INTERNAL_SERVER_ERROR (HttpStatus.INTERNAL_SERVER_ERROR,"서버 내부 에러입니다"),
 
     //403 FORBIDDEN
     FORBIDDEN(HttpStatus.FORBIDDEN,"해당 데이터에 대한 권한이 없습니다"),

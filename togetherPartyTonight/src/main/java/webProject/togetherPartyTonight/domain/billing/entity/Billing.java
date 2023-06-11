@@ -16,7 +16,7 @@ import javax.persistence.Id;
 public class Billing {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
 }

@@ -1,11 +1,15 @@
 package webProject.togetherPartyTonight.domain.club.info.entity;
 
+import com.vividsolutions.jts.geom.Point;
 import lombok.*;
-import org.springframework.data.geo.Point;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 import webProject.togetherPartyTonight.domain.club.info.dto.ClubRequestDto;
+import webProject.togetherPartyTonight.global.common.BaseEntity;
 
 import javax.persistence.*;
 import java.awt.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -14,58 +18,60 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Club {
+@DynamicInsert
+public class Club extends BaseEntity {
     @Id
+    @Column(name = "club_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long clubId;
 
-    @Column(name = "master_id")//, nullable = false)
-    //FK
+    @Column(name = "club_master_id", nullable = false)
+//    //FK
     private Long masterId;
 
-    @Column(nullable = false)
-    private String name;
+    @Column(name="club_name", nullable = false, length = 11)
+    private String clubName;
 
-    @Column(name = "club_category" , nullable = false)
+    @Column(name = "club_category" , nullable = false, length = 255)
     private String clubCategory;
 
-    @Column(nullable = false)
-    private Integer minimum;
+    @Column(name="club_minimum", nullable = false, length = 11)
+    private Integer clubMinimum;
 
-    @Column(nullable = false)
-    private Integer maximum;
+    @Column(name = "club_maximum",nullable = false, length = 11)
+    private Integer clubMaximum;
 
-    @Column(name = "club_details", nullable = false)
-    private String clubDetails;
+    @Column(name = "club_content", nullable = false)
+    private String clubContent;
 
-    @Column(name = "club_tags",columnDefinition = "json")// nullable = false)
+    @Column(name = "club_tags", nullable = false)
     private String clubTags;
 
-//    @Column(name = "club_point", columnDefinition = "point") // nullable = false)
-//    private Point clubPoint;
+    @Column(name = "club_point", columnDefinition = "GEOMETRY")//,  nullable = false)
+    private Point clubPoint;
 
-    @Column(name = "club_state", nullable = false)
-    private String clubState;
+    @Column(name = "address", nullable = false)
+    private String address;
 
-    @Column(name = "created_date") //, nullable = false)
-    private LocalDateTime createdDate;
+    @Column(name = "club_meeting_date")// nullable = false)
+    private LocalDate meetingDate;
 
-    @Column (name="modified_date") //, nullable = false)
-    private LocalDateTime modifiedDate;
+    @Column(name = "club_state", nullable = false, length = 1, columnDefinition = "tinyint")
+    private Boolean clubState; //true: 모집중, false: 모집 완료
 
-    public Club toEntity (ClubRequestDto clubRequest) {
-        this.name= clubRequest.getName();
-        this.clubState=clubRequest.getClubState();
+
+    public Club (ClubRequestDto clubRequest) {
+        this.clubName=clubRequest.getClubName();
         this.clubCategory=clubRequest.getClubCategory();
-        this.clubDetails= clubRequest.getClubDetails();
-        this.maximum = clubRequest.getMaximum();
-        this.minimum= clubRequest.getMinimum();
-        this.createdDate= LocalDateTime.now();
-        this.modifiedDate= LocalDateTime.now();
-        //this.clubTags = clubRequest.getClubTags();
-        //this.clubPoint=
-        //this.masterId =
-        return this;
+        this.clubContent= clubRequest.getClubContent();
+        this.clubMaximum = clubRequest.getClubMaximum();
+        this.clubMinimum= clubRequest.getClubMinimum();
+        this.clubTags = clubRequest.getClubTags();
+        //this.clubPoint= new Point(clubRequest.getLatitude(), clubRequest.getLongitude());
+        this.address= clubRequest.getAddress();
+        this.meetingDate= clubRequest.getMeetingDate();
+        this.masterId = clubRequest.getUserId();
+        this.clubState=true;
     }
 
 

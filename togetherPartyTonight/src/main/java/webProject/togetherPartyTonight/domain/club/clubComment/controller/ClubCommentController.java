@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/club/comment")
+@RequestMapping("/clubs/comment")
 @Slf4j
 public class ClubCommentController {
 }

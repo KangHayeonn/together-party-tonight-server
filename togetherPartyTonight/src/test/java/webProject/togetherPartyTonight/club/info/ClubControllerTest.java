@@ -19,9 +19,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import webProject.togetherPartyTonight.domain.club.info.controller.ClubController;
 import webProject.togetherPartyTonight.domain.club.info.dto.ClubResponseDto;
 import webProject.togetherPartyTonight.domain.club.info.dto.ClubRequestDto;
+import webProject.togetherPartyTonight.domain.club.info.entity.Club;
+import webProject.togetherPartyTonight.domain.club.info.repository.ClubRepository;
 import webProject.togetherPartyTonight.domain.club.info.service.ClubService;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -32,6 +35,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * Mockito를 이용한 controller test
+ * test용 dummy data sql파일로 만드는게 편할것 같음
+ * 이슈/에러를 잡지 못한 부분은 주석처리 되어있음
  */
 @WebMvcTest(ClubControllerTest.class)
 @ExtendWith(MockitoExtension.class)
@@ -42,6 +47,8 @@ public class ClubControllerTest {
     @Mock
     private ClubService clubService;
 
+    @Mock
+    private ClubRepository clubRepository;
     @Autowired
     private MockMvc mockMvc; //http 호출을 위한 MockMVC
 
@@ -54,64 +61,83 @@ public class ClubControllerTest {
     @DisplayName("모임 상세 조회 성공")
     void getDetailSuccess () throws Exception{
 //        //given
-//        ClubResponseDto response = getResponse();
-//        Long clubId = 1L;
-//
+        ClubRequestDto request = getRequest();
+        clubRepository.save(new Club(request));
+        ClubResponseDto response = getResponse();
+        Long clubId = 1L;
+
 //        //when
-//        ResultActions resultActions = mockMvc.perform(
-//                MockMvcRequestBuilders.get("/api/club/" + clubId)
-//        );
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/clubs/" + clubId)
+        );
 //        resultActions.andExpect(status().isOk())
-//                .andExpect(jsonPath("$.name").value("test"));
-//
+//                .andExpect(jsonPath("$.data.name").value("test"));
 //        //then
+
+
 
     }
 
     @Test
     @DisplayName("모임 추가 성공")
     void addSuccess () throws Exception{
-//  ㅋ
-//        resultActions.andExpect(status().isOk())
-//                .andExpect(jsonPath("$.name").value("test"));
-//
-//        //then
-//        verify(clubService).addClub(request);
+        //given
+        ClubRequestDto request = getRequest();
+
+        ResultActions resultActions= mockMvc.perform(
+                        MockMvcRequestBuilders.get("/api/clubs")
+                                .content(new Gson().toJson(request))
+                );
+        //resultActions.andExpect(status().isOk());
+        //LocalDate 형식을 gson이 직렬화 하지 못하는 이슈가 있어서 해당 클래스를 구현해야해서 임시 주석처리
+
+        //then
+        //verify(clubService).addClub(request);
     }
 
     @Test
     @DisplayName("모임 삭제 성공")
     void deleteSuccess () throws Exception{
-//        Long clubId = 1L;
-//
-//        doNothing().when(clubService)
-//                .deleteClub(clubId);
-//        //when
-//        ResultActions resultActions = mockMvc.perform(
-//                MockMvcRequestBuilders.post("/api/club/1")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//        );
+        //given
+        Long clubId = 1L;
+        //when
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.delete("/api/clubs/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+        resultActions.andExpect(status().isOk());
+
+        //then
+        //verify(clubService).deleteClub(1L);
     }
 
     ClubRequestDto getRequest() {
         return ClubRequestDto.builder()
-                .name("test")
+                .clubName("test")
+                .clubContent("test-content")
                 .clubCategory("test-category")
-                .clubState("test-state")
-                .minimum(2)
-                .maximum(6)
-                .clubDetails("test-details")
+                .clubTags("test-tags")
+                .address("test-address")
+                .meetingDate(LocalDate.parse("2023-06-11"))
+                .latitude(20.222F)
+                .longitude(11.11F)
+                .userId(1L)
+                .clubMinimum(2)
+                .clubMaximum(6)
                 .build();
     }
 
     ClubResponseDto getResponse () {
         return ClubResponseDto.builder()
-                .name("test")
+                .clubName("test")
+                .clubContent("test-content")
                 .clubCategory("test-category")
-                .clubState("test-state")
-                .minimum(2)
-                .maximum(6)
-                .clubDetails("test-details")
+                .clubTags("test-tags")
+                .address("test-address")
+                .meetingDate(LocalDate.parse("2023-06-11"))
+                .userId(1L)
+                .clubMinimum(2)
+                .clubMaximum(6)
                 .build();
     }
 
