@@ -7,7 +7,7 @@ import webProject.togetherPartyTonight.domain.member.service.MemberService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/members")
+@RequestMapping("/members")
 @Slf4j
 public class MemberController {
     private final MemberService memberService;

@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/clubs")
+@RequestMapping("/clubs")
 @Slf4j
 @Api(tags = {"모임 기본 CRUD API"})
 public class ClubController {

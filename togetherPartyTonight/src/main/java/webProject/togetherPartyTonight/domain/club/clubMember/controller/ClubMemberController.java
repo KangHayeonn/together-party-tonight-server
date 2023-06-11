@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/club/member")
+@RequestMapping("/clubs/member")
 @Slf4j
 public class ClubMemberController {
 }
