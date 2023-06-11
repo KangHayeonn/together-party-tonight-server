@@ -8,7 +8,7 @@ import webProject.togetherPartyTonight.domain.review.service.ReviewService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/review")
+@RequestMapping("/api/reviews")
 @Slf4j
 public class ReviewController {
     private final ReviewService reviewService;

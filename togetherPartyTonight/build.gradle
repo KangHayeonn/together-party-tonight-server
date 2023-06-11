@@ -32,6 +32,15 @@ dependencies {
 	//테스트용 h2 db
 	implementation 'com.h2database:h2:2.1.214'
 	implementation group: 'org.hibernate', name: 'hibernate-spatial', version: '5.1.0.Final'
+
+	implementation group: 'org.springframework.security', name: 'spring-security-core', version: '6.0.1'
+	implementation "io.jsonwebtoken:jjwt:0.9.1"
+
+	implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
+	implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+
+
+
 }
 
 tasks.named('test') {

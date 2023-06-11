@@ -15,11 +15,11 @@ import webProject.togetherPartyTonight.domain.club.info.repository.ClubRepositor
 import webProject.togetherPartyTonight.domain.club.info.service.ClubService;
 import webProject.togetherPartyTonight.global.error.ErrorCode;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.*;
 
@@ -36,15 +36,16 @@ public class ClubServiceTest {
     @DisplayName("모임 추가 성공")
     void addClubSuccess () {
 //        //given
-//        ClubRequestDto request = getRequest();
-//        Club requestEntity = new Club().toEntity(request);
-//        doReturn(new ClubResponseDto().toDto(getResponse())).when(clubRepository).save(requestEntity);
-//
+        ClubRequestDto request = getRequest();
+        Club requestEntity = new Club(request);
+        Club response = getResponse();
+        doReturn(response).when(clubRepository).save(any(requestEntity.getClass()));
+
 //        //when
-//        ClubResponseDto clubResponseDto = clubService.addClub(any(request.getClass()));
-//
+        clubService.addClub(request);
+
 //        //then
-//        assertThat(request.getName().equals(clubResponseDto.getName()));
+        assertThatNoException();
 //        /*
 //        assertThat (...)
 //         */
@@ -60,7 +61,7 @@ public class ClubServiceTest {
         //when
         ClubResponseDto responseDto = clubService.getClub(clubId);
         //then
-        assertThat(responseDto.getName().equals("test"));
+        assertThat(responseDto.getClubName().equals("test"));
         /*
         assertThat ...
          */
@@ -98,28 +99,32 @@ public class ClubServiceTest {
 
     ClubRequestDto getRequest () {
         return ClubRequestDto.builder()
-                .name("test")
-                .clubDetails("test-details")
+                .clubName("test")
+                .clubContent("test-content")
                 .clubCategory("test-category")
-                .clubState("test-state")
-//                .clubPoint(new Point(10,20))
-                .maximum(6)
-                .minimum(2)
-                .createdDate(LocalDateTime.now())
+                .clubTags("test-tags")
+                .address("test-address")
+                .meetingDate(LocalDate.parse("2023-06-11"))
+                .userId(1L)
+                .clubMinimum(2)
+                .clubMaximum(6)
                 .build();
     }
 
     Club getResponse () {
         return Club.builder()
-                .id(1L)
-                .name("test")
-                .clubDetails("test-details")
+                .clubName("test")
+                .clubId(1L)
+                .clubPoint(null)
+                .clubContent("test-content")
                 .clubCategory("test-category")
-                .clubState("test-state")
-//                .clubPoint(new Point(10,20))
-                .maximum(6)
-                .minimum(2)
-                .createdDate(LocalDateTime.now())
+                .clubTags("test-tags")
+                .address("test-address")
+                .meetingDate(LocalDate.parse("2023-06-11"))
+                .masterId(2L)
+                .clubMinimum(2)
+                .clubMaximum(6)
+                .clubState(true)
                 .build();
     }
 

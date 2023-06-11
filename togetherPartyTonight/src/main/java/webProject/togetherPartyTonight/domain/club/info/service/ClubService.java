@@ -1,6 +1,8 @@
 package webProject.togetherPartyTonight.domain.club.info.service;
 
 import lombok.RequiredArgsConstructor;
+import org.hibernate.HibernateException;
+import org.hibernate.PropertyValueException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import webProject.togetherPartyTonight.domain.club.info.dto.ClubResponseDto;
@@ -10,14 +12,22 @@ import webProject.togetherPartyTonight.domain.club.info.exception.ClubException;
 import webProject.togetherPartyTonight.domain.club.info.repository.ClubRepository;
 import webProject.togetherPartyTonight.global.error.ErrorCode;
 
+import java.util.Iterator;
+
 @Service
 @RequiredArgsConstructor
 public class ClubService {
     private final ClubRepository clubRepository;
-    public ClubResponseDto addClub (ClubRequestDto clubRequest) {
-        Club club = new Club().toEntity(clubRequest);
-        Club save = clubRepository.save(club);
-        return new ClubResponseDto().toDto(save);
+    public void addClub (ClubRequestDto clubRequest) {
+        Club club = new Club(clubRequest);
+        System.out.println("club.getClubPoint() = " + club.getClubPoint());
+        System.out.println("club.getAddress() = " + club.getAddress());
+        System.out.println("clubRequest = " + club.getClubTags());
+//        try {
+            clubRepository.save(club);
+//        } catch (Exception e) {
+//            throw new ClubException(ErrorCode.INTERNAL_SERVER_ERROR);
+//        }
     }
 
     /**
