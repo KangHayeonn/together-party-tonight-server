@@ -5,15 +5,19 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ develop ]
+    paths:
+      - "./togetherPartyTonight/**"
 
 env:
   S3_BUCKET_NAME: topato-github-actions-s3-bucket
-  working-directory: ./togetherPartyTonight
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory:
+          - ./togetherPartyTonight
 
     steps:
       - uses: actions/checkout@v3
@@ -26,35 +30,28 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
-        working-directory: ${{ env.working-directory }}
 
       - name: Build with Gradle
         run: ./gradlew clean build -x test
-        working-directory: ${{ env.working-directory }}
       # 디렉토리 생성
       - name: Make Directory
         run: mkdir -p deploy
-        working-directory: ${{ env.working-directory }}
 
       # Jar 파일 복사
       - name: Copy Jar
         run: cp ./build/libs/*.jar ./deploy
-        working-directory: ${{ env.working-directory }}
 
       # appspec.yml 파일 복사
       - name: Copy appspec.yml
         run: cp appspec.yml ./deploy
-        working-directory: ${{ env.working-directory }}
 
       # script files 복사
       - name: Copy script
         run: cp ./scripts/*.sh ./deploy
-        working-directory: ${{ env.working-directory }}
 
       - name: Make zip file
         run: zip -r ./topato.zip ./deploy
         shell: bash
-        working-directory: ${{ env.working-directory }}
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -65,7 +62,6 @@ jobs:
 
       - name: Upload to S3
         run: aws s3 cp --region ap-northeast-2 ./topato.zip s3://$S3_BUCKET_NAME/
-        working-directory: ${{ env.working-directory }}
 
       # Deploy
       - name: Deploy
