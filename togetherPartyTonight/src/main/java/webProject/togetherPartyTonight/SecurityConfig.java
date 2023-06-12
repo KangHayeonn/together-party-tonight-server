@@ -9,7 +9,8 @@ public class SecurityConfig {
 
 
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.formLogin().disable();
+        http.formLogin().disable()
+                .httpBasic().disable();
         http.authorizeRequests().anyRequest().permitAll();
 
         return http.build();
