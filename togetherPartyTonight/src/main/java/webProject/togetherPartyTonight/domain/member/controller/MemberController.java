@@ -11,5 +11,6 @@ import webProject.togetherPartyTonight.domain.member.service.MemberService;
 @Slf4j
 public class MemberController {
     private final MemberService memberService;
+    
 
 }
