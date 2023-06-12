@@ -5,7 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4b2457fc-19d2-44e8-b6ec-db5804e6fc4d" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/togetherPartyTonight/src/main/java/webProject/togetherPartyTonight/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/togetherPartyTonight/src/main/java/webProject/togetherPartyTonight/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/togetherPartyTonight/src/main/java/webProject/togetherPartyTonight/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/togetherPartyTonight/src/main/java/webProject/togetherPartyTonight/test/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/togetherPartyTonight/src/main/java/webProject/togetherPartyTonight/TestController.java" beforeDir="false" afterPath="$PROJECT_DIR$/togetherPartyTonight/src/main/java/webProject/togetherPartyTonight/test/TestController.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -83,7 +84,7 @@
       <workItem from="1686542287461" duration="46000" />
       <workItem from="1686545189241" duration="1949000" />
       <workItem from="1686557256036" duration="1426000" />
-      <workItem from="1686561858891" duration="52000" />
+      <workItem from="1686561858891" duration="719000" />
     </task>
     <servers />
   </component>

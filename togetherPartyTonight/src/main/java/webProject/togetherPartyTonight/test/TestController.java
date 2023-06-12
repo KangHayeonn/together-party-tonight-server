@@ -1,4 +1,4 @@
-package webProject.togetherPartyTonight;
+package webProject.togetherPartyTonight.test;
 
 
 import org.springframework.http.HttpStatus;
