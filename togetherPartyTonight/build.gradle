@@ -40,8 +40,8 @@ dependencies {
 	implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
 	implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
 
-
-
+	//소켓 추가
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 }
 
 tasks.named('test') {
