@@ -1,14 +1,12 @@
 package webProject.togetherPartyTonight.club.info;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.geo.Point;
+import org.springframework.transaction.annotation.Transactional;
 import webProject.togetherPartyTonight.domain.club.info.entity.Club;
 import webProject.togetherPartyTonight.domain.club.info.repository.ClubRepository;
 
@@ -28,13 +26,13 @@ public class ClubRepositoryTest {
     @Autowired
     TestEntityManager testEntityManager;
 
-    EntityManager em;
 
     @BeforeEach
     void beforeEach () {
-        em = testEntityManager.getEntityManager();
-        clubRepository.deleteAll();
-        em.createNativeQuery("ALTER TABLE CLUB AUTO_INCREMENT=1;");
+        EntityManager em = testEntityManager.getEntityManager();
+        //각 테스트 실행 전에 auto generate되는 PK값을 1로 초기화
+        em.createNativeQuery("ALTER TABLE CLUB ALTER COLUMN club_id RESTART WITH 1").executeUpdate();
+        //h2 설정이 mysql모드이지만 일부 호환되지 않는 문법이 있어서 auto_increment 초기화는 h2문법으로 작성
     }
 
     @DisplayName("모임 추가")
@@ -88,10 +86,10 @@ public class ClubRepositoryTest {
 
         //when
         Optional<Club> optionalClub = clubRepository.findById(clubId);
-
+        assertThat(optionalClub.isPresent());
         //then
-        save.getClubId();
-        //assertThat(optionalClub.get().getClubId().equals(save.getClubId()));
+
+        assertThat(optionalClub.get().getClubId().equals(save.getClubId()));
         //찾아온 데이터의 id값이 given의 id와 같은지 비교
     }
 
@@ -112,13 +110,10 @@ public class ClubRepositoryTest {
                 .clubMaximum(6)
                 .clubState(true)
                 .build();
-        Club save = clubRepository.save(club);
+        clubRepository.save(club);
 
-        assertThat(clubId.equals(save.getClubId()));
         //when
-        //clubRepository.deleteById(clubId);
-        //테스트 과정중 에러를 찾지 못해서 임시 주석처리합니다.
-        //단위 테스트는 통과하는데 전체 클래스 실행시 fail하는 이슈
+        clubRepository.deleteById(1L);
 
         //then
         Optional<Club> afterDelete = clubRepository.findById(clubId);
