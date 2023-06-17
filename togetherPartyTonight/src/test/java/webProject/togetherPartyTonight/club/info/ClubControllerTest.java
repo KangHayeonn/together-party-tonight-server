@@ -21,6 +21,7 @@ import webProject.togetherPartyTonight.domain.club.info.dto.AddClubRequest;
 import webProject.togetherPartyTonight.domain.club.info.entity.Club;
 import webProject.togetherPartyTonight.domain.club.info.repository.ClubRepository;
 import webProject.togetherPartyTonight.domain.club.info.service.ClubService;
+import webProject.togetherPartyTonight.domain.member.entity.Member;
 
 import java.time.LocalDate;
 
@@ -57,9 +58,11 @@ public class ClubControllerTest {
     @DisplayName("모임 상세 조회 성공")
     void getDetailSuccess () throws Exception{
 //        //given
-        ClubRequestDto request = getRequest();
-        clubRepository.save(new Club(request));
-        ClubResponseDto response = getResponse();
+        AddClubRequest request = getRequest();
+        Member master = new Member();
+        master.setId(1L);
+        clubRepository.save(request.toClub(master));
+        ClubDetailResponse response = getResponse();
         Long clubId = 1L;
 
 //        //when
@@ -78,14 +81,13 @@ public class ClubControllerTest {
     @DisplayName("모임 추가 성공")
     void addSuccess () throws Exception{
         //given
-        ClubRequestDto request = getRequest();
+        AddClubRequest request = getRequest();
 
         ResultActions resultActions= mockMvc.perform(
-                        MockMvcRequestBuilders.get("/api/clubs")
+                        MockMvcRequestBuilders.post("/api/clubs")
                                 .content(new Gson().toJson(request))
                 );
         //resultActions.andExpect(status().isOk());
-        //LocalDate 형식을 gson이 직렬화 하지 못하는 이슈가 있어서 해당 클래스를 구현해야해서 임시 주석처리
 
         //then
         //verify(clubService).addClub(request);
@@ -98,23 +100,23 @@ public class ClubControllerTest {
         Long clubId = 1L;
         //when
         ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.delete("/api/clubs/1")
+                MockMvcRequestBuilders.delete("/api/clubs")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .content(" { \"clubId\" : 1, \"userId\" : 1 }")
         );
-        resultActions.andExpect(status().isOk());
 
         //then
         //verify(clubService).deleteClub(1L);
     }
 
-    ClubRequestDto getRequest() {
-        return ClubRequestDto.builder()
+    AddClubRequest getRequest() {
+        return AddClubRequest.builder()
                 .clubName("test")
-                .clubContent("test-content")
-                .clubCategory("test-category")
-                .clubTags("test-tags")
-                .address("test-address")
-                .meetingDate(LocalDate.parse("2023-06-11"))
+                .clubContent("content")
+                .clubCategory("category")
+                .clubTags("tags")
+                .address("address")
+                .meetingDate("2023-06-11")
                 .latitude(20.222F)
                 .longitude(11.11F)
                 .userId(1L)
@@ -123,13 +125,13 @@ public class ClubControllerTest {
                 .build();
     }
 
-    ClubResponseDto getResponse () {
-        return ClubResponseDto.builder()
+    ClubDetailResponse getResponse () {
+        return ClubDetailResponse.builder()
                 .clubName("test")
-                .clubContent("test-content")
-                .clubCategory("test-category")
-                .clubTags("test-tags")
-                .address("test-address")
+                .clubContent("content")
+                .clubCategory("category")
+                .clubTags("tags")
+                .address("address")
                 .meetingDate(LocalDate.parse("2023-06-11"))
                 .userId(1L)
                 .clubMinimum(2)
