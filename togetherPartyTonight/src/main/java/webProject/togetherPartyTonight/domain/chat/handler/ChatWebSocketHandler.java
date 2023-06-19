@@ -33,9 +33,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         // 클라이언트로부터 메시지를 받았을 때 동작할 로직 구현
         String receivedMessage = message.getPayload();
-        webSocketService.broadcast(receivedMessage);
-
-
+        webSocketService.broadcastAll(receivedMessage, session.getId());
     }
 
     @Override

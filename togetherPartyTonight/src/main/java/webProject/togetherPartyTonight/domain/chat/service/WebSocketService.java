@@ -1,94 +1,68 @@
 package webProject.togetherPartyTonight.domain.chat.service;
 
 
-import lombok.extern.log4j.Log4j2;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-
+import webProject.togetherPartyTonight.global.common.service.RedisService;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
-
+/**
+ * 기본적으로 소켓 접속 시도 한 모든 소켓 접속에 대한 서비스를 반영합니다
+ * 추후 공통 도메인으로 이동을 고려하겠습니다
+ */
 @Service
 public class WebSocketService {
 
-    // Redis Template 연동
-    private RedisTemplate<String, Object> redisTemplate;
-    String sessionKeyName = "sessionKeyMap";
+    // Redis Service 사용
+    private RedisService redisService;
+
+    //추후 config 관리를 염두해두기.
+    private String sessionKeyName = "sessionKeyMap";
+    private ObjectMapper mapper = new ObjectMapper();
+
+    //멀티 쓰레드에서 사용 가능한 해시맵
+    private Map<String, WebSocketSession> sessionMap = new ConcurrentHashMap<>();
+
 
     @Autowired
-    public WebSocketService(RedisTemplate<String, Object> redisTemplate) {
-        this.redisTemplate = redisTemplate;
+    public WebSocketService(RedisService redisService) {
+        this.redisService = redisService;
     }
 
-    public void addMember(WebSocketSession session) {
+    public void addMember(WebSocketSession session) throws JsonProcessingException {
 
-        Object result = redisGet(sessionKeyName);
+        String sessionId = session.getId();
 
-        if (result == null) {
-            Map<WebSocketSession, String> webSocketSessionStringMap = new HashMap<>();
-            webSocketSessionStringMap.put(session, "");
-            addStringKeyWithMapValue(sessionKeyName, webSocketSessionStringMap);
-            return;
+        //sessionMap 에 없다면 삽입
+        if (!sessionMap.containsKey(sessionId)) {
+            sessionMap.put(sessionId, session);
         }
 
-        Map<WebSocketSession, String> resultMap = (Map<WebSocketSession, String>) result;
-        resultMap.put(session,"");
-        addStringKeyWithMapValue(sessionKeyName, resultMap);
+        //이 부분은 추후 로그인 시에 넣어줘도 됨. value 에 userId 를 넣어두면 좋을 것 같음.
+        redisService.addStringKeyWithMapKey(sessionKeyName, sessionId, null);
     }
 
     public void removeMember(WebSocketSession session) {
-
-        Object result = redisGet(sessionKeyName);
-
-        if (result == null) {
-            return;
-        }
-
-        Map<WebSocketSession, String> resultMap = (Map<WebSocketSession, String>) result;
-        resultMap.remove(session);
-        addStringKeyWithMapValue(sessionKeyName, resultMap);
+        redisService.removeStringKeyWithMapKey(sessionKeyName, session.getId());
     }
 
-    public void redisAddStringValue(String key, Object value){
-        ValueOperations<String, Object> stringStringValueOperations = redisTemplate.opsForValue();
-        stringStringValueOperations.set(key, value);
-    }
-
-
-    // redis에서 Map을 추가하는 방법.
-    public void addStringKeyWithMapValue(String key, Map<WebSocketSession, String> mapValue) {
-        HashOperations<String, Object, Object> hashOperations = redisTemplate.opsForHash();
-        hashOperations.putAll(key, mapValue);
-    }
-
-    public Object redisGet(String key) {
-        Optional<ValueOperations<String, Object>> stringObjectValueOperations = Optional.of(redisTemplate.opsForValue());
-        return stringObjectValueOperations.get().get(key);
-    }
-
-    public void broadcast(String receivedMessage) {
+    //모든 세션에 전체 발송
+    public void broadcastAll(String message, String sessionId) {
 
         // 받은 메시지를 다른 클라이언트들에게 전달
-
-        Object result = redisGet(sessionKeyName);
-
-        if (result == null) {
-            return;
-        }
-
-        Map<WebSocketSession, String> resultMap = (Map<WebSocketSession, String>)result;
-        resultMap.keySet().forEach(session-> {
+        sessionMap.forEach((key,value)-> {
             try {
-                session.sendMessage(new TextMessage("Echo: " + receivedMessage));
+                value.sendMessage(new TextMessage("sender :"+sessionId+" message: "+message));
             } catch (IOException e) {
-                    e.printStackTrace();
+                e.printStackTrace();
             }
         });
     }

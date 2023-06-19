@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import webProject.togetherPartyTonight.domain.chat.dto.RedisKeyValDto;
 import webProject.togetherPartyTonight.domain.chat.service.WebSocketService;
 
 @RestController
@@ -21,14 +20,5 @@ public class ChatController {
         this.webSocketService = webSocketService;
     }
 
-    @GetMapping("/key")
-    public Object getKey(@RequestParam String key) {
-        return webSocketService.redisGet(key);
-    }
 
-    @PostMapping("/key")
-    public String addKey(@RequestBody RedisKeyValDto redisKeyValDto) {
-        webSocketService.redisAddStringValue(redisKeyValDto.getKey(), redisKeyValDto.getValue());
-        return "Success";
-    }
 }
