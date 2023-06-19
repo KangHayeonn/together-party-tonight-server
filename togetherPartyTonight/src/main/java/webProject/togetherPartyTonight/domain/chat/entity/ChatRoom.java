@@ -34,9 +34,11 @@ public class ChatRoom extends BaseEntity {
     @OneToMany(mappedBy = "chatRoom")
     private List<Chat> chats = new ArrayList<>();
 
+    //chatMemberA 가 보는 채팅창 이름 . (초깃값 : chatMemberB 닉네임)
     @Column(length = 20, nullable = false)
-    private String charRoomAName;
+    private String chatRoomAName;
 
+    //chatMemberB 가 보는 채팅창 이름 . (초깃값 : chatMemberA 닉네임)
     @Column(length = 20, nullable = false)
-    private String charRoomBName;
+    private String chatRoomBName;
 }

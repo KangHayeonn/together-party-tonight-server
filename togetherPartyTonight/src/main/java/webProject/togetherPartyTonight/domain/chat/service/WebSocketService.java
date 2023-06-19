@@ -12,7 +12,6 @@ import webProject.togetherPartyTonight.global.common.service.RedisService;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Supplier;
 
 /**
  * 기본적으로 소켓 접속 시도 한 모든 소켓 접속에 대한 서비스를 반영합니다
@@ -30,7 +29,6 @@ public class WebSocketService {
 
     //멀티 쓰레드에서 사용 가능한 해시맵
     private Map<String, WebSocketSession> sessionMap = new ConcurrentHashMap<>();
-
 
     @Autowired
     public WebSocketService(RedisService redisService) {
@@ -60,7 +58,11 @@ public class WebSocketService {
         // 받은 메시지를 다른 클라이언트들에게 전달
         sessionMap.forEach((key,value)-> {
             try {
-                value.sendMessage(new TextMessage("sender :"+sessionId+" message: "+message));
+                if (!value.isOpen()) {
+                    removeMember(value);
+                } else {
+                    value.sendMessage(new TextMessage("sender :"+sessionId+", message: "+message));
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
