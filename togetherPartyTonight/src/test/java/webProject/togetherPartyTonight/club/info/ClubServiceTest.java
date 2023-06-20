@@ -41,7 +41,7 @@ public class ClubServiceTest {
         Member master = new Member();
         master.setId(1L);
 
-        Club requestEntity = request.toClub(master);
+//        Club requestEntity = request.toClub(master);
         Club response = getResponse();
 //        doReturn(response).when(clubRepository).save(any(requestEntity.getClass()));
 

