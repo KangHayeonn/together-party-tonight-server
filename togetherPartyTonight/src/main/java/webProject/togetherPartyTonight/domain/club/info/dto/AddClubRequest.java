@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.locationtech.jts.geom.Point;
 import org.springframework.lang.NonNull;
 import webProject.togetherPartyTonight.domain.club.info.entity.Club;
 import webProject.togetherPartyTonight.domain.member.entity.Member;
@@ -64,7 +65,7 @@ public class AddClubRequest {
     @NotEmpty
     private String meetingDate;
 
-    public Club toClub (Member master) {
+    public Club toClub (Member master, Point point) {
 
         return Club.builder()
                 .master(master)
@@ -75,7 +76,7 @@ public class AddClubRequest {
                 .clubTags(clubTags)
                 .address(address)
                 .meetingDate(LocalDate.parse(meetingDate))
-                .clubPoint(null)
+                .clubPoint(point)
                 .clubCategory(clubCategory)
                 .clubState(true) //모집중
                 .build();

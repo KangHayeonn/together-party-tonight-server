@@ -7,6 +7,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.springframework.dao.EmptyResultDataAccessException;
 
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import webProject.togetherPartyTonight.domain.club.info.dto.*;
 import webProject.togetherPartyTonight.domain.club.info.entity.ApprovalState;
@@ -39,24 +40,23 @@ public class ClubService {
     private final MemberRepository memberRepository;
 
 
-// TODO: 2023/06/18 meetingDate가 지나면 clubState=false, member수가 clubMaximum이 되면 clubState=false
+// TODO: 2023/06/18 meetingDate가 지나면 clubState=false
 
 
     @Transactional
     public void addClub (AddClubRequest clubRequest) {
         Member master = memberRepository.getReferenceById(clubRequest.getUserId());
         // TODO: 2023/06/17 JWT 내부 유저정보와 requestBody의 userId가 다르면 '권한 없음' exception
-        Club club = clubRequest.toClub(master);
-        try {
-            GeometryFactory gf = new GeometryFactory();
-            Point point = gf.createPoint(new Coordinate(clubRequest.getLatitude(), clubRequest.getLongitude()));
-            clubRepository.save(club);
-            clubRepository.savePoint(point, club.getClubId());
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new ClubException(ErrorCode.INTERNAL_SERVER_ERROR);
-        }
+        Point point = makePoint(clubRequest.getLatitude(), clubRequest.getLongitude());
+        //point 생성
+
+        Club club = clubRequest.toClub(master, point);
+        //엔티티 생성
+
+        clubRepository.save(club);
+        //저장
+
     }
 
     /**
@@ -77,6 +77,10 @@ public class ClubService {
             Long userId = requestDto.getUserId();
             // TODO: 2023/06/17 JWT 내부 유저정보와 requestBody의 userId가 다르면 '권한 없음' exception
             clubRepository.deleteById(clubId);
+
+            //단방향 매핑이기 때문에 cascade 옵션을 주지 않고, 개별로 club_member, club_signup 엔티티 삭제
+            clubMemberRepository.deleteByClubClubId(clubId);
+            clubSignupRepository.deleteByClubClubId(clubId);
         }catch (EmptyResultDataAccessException e) {
             throw new ClubException(ErrorCode.INVALID_CLUB_ID);
         }
@@ -98,14 +102,25 @@ public class ClubService {
         clubEntity.setClubName(clubDto.getClubName());
         clubEntity.setClubCategory(clubDto.getClubCategory());
         clubEntity.setClubContent(clubDto.getClubContent());
-        clubEntity.setClubMaximum(clubDto.getClubMaximum());
-        clubEntity.setClubMinimum(clubDto.getClubMinimum());
         clubEntity.setClubTags(clubDto.getClubTags());
         clubEntity.setAddress(clubDto.getAddress());
         clubEntity.setMeetingDate(LocalDate.parse(clubDto.getMeetingDate()));
+        clubEntity.setClubMinimum(clubDto.getClubMinimum());
 
-        // TODO: 2023/06/18  clubEntity.setClubPoint(point);
-        // clubEntity.setClubState(clubDto.getClubState());
+        if (clubMemberRepository.getMemberCnt(clubDto.getClubId()) > clubDto.getClubMaximum()) {
+            throw new ClubException(ErrorCode.INVALID_CLUB_MAXIMUM);
+        }
+        else if (clubMemberRepository.getMemberCnt(clubDto.getClubId()) == clubDto.getClubMaximum()) {
+            clubEntity.setClubMaximum(clubDto.getClubMaximum());
+            clubEntity.setClubState(false);
+        }
+        else{
+            clubEntity.setClubMaximum(clubDto.getClubMaximum());
+        }
+
+        Point point = makePoint(clubDto.getLatitude(), clubDto.getLongitude());
+        clubEntity.setClubPoint(point);
+
         return clubEntity;
 
     }
@@ -175,6 +190,8 @@ public class ClubService {
                 ClubMember clubMember = new ClubMember(clubSignup.getClub(), clubSignup.getClubMember());
                 clubMemberRepository.save(clubMember);
                 //ClubMember 에 추가
+                checkIfRecruitComplete(clubSignup);
+                //최대 모집 인원에 도달 했는지 확인하고 모집완료 상태로 변경
             } else {
                 clubSignup.setClubSignupApprovalState(ApprovalState.REFUSE);
                 //clubSignup 의 approvalState 를 REFUSE 로 변경
@@ -189,6 +206,7 @@ public class ClubService {
     }
 
     //모임별 신청한 사람 조회
+    //pending, refuse, approve 모두 보내고 있음
     public ReceivedApplicationList getRequestListPerClub (Long userId, Long clubId) {
         Club club = clubRepository.findById(clubId).orElseThrow(
                 () -> new ClubException(ErrorCode.INVALID_CLUB_ID)
@@ -210,7 +228,7 @@ public class ClubService {
                     .clubName(c.getClub().getClubName())
                     .clubId(c.getClub().getClubId())
                     .userId(c.getClubMember().getId())
-            //        .userName(c.getClubMember().getName())
+            //      nickname
                     .signupDate(c.getClubSignupDate().toString())
                     .approvalStatus(c.getClubSignupApprovalState().name())
                     .build();
@@ -221,6 +239,7 @@ public class ClubService {
     }
 
     //내가 신청한 모임 조회
+    //승인된거랑 거절된거 모두 보냄
     public MyAppliedClubList getAppliedList(Long userId) {
         memberRepository.findById(userId).orElseThrow(
                 () -> new MemberException(ErrorCode.INVALID_MEMBER_ID)
@@ -237,7 +256,7 @@ public class ClubService {
                     .clubName(c.getClub().getClubName())
                     .clubId(c.getClub().getClubId())
                     .userId(c.getClub().getMaster().getId())
-                    //        .userName(c.getClubMember().getName())
+                    //nickname
                     .signupDate(c.getClubSignupDate().toString())
                     .approvalStatus(c.getClubSignupApprovalState().name())
                     .build();
@@ -282,6 +301,20 @@ public class ClubService {
     public List<String> splitTags (String tags) {
         String[] split = tags.split(",");
         return Arrays.stream(split).collect(Collectors.toList());
+    }
+
+    public void checkIfRecruitComplete(ClubSignup clubSignup) {
+        //현재 승인된 모임 인원이 모집 최대 인원에 도달했는지 여부 반환
+        boolean res= false;
+        Club club = clubSignup.getClub();
+        Integer memberCnt = clubMemberRepository.getMemberCnt(club.getClubId()); //현재 승인된 인원
+        Integer maximum = club.getClubMaximum(); //모임의 최대인원
+        if (memberCnt==maximum) club.setClubState(false); //모임이 꽉 찼으면 모집완료 상태로 변경
+    }
+
+    public Point makePoint (Float latitude, Float longitude) {
+        GeometryFactory gf = new GeometryFactory();
+        return gf.createPoint(new Coordinate(latitude, longitude));
     }
 
 

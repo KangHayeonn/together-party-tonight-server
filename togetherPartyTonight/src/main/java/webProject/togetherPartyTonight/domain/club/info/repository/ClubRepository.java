@@ -15,13 +15,6 @@ import java.util.List;
 @Repository
 public interface ClubRepository extends JpaRepository<Club,Long> {
 
-    String insertPointQuery = "UPDATE club SET club_point = ST_GEOMFROMTEXT(:point, 4326) WHERE club_id=:clubId";
-
-    @Modifying
-    @Transactional
-    @Query(nativeQuery = true, value = insertPointQuery)
-    int savePoint(@Param(value = "point") Point point, @Param(value = "clubId") Long clubId);
-
     List<Club> findClubByMasterId (Long masterId);
 
 

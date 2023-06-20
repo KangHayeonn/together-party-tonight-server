@@ -9,11 +9,23 @@ import javax.persistence.Converter;
 
 @Converter
 public class PointConverter implements AttributeConverter<Point,String> {
+    /**
+     *
+     * @param attribute  the entity attribute value to be converted
+     * @return point형식을 WKT (String)으로 변환
+     */
     @Override
     public String convertToDatabaseColumn(Point attribute) {
         return attribute.toString();
     }
 
+
+    /**
+     *
+     * @param dbData  the data from the database column to be
+     *                converted
+     * @return dbData를 point형식으로 변환
+     */
     @Override
     public Point convertToEntityAttribute(String dbData) {
         GeometryFactory gf = new GeometryFactory();

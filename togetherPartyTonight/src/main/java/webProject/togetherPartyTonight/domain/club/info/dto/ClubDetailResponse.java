@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ClubDetailResponse {
-    private String nickname;
+    private String nickName;
     private Long userId;
     private String clubName;
     private String clubCategory;

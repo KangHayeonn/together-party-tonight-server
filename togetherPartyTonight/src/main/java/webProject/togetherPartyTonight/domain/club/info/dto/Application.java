@@ -14,7 +14,7 @@ public class Application {
     private Long clubId;
     private String clubName;
     private Long userId;
-    private String userName;
+    private String nickName;
     private String signupDate;
     private String approvalStatus;
 }
