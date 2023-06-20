@@ -10,7 +10,7 @@ import webProject.togetherPartyTonight.domain.chat.service.WebSocketService;
 
 public class ChatWebSocketHandler extends TextWebSocketHandler {
 
-    WebSocketService webSocketService;
+    private WebSocketService webSocketService;
 
     @Autowired
     public ChatWebSocketHandler(WebSocketService webSocketService) {
@@ -38,7 +38,6 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
-
         super.handleMessage(session, message);
     }
 }
