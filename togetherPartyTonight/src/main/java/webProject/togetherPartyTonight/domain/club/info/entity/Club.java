@@ -4,9 +4,7 @@ package webProject.togetherPartyTonight.domain.club.info.entity;
 import lombok.*;
 import org.hibernate.annotations.ColumnTransformer;
 import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.Type;
 import org.locationtech.jts.geom.Point;
-import webProject.togetherPartyTonight.domain.club.info.dto.AddClubRequest;
 import webProject.togetherPartyTonight.domain.member.entity.Member;
 import webProject.togetherPartyTonight.global.common.BaseEntity;
 import webProject.togetherPartyTonight.global.util.PointConverter;
@@ -36,7 +34,8 @@ public class Club extends BaseEntity {
     private String clubName;
 
     @Column(name = "club_category" , nullable = false, length = 255)
-    private String clubCategory;
+    @Enumerated(EnumType.STRING)
+    private ClubCategory clubCategory;
 
     @Column(name="club_minimum", nullable = false, length = 11)
     private Integer clubMinimum;

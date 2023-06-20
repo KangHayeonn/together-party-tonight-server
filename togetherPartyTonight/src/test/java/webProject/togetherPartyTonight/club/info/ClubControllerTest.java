@@ -129,7 +129,7 @@ public class ClubControllerTest {
         return ClubDetailResponse.builder()
                 .clubName("test")
                 .clubContent("content")
-                .clubCategory("category")
+                //.clubCategory("category")
                 .clubTags("tags")
                 .address("address")
                 .meetingDate(LocalDate.parse("2023-06-11"))

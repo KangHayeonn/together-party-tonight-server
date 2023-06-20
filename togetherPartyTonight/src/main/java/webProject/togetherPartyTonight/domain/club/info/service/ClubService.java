@@ -10,10 +10,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import webProject.togetherPartyTonight.domain.club.info.dto.*;
-import webProject.togetherPartyTonight.domain.club.info.entity.ApprovalState;
-import webProject.togetherPartyTonight.domain.club.info.entity.Club;
-import webProject.togetherPartyTonight.domain.club.info.entity.ClubMember;
-import webProject.togetherPartyTonight.domain.club.info.entity.ClubSignup;
+import webProject.togetherPartyTonight.domain.club.info.entity.*;
 import webProject.togetherPartyTonight.domain.club.info.exception.ClubException;
 import webProject.togetherPartyTonight.domain.club.info.repository.ClubMemberRepository;
 import webProject.togetherPartyTonight.domain.club.info.repository.ClubRepository;
@@ -40,7 +37,7 @@ public class ClubService {
     private final MemberRepository memberRepository;
 
 
-// TODO: 2023/06/18 meetingDate가 지나면 clubState=false
+// TODO: 2023/06/18 meetingDate가 지나면 clubState=false -> 스케줄러
 
 
     @Transactional
@@ -91,37 +88,27 @@ public class ClubService {
         Long clubId = clubRequest.getClubId();
         Long userId = clubRequest.getUserId();
         // TODO: 2023/06/17 JWT 내부 유저정보와 requestBody의 userId가 다르면 '권한 없음' exception
-        Club club = clubRepository.findById(clubId)
+        Club club = clubRepository.findByClubIdAndMasterId(clubId, userId)
                 .orElseThrow(()-> new ClubException(ErrorCode.INVALID_CLUB_ID));
         compareChange(clubRequest, club);
         return new ClubDetailResponse().toDto(club);
 
     }
 
-    public Club compareChange (ModifyClubRequest clubDto, Club clubEntity) {
-        clubEntity.setClubName(clubDto.getClubName());
-        clubEntity.setClubCategory(clubDto.getClubCategory());
-        clubEntity.setClubContent(clubDto.getClubContent());
-        clubEntity.setClubTags(clubDto.getClubTags());
-        clubEntity.setAddress(clubDto.getAddress());
-        clubEntity.setMeetingDate(LocalDate.parse(clubDto.getMeetingDate()));
-        clubEntity.setClubMinimum(clubDto.getClubMinimum());
-
+    @Transactional
+    public void compareChange (ModifyClubRequest clubDto, Club clubEntity) {
+        Point point = makePoint(clubDto.getLatitude(), clubDto.getLongitude());
+        Integer flag ;
         if (clubMemberRepository.getMemberCnt(clubDto.getClubId()) > clubDto.getClubMaximum()) {
-            throw new ClubException(ErrorCode.INVALID_CLUB_MAXIMUM);
+            flag = -1;
         }
         else if (clubMemberRepository.getMemberCnt(clubDto.getClubId()) == clubDto.getClubMaximum()) {
-            clubEntity.setClubMaximum(clubDto.getClubMaximum());
-            clubEntity.setClubState(false);
+            flag =0;
         }
         else{
-            clubEntity.setClubMaximum(clubDto.getClubMaximum());
+            flag =1;
         }
-
-        Point point = makePoint(clubDto.getLatitude(), clubDto.getLongitude());
-        clubEntity.setClubPoint(point);
-
-        return clubEntity;
+        clubDto.toEntity(clubEntity, flag, point);
 
     }
 
@@ -206,7 +193,7 @@ public class ClubService {
     }
 
     //모임별 신청한 사람 조회
-    //pending, refuse, approve 모두 보내고 있음
+    // TODO: 2023/06/21  pending, refuse, approve, kicked 모두 보내고 있음 -> pending, approve 만?
     public ReceivedApplicationList getRequestListPerClub (Long userId, Long clubId) {
         Club club = clubRepository.findById(clubId).orElseThrow(
                 () -> new ClubException(ErrorCode.INVALID_CLUB_ID)
@@ -315,6 +302,21 @@ public class ClubService {
     public Point makePoint (Float latitude, Float longitude) {
         GeometryFactory gf = new GeometryFactory();
         return gf.createPoint(new Coordinate(latitude, longitude));
+    }
+
+    public void kickout (DeleteMyAppliedRequest request) {
+        Long clubSignupId = request.getClubSignupId();
+        Long userId = request.getUserId(); //모임장 아이디
+        ClubSignup signup = clubSignupRepository.findById(clubSignupId).orElseThrow(
+                () -> new ClubException(ErrorCode.INVALID_CLUB_SIGNUP_ID)
+        );
+        if (signup.getClubMaster().getId() != userId) throw new ClubException(ErrorCode.INVALID_MEMBER_ID);
+
+        signup.setClubSignupApprovalState(ApprovalState.KICKOUT);
+        // 상태를 '강퇴'로 변경
+        clubMemberRepository.deleteByMemberId(signup.getClubMember().getId());
+        // 멤버 목록에서 삭제
+
     }
 
 

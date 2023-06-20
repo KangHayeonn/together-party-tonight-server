@@ -8,7 +8,8 @@ import lombok.RequiredArgsConstructor;
 public enum ApprovalState {
     APPROVE("approve"),
     PENDING ("pending"),
-    REFUSE ("refuse");
+    REFUSE ("refuse"),
+    KICKOUT("kickout");
 
     private String approvalState;
 

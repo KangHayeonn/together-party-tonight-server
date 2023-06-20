@@ -17,10 +17,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class DeleteAndSignupRequestDto {
 
-    @NotNull
+    @NotNull (message = "userId는 필수 입력 값입니다.")
     private Long userId ;
 
-    @NotNull
+    @NotNull (message = "clubId는 필수 입력 값입니다.")
     private Long clubId ;
 
     public ClubSignup toClubSignup (Club club, Member member, Member master) {

@@ -2,6 +2,7 @@ package webProject.togetherPartyTonight.domain.club.info.dto;
 
 import lombok.Builder;
 import lombok.Data;
+import webProject.togetherPartyTonight.domain.club.info.entity.ClubCategory;
 
 import java.util.List;
 
@@ -9,7 +10,7 @@ import java.util.List;
 @Builder
 public class MyOwnedClub {
     private String clubName;
-    private String clubCategory;
+    private ClubCategory clubCategory;
     private Integer clubMaximum;
     private Integer clubMinimum;
     private String clubContent;

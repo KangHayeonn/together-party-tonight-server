@@ -11,9 +11,9 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DeleteMyAppliedRequest {
-    @NotNull
+    @NotNull (message = "userId는 필수 입력 값입니다.")
     private Long userId;
 
-    @NotNull
+    @NotNull (message = "clubSignupId는 필수 입력 값입니다.")
     private Long clubSignupId;
 }

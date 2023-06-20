@@ -11,11 +11,14 @@ import webProject.togetherPartyTonight.domain.club.info.entity.Club;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ClubRepository extends JpaRepository<Club,Long> {
 
     List<Club> findClubByMasterId (Long masterId);
+
+    Optional<Club> findByClubIdAndMasterId(Long clubId, Long masterId);
 
 
 }

@@ -126,7 +126,7 @@ public class ClubServiceTest {
                 .clubId(1L)
                 .clubPoint(null)
                 .clubContent("content")
-                .clubCategory("category")
+//                .clubCategory("category")
                 .clubTags("tags")
                 .address("address")
                 .meetingDate(LocalDate.parse("2023-06-11"))

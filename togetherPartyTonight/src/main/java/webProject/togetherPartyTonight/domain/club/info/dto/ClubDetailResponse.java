@@ -2,6 +2,7 @@ package webProject.togetherPartyTonight.domain.club.info.dto;
 
 import lombok.*;
 import webProject.togetherPartyTonight.domain.club.info.entity.Club;
+import webProject.togetherPartyTonight.domain.club.info.entity.ClubCategory;
 
 import java.time.LocalDate;
 
@@ -13,7 +14,7 @@ public class ClubDetailResponse {
     private String nickName;
     private Long userId;
     private String clubName;
-    private String clubCategory;
+    private ClubCategory clubCategory;
     private Integer clubMaximum;
     private Integer clubMinimum;
     private String clubContent;

@@ -13,4 +13,6 @@ public interface ClubMemberRepository extends JpaRepository<ClubMember, Long> {
     int getMemberCnt (@Param(value = "clubId") Long clubId);
 
     void deleteByClubClubId (Long clubId);
+
+    void deleteByMemberId (Long memberId);
 }

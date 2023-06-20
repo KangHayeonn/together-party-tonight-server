@@ -12,10 +12,10 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class ApproveRequest {
 
-    @NotNull
+    @NotNull (message = "clubSignupId는 필수 입력 값입니다.")
     private Long clubSignupId;
 
-    @NotNull
+    @NotNull (message = "approve는 필수 입력 값입니다.")
     private Boolean approve;
 
 

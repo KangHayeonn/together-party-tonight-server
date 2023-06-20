@@ -32,7 +32,6 @@ public class ClubController {
     private final String SUCCESS = "true";
     private final String FAIL = "false";
 
-    Logger logger = LoggerFactory.getLogger(ClubController.class);
 
     /**
      * 모임 만들기 api
@@ -40,11 +39,7 @@ public class ClubController {
     @PostMapping("")
     @ApiOperation(value = "모임 만들기")
     public ResponseEntity<CommonResponse> addClub (@RequestBody @Valid AddClubRequest clubRequest, HttpServletRequest request) {
-        logger.info(request.getMethod()+" "+request.getRequestURI());
-
-        if (LocalDate.parse(clubRequest.getMeetingDate()).isBefore(LocalDate.now())) {
-            throw new ClubException(ErrorCode.INVALID_REQUEST_BODY_PARAMETER_DATA);
-        }
+        log.info("[{}] {}",request.getMethod(),request.getRequestURI());
 
         clubService.addClub(clubRequest);
         CommonResponse response = new CommonResponse(SUCCESS, HttpStatus.OK.value());
@@ -57,7 +52,7 @@ public class ClubController {
     @GetMapping("/{id}")
     @ApiOperation(value = "모임 상세 조회", response = ClubDetailResponse.class)
     public ResponseEntity<ResponseWithData> getClub(@PathVariable Long id, HttpServletRequest request) {
-        logger.info(request.getMethod()+" "+request.getRequestURI());
+        log.info("[{}] {}",request.getMethod(),request.getRequestURI());
         ClubDetailResponse responseDto = clubService.getClub(id);
         ResponseWithData response = new ResponseWithData(SUCCESS,HttpStatus.OK.value(),responseDto);
         return new ResponseEntity<>(response,HttpStatus.OK);
@@ -69,7 +64,7 @@ public class ClubController {
     @DeleteMapping("")
     @ApiOperation(value = "모임 삭제")
     public ResponseEntity<CommonResponse> deleteClub(@RequestBody @Valid  DeleteAndSignupRequestDto requestDto, HttpServletRequest request) {
-        logger.info(request.getMethod()+" "+request.getRequestURI());
+        log.info("[{}] {}",request.getMethod(),request.getRequestURI());
 
         clubService.deleteClub(requestDto);
         CommonResponse response = new CommonResponse(SUCCESS, HttpStatus.OK.value());
@@ -82,7 +77,7 @@ public class ClubController {
     @PutMapping("")
     @ApiOperation(value = "모임 변경")
     public  ResponseEntity<CommonResponse> modifyClub (@RequestBody @Valid ModifyClubRequest modifyRequest, HttpServletRequest request) {
-        logger.info(request.getMethod() + " " + request.getRequestURI());
+        log.info("[{}] {}",request.getMethod(),request.getRequestURI());
 
         clubService.modifyClub(modifyRequest);
         CommonResponse response = new CommonResponse(SUCCESS, HttpStatus.OK.value());
@@ -95,7 +90,7 @@ public class ClubController {
     @PostMapping("/signup")
     @ApiOperation(value = "모임 신청")
     public  ResponseEntity<CommonResponse> signup(@RequestBody @Valid DeleteAndSignupRequestDto requestDto, HttpServletRequest request) {
-        logger.info(request.getMethod() + " " + request.getRequestURI());
+        log.info("[{}] {}",request.getMethod(),request.getRequestURI());
 
         clubService.signup(requestDto);
         CommonResponse response = new CommonResponse(SUCCESS, HttpStatus.OK.value());
@@ -108,7 +103,7 @@ public class ClubController {
     @PostMapping("/approve")
     @ApiOperation(value = "모임 신청 응답(수락/거절)")
     public  ResponseEntity<CommonResponse> approve(@RequestBody @Valid ApproveRequest requestDto, HttpServletRequest request){
-        logger.info(request.getMethod() + " " + request.getRequestURI());
+        log.info("[{}] {}",request.getMethod(),request.getRequestURI());
 
         clubService.approve(requestDto);
         CommonResponse response = new CommonResponse(SUCCESS, HttpStatus.OK.value());
@@ -122,7 +117,7 @@ public class ClubController {
     @GetMapping("/applicationList")
     @ApiOperation(value = "모임별 신청 받은 내역 조회")
     public  ResponseEntity<ResponseWithData> getRequestList(@RequestParam("userId") Long userId, @RequestParam("clubId") Long clubId, HttpServletRequest request) {
-        logger.info(request.getMethod() + " " + request.getRequestURI());
+        log.info("[{}] {}",request.getMethod(),request.getRequestURI());
         ReceivedApplicationList requestListPerClub = clubService.getRequestListPerClub(userId, clubId);
         ResponseWithData response = new ResponseWithData(SUCCESS, HttpStatus.OK.value(),requestListPerClub);
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -134,7 +129,7 @@ public class ClubController {
     @GetMapping("/myApplied")
     @ApiOperation(value = "사용자별 신청한 모임 조회")
     public  ResponseEntity<ResponseWithData> getMyAppliedList(@RequestParam("userId") Long userId, HttpServletRequest request) {
-        logger.info(request.getMethod() + " " + request.getRequestURI());
+        log.info("[{}] {}",request.getMethod(),request.getRequestURI());
         MyAppliedClubList appliedList = clubService.getAppliedList(userId);
         ResponseWithData response = new ResponseWithData(SUCCESS, HttpStatus.OK.value(),appliedList);
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -146,7 +141,7 @@ public class ClubController {
     @GetMapping("/myOwned")
     @ApiOperation(value = "사용자별 생성한 모임 조회")
     public  ResponseEntity<ResponseWithData> getMyOwnedClub(@RequestParam("userId") Long userId, HttpServletRequest request) {
-        logger.info(request.getMethod() + " " + request.getRequestURI());
+        log.info("[{}] {}",request.getMethod(),request.getRequestURI());
         MyOwnedClubList ownedList = clubService.getOwnedList(userId);
         ResponseWithData response = new ResponseWithData(SUCCESS, HttpStatus.OK.value(),ownedList);
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -158,9 +153,21 @@ public class ClubController {
     @DeleteMapping("/myApplied")
     @ApiOperation(value = "모임 가입 신청 취소")
     public  ResponseEntity<CommonResponse> deleteAppliedClub(@RequestBody @Valid DeleteMyAppliedRequest requestDto, HttpServletRequest request) {
-        logger.info(request.getMethod() + " " + request.getRequestURI());
+        log.info("[{}] {}",request.getMethod(),request.getRequestURI());
 
         clubService.deleteAppliedClub(requestDto);
+        CommonResponse response = new CommonResponse(SUCCESS, HttpStatus.OK.value());
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    /**
+     * 강퇴하기 api
+     */
+    @PostMapping("/kickout")
+    @ApiOperation(value = "강퇴하기")
+    public ResponseEntity<CommonResponse> kickoutMember (@RequestBody @Valid DeleteMyAppliedRequest deleteMyAppliedRequest, HttpServletRequest request) {
+        log.info("[{}] {}",request.getMethod(),request.getRequestURI());
+        clubService.kickout(deleteMyAppliedRequest);
         CommonResponse response = new CommonResponse(SUCCESS, HttpStatus.OK.value());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

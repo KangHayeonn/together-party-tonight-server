@@ -13,8 +13,8 @@ public enum ErrorCode {
 
     //400 BAD_REQUEST
     INVALID_REQUEST_BODY_PARAMETER_TYPE(HttpStatus.BAD_REQUEST,"Request Body의 parameter type이 일치하지 않습니다"),
-    INVALID_REQUEST_BODY_PARAMETER_DATA(HttpStatus.BAD_REQUEST,"Request Body의 데이터 중 유효하지 않은 값이 있습니다. " +
-            "빠진 값이 있거나, 문자열 길이, 날짜 범위, 숫자 최대/최소값에 문제가 있을 수 있습니다."),
+    INVALID_MEETING_DATE(HttpStatus.BAD_REQUEST,"모임 날짜가 현재 날짜와 같거나 그 이후여야 합니다"),
+    DATE_PARSING_EXCEPTION(HttpStatus.BAD_REQUEST, "LocalDate형식에 맞게 보내야 합니다"),
     INVALID_CLUB_MAXIMUM(HttpStatus.BAD_REQUEST, "현재 멤버 수보다 모임 최대 인원이 적습니다. 더 높게 입력해야 합니다."),
 
     INVALID_CLUB_ID (HttpStatus.BAD_REQUEST,"유효하지 않은 모임 ID 입니다."),
