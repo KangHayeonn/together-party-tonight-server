@@ -1,6 +1,7 @@
 package webProject.togetherPartyTonight.domain.member.controller;
 
 
+import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import webProject.togetherPartyTonight.global.common.ResponseWithData;
 @RequiredArgsConstructor
 @RequestMapping("/members")
 @Slf4j
+@Api(tags = {"/members"})
 public class MemberController {
 
     private final MemberService memberService;

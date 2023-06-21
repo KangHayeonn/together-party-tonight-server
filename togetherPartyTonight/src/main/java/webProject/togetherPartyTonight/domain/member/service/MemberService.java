@@ -18,7 +18,7 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public MemberInfoDto findById(Long userId){
-        Member member = memberRepository.findById(userId).orElseThrow(() -> new MemberException(ErrorCode.NOT_FOUND));
+        Member member = memberRepository.findById(userId).orElseThrow(() -> new MemberException(ErrorCode.INVALID_MEMBER_ID));
         System.out.println("여기 오긴함?");
         return MemberInfoDto.from(member);
 

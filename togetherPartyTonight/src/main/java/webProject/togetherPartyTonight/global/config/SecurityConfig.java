@@ -39,6 +39,10 @@ public class SecurityConfig {
                 .authenticationEntryPoint(authenticationEntryPoint)
                 .and()
                 .authorizeRequests()
+                .mvcMatchers(
+                        "/v2/api-docs", "/swagger-resources/**", "/swagger-ui/index.html", "/swagger-ui.html","/webjars/**", "/swagger/**",   // swagger
+                        "/h2-console/**",
+                        "/favicon.ico").permitAll()
                 .mvcMatchers(HttpMethod.POST,"/members/login").permitAll()
                 .mvcMatchers(HttpMethod.POST,"/members/reissue").permitAll()
                 .anyRequest()

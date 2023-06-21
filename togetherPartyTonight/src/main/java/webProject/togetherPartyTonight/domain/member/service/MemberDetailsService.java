@@ -30,7 +30,7 @@ public class MemberDetailsService implements UserDetailsService {
             return new MemberDetails(member.get());
         }else {
             System.out.println(email);
-            throw new MemberException(ErrorCode.NOT_FOUND);
+            throw new MemberException(ErrorCode.INVALID_MEMBER_ID);
         }
 
 
