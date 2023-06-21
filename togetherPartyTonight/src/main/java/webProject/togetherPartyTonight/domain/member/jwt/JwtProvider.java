@@ -53,6 +53,7 @@ public class JwtProvider {
         Date now = new Date();
         Date expireDate = new Date(now.getTime() + refreshExpirationTime);
 
+
         String refreshToken = Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
@@ -65,15 +66,17 @@ public class JwtProvider {
     }
 
     /**
-     * 토큰으로부터 클레임을 만들고, 이를 통해 User 객체 생성해 Authentication 객체 반환
+     * 토큰으로부터 클레임을 만들고, 이를 통해 Authentication 객체 반환
      */
-    public Authentication getAuthentication(String accessToken) {
+    public Authentication getAuthentication(String token) {
         String userEmail = Jwts.parser().
                 setSigningKey(secretKey)
-                .parseClaimsJws(accessToken)
+                .parseClaimsJws(token)
                 .getBody().getSubject();
 
+
         log.info("액세스 토큰을 받고 이메일로 파싱했는지 확인 - {}",userEmail);
+
         return new UsernamePasswordAuthenticationToken(userEmail, "",null);
     }
 
@@ -82,23 +85,22 @@ public class JwtProvider {
      */
     public String resolveToken(HttpServletRequest req) {
         String bearerToken = req.getHeader("Authorization");
+
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
         return null;
     }
 
+
     /**
      * Access 토큰을 검증
      */
-    public boolean validateToken(String token){
+    public boolean validateToken(String token) throws ExpiredJwtException,SignatureException{
+
         try {
             Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return true;
-        } catch (MalformedJwtException e) {
-            log.info("잘못된 JWT 서명입니다.");
-        } catch (ExpiredJwtException e) {
-            log.info("만료된 JWT 토큰입니다.");
         } catch (UnsupportedJwtException e) {
             log.info("지원되지 않는 JWT 토큰입니다.");
         } catch (IllegalArgumentException e) {

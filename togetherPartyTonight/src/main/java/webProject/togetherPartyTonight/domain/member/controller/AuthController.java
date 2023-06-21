@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import webProject.togetherPartyTonight.domain.member.dto.LoginRequestDto;
-import webProject.togetherPartyTonight.domain.member.dto.RefreshTokenDto;
+import webProject.togetherPartyTonight.domain.member.dto.TokenDto;
 import webProject.togetherPartyTonight.domain.member.dto.TokenWithIdDto;
 import webProject.togetherPartyTonight.domain.member.service.AuthService;
 import webProject.togetherPartyTonight.global.common.ResponseWithData;
@@ -29,10 +29,12 @@ public class AuthController {
     }
 
     @PostMapping("/reissue")
-    public ResponseWithData requestReissue(@RequestBody RefreshTokenDto refreshTokenDto){
+    public ResponseWithData requestReissue(@RequestHeader("Authorization") String refreshToken){
 
+        System.out.println(refreshToken);
+        TokenDto tokenDto = authService.reissue(refreshToken.substring(7));
 
-        return null;
+        return new ResponseWithData("true",200,tokenDto);
     }
 
 

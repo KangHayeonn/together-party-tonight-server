@@ -26,11 +26,12 @@ public enum ErrorCode {
     FORBIDDEN(HttpStatus.FORBIDDEN,"해당 데이터에 대한 권한이 없습니다"),
 
     //401 UNAUTHORIZED
-    UNAUTHORIZED (HttpStatus.UNAUTHORIZED, "인증이 필요합니다");
+    UNAUTHORIZED (HttpStatus.UNAUTHORIZED, "인증이 필요합니다"),
 
     /**
      * 필요한 에러코드 작성
      */
+    EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "만료된 토큰입니다.");
 
 
     private final HttpStatus httpStatus;

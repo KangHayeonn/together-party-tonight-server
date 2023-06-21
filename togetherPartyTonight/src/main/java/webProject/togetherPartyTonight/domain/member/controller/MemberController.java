@@ -3,6 +3,8 @@ package webProject.togetherPartyTonight.domain.member.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,10 +22,11 @@ public class MemberController {
     private final MemberService memberService;
 
     @GetMapping("/{userId}")
-    public ResponseWithData requestInfo(@PathVariable Long userId){
+    public ResponseEntity<ResponseWithData> requestInfo(@PathVariable Long userId){
 
         MemberInfoDto memberInfoDto = memberService.findById(userId);
 
-        return new ResponseWithData("true",200,memberInfoDto);
+        return new ResponseEntity<>(new ResponseWithData("true",200,memberInfoDto),HttpStatus.OK);
     }
+
 }

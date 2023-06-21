@@ -1,6 +1,7 @@
 package webProject.togetherPartyTonight.domain.member.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -8,12 +9,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import webProject.togetherPartyTonight.domain.member.auth.MemberDetails;
 import webProject.togetherPartyTonight.domain.member.dto.LoginRequestDto;
-import webProject.togetherPartyTonight.domain.member.dto.RefreshTokenDto;
 import webProject.togetherPartyTonight.domain.member.dto.TokenDto;
 import webProject.togetherPartyTonight.domain.member.dto.TokenWithIdDto;
 import webProject.togetherPartyTonight.domain.member.jwt.JwtProvider;
 
 @Service
+@Slf4j
 @Transactional
 @RequiredArgsConstructor
 public class AuthService {
@@ -48,10 +49,16 @@ public class AuthService {
         return tokenWithIdDto;
     }
 
-    public TokenDto reissue(RefreshTokenDto refreshTokenDto){
+    public TokenDto reissue(String refreshToken){
         //토큰 재발급을 위한 로직
+        Authentication authentication = jwtProvider.getAuthentication(refreshToken);
+        log.info("pricipal정보 -{}",authentication.getName());
+        System.out.println(authentication.getPrincipal());
 
-        return null;
+        return new TokenDto(
+                jwtProvider.createAccessToken(authentication),
+                jwtProvider.createRefreshToken(authentication)
+        );
     }
 
 }
