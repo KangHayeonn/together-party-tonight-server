@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import webProject.togetherPartyTonight.domain.member.auth.MemberDetails;
 import webProject.togetherPartyTonight.domain.member.dto.LoginRequestDto;
+import webProject.togetherPartyTonight.domain.member.dto.RefreshTokenDto;
 import webProject.togetherPartyTonight.domain.member.dto.TokenDto;
 import webProject.togetherPartyTonight.domain.member.dto.TokenWithIdDto;
 import webProject.togetherPartyTonight.domain.member.jwt.JwtProvider;
@@ -49,10 +50,11 @@ public class AuthService {
         return tokenWithIdDto;
     }
 
-    public TokenDto reissue(String refreshToken){
+    public TokenDto reissue(RefreshTokenDto refreshTokenDto){
         //토큰 재발급을 위한 로직
-        Authentication authentication = jwtProvider.getAuthentication(refreshToken);
-        log.info("pricipal정보 -{}",authentication.getName());
+        System.out.println(refreshTokenDto.getRefreshToken());
+        Authentication authentication = jwtProvider.getAuthentication(refreshTokenDto.getRefreshToken().substring(7));
+        log.info("pricipal정보 - {}",authentication.getName());
         System.out.println(authentication.getPrincipal());
 
         return new TokenDto(

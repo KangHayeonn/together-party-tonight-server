@@ -22,7 +22,7 @@ public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
 
-    private final AuthenticationEntryPoint authenticationEntryPoint;
+    private final JwtAuthenticationEntryPoint authenticationEntryPoint;
 
 
     @Bean
@@ -34,14 +34,16 @@ public class SecurityConfig {
                 .logout().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // jwt token으로 인증 > 세션 필요없음
                 .and()
-                .authorizeRequests()
-                .mvcMatchers(HttpMethod.POST,"/members/login").permitAll()
-                .mvcMatchers(HttpMethod.GET,"/members/search/**").permitAll()
-                .anyRequest().authenticated() // Authentication 필요한 주소
-                .and()
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling()
-                .authenticationEntryPoint(authenticationEntryPoint);
+                .authenticationEntryPoint(authenticationEntryPoint)
+                .and()
+                .authorizeRequests()
+                .mvcMatchers(HttpMethod.POST,"/members/login").permitAll()
+                .mvcMatchers(HttpMethod.POST,"/members/reissue").permitAll()
+                .anyRequest()
+                .authenticated(); // Authentication 필요한 주소
+
 
         return http.build();
     }

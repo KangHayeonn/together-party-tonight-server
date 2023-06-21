@@ -19,22 +19,19 @@ import java.io.IOException;
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+        // filter에서 인증과 관련된 오류가 발생했을 때 여기를 거친다.
 
-        // 인증이 안된 사람이 뭔가를 요청할 때
-        if(request.getHeader("Authorization") == null){
-            response.setStatus(HttpStatus.SC_OK);
+        //프로젝트 응답 규약으로 200을 응답으로 주기로 했다.
+        response.setStatus(HttpStatus.SC_OK);
 
-            response.setCharacterEncoding("UTF-8");
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
-            // 실패 메시지 작성
-            ObjectMapper objectMapper = new ObjectMapper();
-            ErrorResponse errorResponse = new ErrorResponse("false", ErrorCode.UNAUTHORIZED);
+        // 실패 메시지 작성
+        ObjectMapper objectMapper = new ObjectMapper();
+        ErrorResponse errorResponse = new ErrorResponse("false", ErrorCode.UNAUTHORIZED);
 
-            String result = objectMapper.writeValueAsString(errorResponse);
-            response.getWriter().write(result);
-
-        }
-
+        String result = objectMapper.writeValueAsString(errorResponse);
+        response.getWriter().write(result);
     }
 }

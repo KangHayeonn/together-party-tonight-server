@@ -14,8 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import webProject.togetherPartyTonight.global.common.ErrorResponse;
 import webProject.togetherPartyTonight.global.error.ErrorCode;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
+import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -26,7 +25,6 @@ import java.io.IOException;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
-
 
     @Override
     protected void doFilterInternal(
@@ -75,10 +73,7 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
 
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        //로그인할때는 jwt가 발급된게 없으므로 이 경로에는 필터가 트리거되면 안된다.
-        //reissue상황에서도 jwt에 대한 오류때문에 reissue호출이기 때문에 filter에 트리거 되면안된다.
-        return request.getServletPath().equals("/members/login");
-    }
+
+
+
 }

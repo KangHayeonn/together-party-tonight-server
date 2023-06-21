@@ -2,8 +2,10 @@ package webProject.togetherPartyTonight.domain.member.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import webProject.togetherPartyTonight.domain.member.dto.LoginRequestDto;
+import webProject.togetherPartyTonight.domain.member.dto.RefreshTokenDto;
 import webProject.togetherPartyTonight.domain.member.dto.TokenDto;
 import webProject.togetherPartyTonight.domain.member.dto.TokenWithIdDto;
 import webProject.togetherPartyTonight.domain.member.service.AuthService;
@@ -29,10 +31,10 @@ public class AuthController {
     }
 
     @PostMapping("/reissue")
-    public ResponseWithData requestReissue(@RequestHeader("Authorization") String refreshToken){
+    public ResponseWithData requestReissue(@RequestBody RefreshTokenDto refreshTokenDto){
 
-        System.out.println(refreshToken);
-        TokenDto tokenDto = authService.reissue(refreshToken.substring(7));
+        
+        TokenDto tokenDto = authService.reissue(refreshTokenDto);
 
         return new ResponseWithData("true",200,tokenDto);
     }
