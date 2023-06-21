@@ -31,17 +31,26 @@ dependencies {
 	implementation group: 'com.google.code.gson', name: 'gson', version: '2.9.0'
 	//테스트용 h2 db
 	implementation 'com.h2database:h2:2.1.214'
-	implementation group: 'org.hibernate', name: 'hibernate-spatial', version: '5.1.0.Final'
+	implementation 'org.hibernate:hibernate-core:5.6.3.Final'
+	implementation group: 'org.locationtech.jts', name: 'jts-core', version: '1.16.1'
+	implementation group: 'org.hibernate', name: 'hibernate-spatial', version: '5.6.15.Final'
+
 
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	testImplementation 'org.springframework.security:spring-security-test'
+
 	implementation "io.jsonwebtoken:jjwt:0.9.1"
 
 	implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
 	implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
 
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
+	implementation group: 'org.h2', name: 'h2gis', version: '1.5.0'
 
+	//소켓 추가
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+  
 }
 
 tasks.named('test') {

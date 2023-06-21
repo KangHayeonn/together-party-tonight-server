@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Chat</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        var socket = new WebSocket("ws://localhost:8080/chat"); // WebSocket 연결
+
+        // 메시지 수신 이벤트 핸들러
+        socket.onmessage = function(event) {
+            var receivedMessage = event.data;
+            // 받은 메시지를 화면에 표시
+            $('#messages').append('<li>' + receivedMessage + '</li>');
+        };
+
+        // 메시지 전송 함수
+        function sendMessage() {
+            var message = $('#messageInput').val();
+            // 입력한 메시지를 서버로 전송
+            socket.send(message);
+            $('#messageInput').val(''); // 입력 필드 초기화
+        }
+    </script>
+</head>
+<body>
+<h1>WebSocket Chat</h1>
+<ul id="messages"></ul>
+<input type="text" id="messageInput">
+<button onclick="sendMessage()">Send</button>
+</body>
+</html>
