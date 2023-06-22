@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import webProject.togetherPartyTonight.domain.member.auth.MemberDetails;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
@@ -49,7 +50,8 @@ public class JwtProvider {
      * Refresh 토큰 생성
      */
     public String createRefreshToken(Authentication authentication){
-        Claims claims = Jwts.claims().setSubject(authentication.getName());
+        MemberDetails memberDetails = (MemberDetails) authentication.getPrincipal();
+        Claims claims = Jwts.claims().setSubject(String.valueOf(memberDetails.getId()));
         Date now = new Date();
         Date expireDate = new Date(now.getTime() + refreshExpirationTime);
 

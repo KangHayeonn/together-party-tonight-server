@@ -23,15 +23,17 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
         //프로젝트 응답 규약으로 200을 응답으로 주기로 했다.
         response.setStatus(HttpStatus.SC_OK);
+        if(request.getHeader("Authorization") == null){ // 헤더에 액세스 토큰이 아예 없이 인증이 필요한 요청했을경우
+            response.setCharacterEncoding("UTF-8");
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
-        response.setCharacterEncoding("UTF-8");
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            // 실패 메시지 작성
+            ObjectMapper objectMapper = new ObjectMapper();
+            ErrorResponse errorResponse = new ErrorResponse("false",ErrorCode.FORBIDDEN);
 
-        // 실패 메시지 작성
-        ObjectMapper objectMapper = new ObjectMapper();
-        ErrorResponse errorResponse = new ErrorResponse("false", ErrorCode.UNAUTHORIZED);
+            String result = objectMapper.writeValueAsString(errorResponse);
+            response.getWriter().write(result);
+        }
 
-        String result = objectMapper.writeValueAsString(errorResponse);
-        response.getWriter().write(result);
     }
 }
