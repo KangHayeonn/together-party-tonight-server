@@ -42,10 +42,12 @@ public class S3Service {
 
     private final String http = "https://";
 
-    public String uploadImage(MultipartFile multipartFile) {
+    public String uploadImage(MultipartFile multipartFile, String directory, Long userId) {
+        //directory : review사진과 club사진을 구분하기 위한 디렉토리
+        //userId : 위 디렉토리 내에서도 사용자별로 사진을 구분하기 위한 디렉토리
         String s3Url = http+bucket+ s3regionUrl;
 
-        String fileName = createFileName(multipartFile.getOriginalFilename());
+        String fileName = directory+ userId.toString()+"/"+ createFileName(multipartFile.getOriginalFilename());
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentLength(multipartFile.getSize());
         objectMetadata.setContentType(multipartFile.getContentType());
@@ -57,13 +59,17 @@ public class S3Service {
         catch(IOException e) {
             throw new ReviewException(ErrorCode.S3_UPLOAD_FAIL);
             }
-        System.out.println(s3Url+fileName);
         return s3Url + fileName;
     }
 
+    //  https://topato.s3.ap-northeast-2.amazonaws.com/review/1/name.jpg
+
     public void deleteImage(String fileName) {
-        System.out.println(fileName.substring(72));
-        amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, fileName.substring(72)));
+        String[] split = fileName.split("/");
+
+        String key = fileName.substring(72);
+        System.out.println("key: "+key);
+        amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, key));
     }
 
     private String createFileName(String fileName) {

@@ -13,6 +13,7 @@ import webProject.togetherPartyTonight.domain.review.dto.response.ReviewDetailRe
 import webProject.togetherPartyTonight.domain.review.service.ReviewService;
 import webProject.togetherPartyTonight.global.common.CommonResponse;
 import webProject.togetherPartyTonight.global.common.ResponseWithData;
+import webProject.togetherPartyTonight.infra.S3.S3Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -25,6 +26,7 @@ public class ReviewController {
     private final ReviewService reviewService;
     private final String SUCCESS = "true";
 
+    private final S3Service s3Service;
     @PostMapping("")
     @ApiOperation(value = "리뷰 만들기")
     public ResponseEntity<CommonResponse> addReview (@RequestPart(name = "data") @Valid AddReviewRequest addReviewRequest,

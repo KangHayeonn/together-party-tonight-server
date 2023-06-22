@@ -31,6 +31,8 @@ public class ReviewService {
 
     private final S3Service s3Service;
 
+    private final String directory = "review/";
+
     @Transactional
     public void addReview(AddReviewRequest request, MultipartFile image) {
         Long clubId = request.getClubId();
@@ -54,7 +56,7 @@ public class ReviewService {
                 imageUrl = s3Service.getImage("review_default.jpg");
             }
             else {
-                imageUrl = s3Service.uploadImage(image);
+                imageUrl = s3Service.uploadImage(image, directory, request.getUserId());
             }
             Review review = request.toEntity(club, clubMember.getMember(),imageUrl);
             reviewRepository.save(review);
@@ -79,7 +81,7 @@ public class ReviewService {
 
         String imageUrl="";
         if(image!=null){ //수정할 새로운 이미지가 있으면
-            imageUrl = s3Service.uploadImage(image); //s3에 업로드하고 url받아옴
+            imageUrl = s3Service.uploadImage(image, directory, request.getUserId()); //s3에 업로드하고 url받아옴
             if(!review.getImageUrl().contains("default")) { //기존 이미지가 default 이미지가 아니라면
                 s3Service.deleteImage(review.getImageUrl()); //s3에서 삭제
             }
@@ -91,11 +93,12 @@ public class ReviewService {
     @Transactional
     public void deleteReview(Long reviewId) {
         // TODO: 2023/06/21 권한없음 exception
-        try {
-            s3Service.deleteImage(reviewRepository.getReferenceById(reviewId).getImageUrl());
-            reviewRepository.deleteById(reviewId);
-        } catch (EmptyResultDataAccessException e){
-            throw new ReviewException(ErrorCode.INVALID_REVIEW_ID);
-        }
+        Review review = reviewRepository.findById(reviewId).orElseThrow(
+                ()-> new ReviewException(ErrorCode.INVALID_REVIEW_ID)
+        );
+        if (!review.getImageUrl().contains("default"))
+            s3Service.deleteImage(review.getImageUrl());
+        reviewRepository.deleteById(reviewId);
+
     }
 }
