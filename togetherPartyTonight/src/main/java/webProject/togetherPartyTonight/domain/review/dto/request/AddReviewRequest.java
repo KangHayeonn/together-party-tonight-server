@@ -1,6 +1,7 @@
 package webProject.togetherPartyTonight.domain.review.dto.request;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 import webProject.togetherPartyTonight.domain.club.info.entity.Club;
 import webProject.togetherPartyTonight.domain.member.entity.Member;
@@ -10,6 +11,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Data
+@NoArgsConstructor
 public class AddReviewRequest {
     @NotNull(message = "clubId는 필수 입력 값입니다.")
     Long clubId;
@@ -23,12 +25,13 @@ public class AddReviewRequest {
     @NotNull(message = "reviewContent는 필수 입력 값입니다.")
     String reviewContent;
 
-    public Review toEntity(Club club, Member member) {
+    public Review toEntity(Club club, Member member, String image) {
         return Review.builder()
                 .club(club)
                 .member(member)
                 .reviewContent(this.reviewContent)
                 .rating(rating)
+                .imageUrl(image)
                 .build();
     }
 }

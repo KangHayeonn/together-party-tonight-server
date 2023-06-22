@@ -35,6 +35,9 @@ public class Review extends BaseEntity {
     @Column(name = "review_rating", columnDefinition = "TINYINT")
     private Integer rating;
 
+    @Column(name = "review_image_url")
+    private String imageUrl;
+
 
 
 

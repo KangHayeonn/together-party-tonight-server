@@ -29,6 +29,7 @@ public enum ErrorCode {
 
     //500 INTERNAL_SERVER_ERROR
     INTERNAL_SERVER_ERROR (HttpStatus.INTERNAL_SERVER_ERROR,"서버 내부 에러입니다"),
+    S3_UPLOAD_FAIL (HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 문제로 인해 이미지 업로드에 실패하였습니다."),
 
     //403 FORBIDDEN
     FORBIDDEN(HttpStatus.FORBIDDEN,"권한이 없습니다"),

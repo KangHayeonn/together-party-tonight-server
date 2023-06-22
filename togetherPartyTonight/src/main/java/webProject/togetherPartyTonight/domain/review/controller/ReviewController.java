@@ -27,7 +27,7 @@ public class ReviewController {
 
     @PostMapping("")
     @ApiOperation(value = "리뷰 만들기")
-    public ResponseEntity<CommonResponse> addReview (@RequestBody @Valid AddReviewRequest addReviewRequest,
+    public ResponseEntity<CommonResponse> addReview (@RequestPart(name = "data") @Valid AddReviewRequest addReviewRequest,
                                                      @RequestPart(required = false)MultipartFile image, HttpServletRequest request) {
         log.info("[{}] {}",request.getMethod(),request.getRequestURI());
 
@@ -48,10 +48,11 @@ public class ReviewController {
 
     @PutMapping("")
     @ApiOperation(value = "리뷰 수정하기")
-    public ResponseEntity<CommonResponse> modifyReview (@RequestBody @Valid ModifyReviewRequest modifyReviewRequest, HttpServletRequest request) {
+    public ResponseEntity<CommonResponse> modifyReview (@RequestPart(name = "data") @Valid ModifyReviewRequest modifyReviewRequest, HttpServletRequest request,
+                                                        @RequestPart(required = false) MultipartFile image) {
         log.info("[{}] {}",request.getMethod(),request.getRequestURI());
 
-        reviewService.modifyReview(modifyReviewRequest);
+        reviewService.modifyReview(modifyReviewRequest, image);
         CommonResponse response = new CommonResponse(SUCCESS, HttpStatus.OK.value());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

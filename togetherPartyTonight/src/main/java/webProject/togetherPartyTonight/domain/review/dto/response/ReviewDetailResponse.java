@@ -36,7 +36,7 @@ public class ReviewDetailResponse {
                 .address(club.getAddress())
                 .meetingDate(club.getMeetingDate())
                 .createdDate(club.getCreatedDate())
-            //    .image(review.get)
+                .image(review.getImageUrl())
                 .build();
     }
 }

@@ -15,6 +15,7 @@ import webProject.togetherPartyTonight.domain.review.entity.Review;
 import webProject.togetherPartyTonight.domain.review.exception.ReviewException;
 import webProject.togetherPartyTonight.domain.review.repository.ReviewRepository;
 import webProject.togetherPartyTonight.global.error.ErrorCode;
+import webProject.togetherPartyTonight.infra.S3.S3Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
@@ -28,6 +29,9 @@ public class ReviewService {
     private final ClubRepository clubRepository;
     private final ClubMemberRepository clubMemberRepository;
 
+    private final S3Service s3Service;
+
+    @Transactional
     public void addReview(AddReviewRequest request, MultipartFile image) {
         Long clubId = request.getClubId();
         Long userId = request.getUserId();
@@ -42,9 +46,17 @@ public class ReviewService {
         ClubMember clubMember = clubMemberRepository.findByClubClubIdAndMemberId(clubId, userId).orElseThrow(
                 () -> new ReviewException(ErrorCode.INVALID_MEMBER_ID)
         );
+
+        //clubMember에 사용자가 존재하고, 현재날짜가 meetingDate보다 이후일 경우에만 리뷰 작성가능
         if(LocalDate.now().isAfter(club.getMeetingDate()))  {
-            //clubMember에 사용자가 존재하고, 현재날짜가 meetingDate보다 이후일 경우에만 리뷰 작성가능
-            Review review = request.toEntity(club, clubMember.getMember());
+            String imageUrl;
+            if (image==null) {
+                imageUrl = s3Service.getImage("review_default.jpg");
+            }
+            else {
+                imageUrl = s3Service.uploadImage(image);
+            }
+            Review review = request.toEntity(club, clubMember.getMember(),imageUrl);
             reviewRepository.save(review);
         }
         else throw new ReviewException(ErrorCode.INVALID_REVIEW_DATE);
@@ -59,22 +71,31 @@ public class ReviewService {
     }
 
     @Transactional
-    public void modifyReview(ModifyReviewRequest request) {
+    public void modifyReview(ModifyReviewRequest request, MultipartFile image) {
         Long reviewId = request.getReviewId();
         Review review = reviewRepository.findById(reviewId).orElseThrow(
                 () -> new ReviewException(ErrorCode.INVALID_REVIEW_ID)
         );
-        request.modify(review);
+
+        String imageUrl="";
+        if(image!=null){ //수정할 새로운 이미지가 있으면
+            imageUrl = s3Service.uploadImage(image); //s3에 업로드하고 url받아옴
+            if(!review.getImageUrl().contains("default")) { //기존 이미지가 default 이미지가 아니라면
+                s3Service.deleteImage(review.getImageUrl()); //s3에서 삭제
+            }
+        }
+
+        request.modify(review, imageUrl); //디비에 새로운 수정사항 반영
     }
 
     @Transactional
     public void deleteReview(Long reviewId) {
         // TODO: 2023/06/21 권한없음 exception
         try {
+            s3Service.deleteImage(reviewRepository.getReferenceById(reviewId).getImageUrl());
             reviewRepository.deleteById(reviewId);
         } catch (EmptyResultDataAccessException e){
             throw new ReviewException(ErrorCode.INVALID_REVIEW_ID);
         }
-
     }
 }
