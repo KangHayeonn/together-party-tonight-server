@@ -63,6 +63,9 @@ public class Club extends BaseEntity {
     @Column(name = "club_state", nullable = false, length = 1, columnDefinition = "tinyint")
     private Boolean clubState; //true: 모집중, false: 모집 완료
 
+    @Column(name = "club_image", nullable = false)
+    private String image;
+
 
 
 

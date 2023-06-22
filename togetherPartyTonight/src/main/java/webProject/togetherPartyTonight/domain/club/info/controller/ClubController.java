@@ -4,23 +4,22 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import webProject.togetherPartyTonight.domain.club.info.dto.*;
-import webProject.togetherPartyTonight.domain.club.info.exception.ClubException;
+import org.springframework.web.multipart.MultipartFile;
+import webProject.togetherPartyTonight.domain.club.info.dto.request.*;
+import webProject.togetherPartyTonight.domain.club.info.dto.response.ClubDetailResponse;
+import webProject.togetherPartyTonight.domain.club.info.dto.response.MyAppliedClubList;
+import webProject.togetherPartyTonight.domain.club.info.dto.response.MyOwnedClubList;
+import webProject.togetherPartyTonight.domain.club.info.dto.response.ReceivedApplicationList;
+import webProject.togetherPartyTonight.domain.club.info.entity.ClubCategory;
 import webProject.togetherPartyTonight.domain.club.info.service.ClubService;
 import webProject.togetherPartyTonight.global.common.CommonResponse;
-import webProject.togetherPartyTonight.global.common.ErrorResponse;
 import webProject.togetherPartyTonight.global.common.ResponseWithData;
-import webProject.togetherPartyTonight.global.error.ErrorCode;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.time.LocalDate;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,10 +37,11 @@ public class ClubController {
      */
     @PostMapping("")
     @ApiOperation(value = "모임 만들기")
-    public ResponseEntity<CommonResponse> addClub (@RequestBody @Valid AddClubRequest clubRequest, HttpServletRequest request) {
+    public ResponseEntity<CommonResponse> addClub (@RequestPart(name = "data") @Valid AddClubRequest clubRequest,
+                                                   @RequestPart(name = "image", required = false) MultipartFile multipartFile, HttpServletRequest request) {
         log.info("[{}] {}",request.getMethod(),request.getRequestURI());
 
-        clubService.addClub(clubRequest);
+        clubService.addClub(clubRequest, multipartFile);
         CommonResponse response = new CommonResponse(SUCCESS, HttpStatus.OK.value());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -63,7 +63,7 @@ public class ClubController {
      */
     @DeleteMapping("")
     @ApiOperation(value = "모임 삭제")
-    public ResponseEntity<CommonResponse> deleteClub(@RequestBody @Valid  DeleteAndSignupRequestDto requestDto, HttpServletRequest request) {
+    public ResponseEntity<CommonResponse> deleteClub(@RequestBody @Valid DeleteAndSignupRequestDto requestDto, HttpServletRequest request) {
         log.info("[{}] {}",request.getMethod(),request.getRequestURI());
 
         clubService.deleteClub(requestDto);
@@ -76,10 +76,11 @@ public class ClubController {
      */
     @PutMapping("")
     @ApiOperation(value = "모임 변경")
-    public  ResponseEntity<CommonResponse> modifyClub (@RequestBody @Valid ModifyClubRequest modifyRequest, HttpServletRequest request) {
+    public  ResponseEntity<CommonResponse> modifyClub (@RequestPart(name = "data") @Valid ModifyClubRequest modifyRequest,
+                                                       @RequestPart(name = "image", required = false) MultipartFile multipartFile, HttpServletRequest request) {
         log.info("[{}] {}",request.getMethod(),request.getRequestURI());
 
-        clubService.modifyClub(modifyRequest);
+        clubService.modifyClub(modifyRequest, multipartFile);
         CommonResponse response = new CommonResponse(SUCCESS, HttpStatus.OK.value());
         return new ResponseEntity<>(response,HttpStatus.OK);
     }

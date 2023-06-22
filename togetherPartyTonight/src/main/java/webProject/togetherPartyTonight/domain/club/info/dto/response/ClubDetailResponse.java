@@ -1,4 +1,4 @@
-package webProject.togetherPartyTonight.domain.club.info.dto;
+package webProject.togetherPartyTonight.domain.club.info.dto.response;
 
 import lombok.*;
 import webProject.togetherPartyTonight.domain.club.info.entity.Club;
@@ -23,6 +23,7 @@ public class ClubDetailResponse {
     private Float latitude;
     private Float longitude;
     private LocalDate meetingDate;
+    private String image;
 
     public ClubDetailResponse toDto (Club club) {
 //        this.nickname=club.getNickname();
@@ -37,6 +38,7 @@ public class ClubDetailResponse {
         this.clubTags = club.getClubTags();
         this.address=club.getAddress();
         this.meetingDate= club.getMeetingDate();
+        this.image=club.getImage();
         return this;
     }
 }

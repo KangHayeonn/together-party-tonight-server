@@ -1,7 +1,6 @@
 package webProject.togetherPartyTonight.domain.club.info.entity;
 
 import lombok.*;
-import webProject.togetherPartyTonight.domain.club.info.dto.DeleteAndSignupRequestDto;
 import webProject.togetherPartyTonight.domain.member.entity.Member;
 import webProject.togetherPartyTonight.global.common.BaseEntity;
 

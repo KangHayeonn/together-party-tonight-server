@@ -1,4 +1,4 @@
-package webProject.togetherPartyTonight.domain.club.info.dto;
+package webProject.togetherPartyTonight.domain.club.info.dto.request;
 
 
 import lombok.AllArgsConstructor;
@@ -71,7 +71,7 @@ public class AddClubRequest {
     @IsAfter
     private String meetingDate;
 
-    public Club toClub (Member master, Point point) {
+    public Club toClub (Member master, Point point, String url) {
 
         return Club.builder()
                 .master(master)
@@ -85,6 +85,7 @@ public class AddClubRequest {
                 .clubPoint(point)
                 .clubCategory(ClubCategory.valueOf(clubCategory))
                 .clubState(true) //모집중
+                .image(url)
                 .build();
     }
 

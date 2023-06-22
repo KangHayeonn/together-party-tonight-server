@@ -1,4 +1,4 @@
-package webProject.togetherPartyTonight.domain.club.info.dto;
+package webProject.togetherPartyTonight.domain.club.info.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
