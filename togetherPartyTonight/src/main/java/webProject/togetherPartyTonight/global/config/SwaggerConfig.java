@@ -18,9 +18,10 @@ public class SwaggerConfig {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.any()) //대상 패키지 설정
-                .paths(PathSelectors.ant("/api/**"))
+                .apis(RequestHandlerSelectors.basePackage("webProject.togetherPartyTonight")) //대상 패키지 설정
+                .paths(PathSelectors.ant("/**"))
                 .build();
+
     }
 
     private ApiInfo apiInfo() {
