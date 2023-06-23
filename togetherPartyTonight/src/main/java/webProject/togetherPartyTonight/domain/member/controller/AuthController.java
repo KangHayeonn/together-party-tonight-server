@@ -22,29 +22,20 @@ public class AuthController {
 
     private final AuthService authService;
 
-
-
     @PostMapping("/login")
-    @ApiOperation(value = "토큰 발급", notes = "JWT AccessToken, RefreshToken 을 발급한다")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 404, message = "No param")
-            //Other Http Status code..
-    })
-    @ApiImplicitParam(
-            name = "token"
-            , value = "카카오 엑세스 토큰"
-            , defaultValue = "None")
+    @ApiOperation(value = "로그인 시 토큰 발급", notes = "JWT AccessToken, RefreshToken 을 발급한다")
     public ResponseWithData requestLogin(@RequestBody LoginRequestDto loginRequestDto){
+
         log.info("Dto정보 - {}",loginRequestDto.getEmail());
+
         TokenWithIdDto tokenWithIdDto = authService.login(loginRequestDto);
 
         return new ResponseWithData("true",200, tokenWithIdDto);
     }
 
     @PostMapping("/reissue")
+    @ApiOperation(value = "액세스 토큰 재발급", notes = "액세스 토큰을 재발급해요")
     public ResponseWithData requestReissue(@RequestBody RefreshTokenDto refreshTokenDto){
-
 
         TokenDto tokenDto = authService.reissue(refreshTokenDto);
 

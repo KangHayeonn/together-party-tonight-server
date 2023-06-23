@@ -43,10 +43,9 @@ public class JwtFilter extends OncePerRequestFilter {
                 Authentication auth = jwtProvider.getAuthentication(token); // 토큰을 통해서 인증 반납
                 SecurityContextHolder.getContext().setAuthentication(auth); // 정상 토큰이면 SecurityContext에 저장
             }
-            //token이 null이면 로그인 또는 회원가입 등등 토큰이 없는 경우를 고려해서 넘어간다 인증이 되지않는다.
+            //token이 null이면 로그인 또는 회원가입 등등 토큰이 없는 경우를 고려해서 넘어간다 인증이 되지않는다.(미인증)
             //그래서 SecurityConfig에서 permitAll이 되어있으면 요구하는 api로 ㄱㄱ 하고 없다면 403으로 접근권한 없다고 에러뿌린다.
         }catch (SignatureException  | MalformedJwtException | IllegalStateException e) {
-            System.out.println("잘못된 토큰입니다.");
             //잘못된 토큰이 왔을때 접근권한 없다고 응답(잘못된 토큰) 403
             ErrorCode invalidTokenError = ErrorCode.FORBIDDEN;
             inValidTokenResponse(invalidTokenError,request,response,filterChain);

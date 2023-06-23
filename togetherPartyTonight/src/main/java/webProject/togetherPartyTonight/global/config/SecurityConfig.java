@@ -40,13 +40,12 @@ public class SecurityConfig {
                     .exceptionHandling()
                     .authenticationEntryPoint(authenticationEntryPoint)
                 .and()
-                    .authorizeRequests(auth->auth.mvcMatchers("/v2/api-docs", "/swagger-resources/**", "/swagger-ui/index.html", "/swagger-ui.html","/webjars/**", "/swagger/**",   // swagger
-                        "/h2-console/**",
-                        "/favicon.ico").permitAll()
-                        .mvcMatchers(HttpMethod.POST,"/members/login").permitAll()
-                        .mvcMatchers(HttpMethod.POST,"/members/reissue").permitAll()
-                        .anyRequest()
-                        .authenticated()); // Authentication 필요한 주소
+                    .authorizeRequests(auth->auth
+                            .mvcMatchers("/v2/api-docs", "/swagger-resources/**", "/swagger-ui/index.html", "/swagger-ui.html","/webjars/**", "/swagger/**",   // swagger
+                                "/h2-console/**",
+                                "/favicon.ico").permitAll()
+                        .mvcMatchers(HttpMethod.POST,"/members/login","/members/reissue").permitAll()
+                        .anyRequest().authenticated()); // Authentication 필요한 주소
 
 
         return http.build();
@@ -58,12 +57,7 @@ public class SecurityConfig {
     ) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
-    //논의 필요
-//    @Bean
-//    public WebSecurityCustomizer webSecurityCustomizer() {
-//        return (web) -> web.ignoring().mvcMatchers(HttpMethod.POST,"/members/login","/members/reissue")
-//                .mvcMatchers(HttpMethod.GET,"/members/reviews/**","members/logout");
-//    }
+
 
     @Bean
     public PasswordEncoder passwordEncoder(){

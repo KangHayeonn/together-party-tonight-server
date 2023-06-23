@@ -22,6 +22,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         // filter에서 인증과 관련된 오류가 발생했을 때 여기를 거친다.
 
         //프로젝트 응답 규약으로 200을 응답으로 주기로 했다.
+        System.out.println("여기로 오냐");
         response.setStatus(HttpStatus.SC_OK);
         if(request.getHeader("Authorization") == null){ // 헤더에 액세스 토큰이 아예 없이 인증이 필요한 요청했을경우
             response.setCharacterEncoding("UTF-8");

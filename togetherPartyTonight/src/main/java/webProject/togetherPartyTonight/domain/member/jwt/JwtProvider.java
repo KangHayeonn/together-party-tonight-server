@@ -8,6 +8,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import webProject.togetherPartyTonight.domain.member.auth.MemberDetails;
+import webProject.togetherPartyTonight.domain.member.dto.RefreshTokenDto;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
@@ -50,8 +51,7 @@ public class JwtProvider {
      * Refresh 토큰 생성
      */
     public String createRefreshToken(Authentication authentication){
-        MemberDetails memberDetails = (MemberDetails) authentication.getPrincipal();
-        Claims claims = Jwts.claims().setSubject(String.valueOf(memberDetails.getId()));
+        Claims claims = Jwts.claims().setSubject(authentication.getName());
         Date now = new Date();
         Date expireDate = new Date(now.getTime() + refreshExpirationTime);
 
@@ -88,6 +88,15 @@ public class JwtProvider {
     public String resolveToken(HttpServletRequest req) {
         String bearerToken = req.getHeader("Authorization");
 
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
+    }
+
+    public String resolveToken(RefreshTokenDto dto) {
+        String bearerToken = dto.getRefreshToken();
+        System.out.println(bearerToken);
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }

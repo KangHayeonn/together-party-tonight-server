@@ -2,6 +2,7 @@ package webProject.togetherPartyTonight.domain.member.controller;
 
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -28,12 +29,14 @@ public class MemberController {
     private final MemberService memberService;
 
     @GetMapping("/{userId}")
+    @ApiOperation(value = "유저정보를 불러요", notes = "유저정보를 불러요")
     public ResponseEntity<ResponseWithData> requestInfo(@PathVariable Long userId) throws IOException {
 
 
         MemberInfoDto memberInfoDto = memberService.findById(userId);
 
         return new ResponseEntity<>(new ResponseWithData("true",200,memberInfoDto),HttpStatus.OK);
+
     }
 
 }
