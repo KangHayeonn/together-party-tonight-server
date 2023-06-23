@@ -72,9 +72,4 @@ public class JwtFilter extends OncePerRequestFilter {
         response.getWriter().write(result);
     }
 
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        //재발급에 관해서는 이 필터를 거치지않는다.
-        return request.getServletPath().equals("/members/reissue");
-    }
 }
