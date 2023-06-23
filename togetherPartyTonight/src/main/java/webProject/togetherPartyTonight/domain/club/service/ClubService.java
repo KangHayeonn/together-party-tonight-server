@@ -38,6 +38,8 @@ public class ClubService {
 
     private final S3Service s3Service;
 
+    private final String directory = "club/";
+
 
 // TODO: 2023/06/18 meetingDate가 지나면 clubState=false -> 스케줄러
 
@@ -52,7 +54,7 @@ public class ClubService {
 
         String url="";
         if (image != null) {
-            url = s3Service.uploadImage(image);
+            url = s3Service.uploadImage(image, directory, clubRequest.getUserId());
         }
         else {
             //카테고리별 디폴트 이미지
@@ -119,7 +121,7 @@ public class ClubService {
 
         String imageUrl;
         if(image!=null){ //수정할 새로운 이미지가 있으면
-            imageUrl = s3Service.uploadImage(image); //s3에 업로드하고 url받아옴
+            imageUrl = s3Service.uploadImage(image, directory, clubDto.getUserId()); //s3에 업로드하고 url받아옴
             if(!clubEntity.getImage().contains("default")) { //기존 이미지가 default 이미지가 아니라면
                 s3Service.deleteImage(clubEntity.getImage()); //s3에서 삭제
             }
