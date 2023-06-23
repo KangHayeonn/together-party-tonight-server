@@ -7,16 +7,14 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import webProject.togetherPartyTonight.domain.member.jwt.JwtAuthenticationEntryPoint;
-import webProject.togetherPartyTonight.domain.member.jwt.JwtFilter;
-import webProject.togetherPartyTonight.domain.member.jwt.JwtProvider;
+import webProject.togetherPartyTonight.domain.member.auth.jwt.JwtAuthenticationEntryPoint;
+import webProject.togetherPartyTonight.domain.member.auth.jwt.JwtFilter;
+import webProject.togetherPartyTonight.domain.member.auth.jwt.JwtProvider;
 
 @Configuration
 @RequiredArgsConstructor

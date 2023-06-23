@@ -20,9 +20,7 @@ public class MemberDetails implements UserDetails {//UserDetails를 Member에 �
         return member;
     }
 
-    public Long getId(){
-        return member.getId();
-    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
@@ -35,7 +33,7 @@ public class MemberDetails implements UserDetails {//UserDetails를 Member에 �
 
     @Override
     public String getUsername() {
-        return member.getEmail();
+        return String.valueOf(member.getId());
     }
 
     @Override

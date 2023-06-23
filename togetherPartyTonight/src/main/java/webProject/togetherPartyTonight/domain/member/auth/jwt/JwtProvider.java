@@ -1,4 +1,4 @@
-package webProject.togetherPartyTonight.domain.member.jwt;
+package webProject.togetherPartyTonight.domain.member.auth.jwt;
 
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
@@ -6,18 +6,22 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import webProject.togetherPartyTonight.domain.member.auth.MemberDetails;
-import webProject.togetherPartyTonight.domain.member.dto.RefreshTokenDto;
+import webProject.togetherPartyTonight.domain.member.dto.request.ReissueRequestDto;
+import webProject.togetherPartyTonight.domain.member.repository.MemberRepository;
+import webProject.togetherPartyTonight.domain.member.service.MemberDetailsService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.List;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
 public class JwtProvider {
-
+    private final MemberRepository memberRepository;
 
 
     @Value("${spring.jwt.secret}")
@@ -29,13 +33,13 @@ public class JwtProvider {
     @Value("${spring.jwt.token.refresh-expiration-time}")
     private long refreshExpirationTime;
 
+
     /**
      * Access 토큰 생성
      */
     public String createAccessToken(Authentication authentication){
-
-        //이메일로 jwt암호화 해서 만든다.
-        Claims claims = Jwts.claims().setSubject(authentication.getName());
+        
+        Claims claims = Jwts.claims().setSubject(String.valueOf(authentication.getName()));
         Date now = new Date();
         Date expireDate = new Date(now.getTime() + accessExpirationTime);
 
@@ -51,6 +55,8 @@ public class JwtProvider {
      * Refresh 토큰 생성
      */
     public String createRefreshToken(Authentication authentication){
+
+
         Claims claims = Jwts.claims().setSubject(authentication.getName());
         Date now = new Date();
         Date expireDate = new Date(now.getTime() + refreshExpirationTime);
@@ -71,21 +77,21 @@ public class JwtProvider {
      * 토큰으로부터 클레임을 만들고, 이를 통해 Authentication 객체 반환
      */
     public Authentication getAuthentication(String token) {
-        String userEmail = Jwts.parser().
-                setSigningKey(secretKey)
+
+        String sub =  Jwts.parser()
+                .setSigningKey(secretKey)
                 .parseClaimsJws(token)
                 .getBody().getSubject();
 
+        UserDetails principal = new User(sub, "", List.of());
 
-        log.info("액세스 토큰을 받고 이메일로 파싱했는지 확인 - {}",userEmail);
-
-        return new UsernamePasswordAuthenticationToken(userEmail, "",null);
+        return new UsernamePasswordAuthenticationToken(principal, "",null);
     }
 
     /**
-     * http 헤더로부터 bearer 토큰을 가져옴.
+     * Bearer형식의 Access토큰을 순수한 토큰으로 바꾼다.
      */
-    public String resolveToken(HttpServletRequest req) {
+    public String resolveAccessToken(HttpServletRequest req) {
         String bearerToken = req.getHeader("Authorization");
 
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
@@ -94,9 +100,11 @@ public class JwtProvider {
         return null;
     }
 
-    public String resolveToken(RefreshTokenDto dto) {
+    /**
+     * Bearer형식의 Refresh토큰을 순수한 토큰으로 바꾼다.
+     */
+    public String resolveRefreshToken(ReissueRequestDto dto) {
         String bearerToken = dto.getRefreshToken();
-        System.out.println(bearerToken);
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
@@ -112,10 +120,13 @@ public class JwtProvider {
         try {
             Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return true;
-        } catch (UnsupportedJwtException e) {
+        } catch(SignatureException e){
+            log.info("잘못된 토큰입니다.");
+        } catch (ExpiredJwtException e){
+            log.info("토큰이 만료되었습니다.");
+        }
+        catch (UnsupportedJwtException e) {
             log.info("지원되지 않는 JWT 토큰입니다.");
-        } catch (IllegalArgumentException e) {
-            log.info("JWT 토큰이 잘못되었습니다.");
         }
         return false;
     }

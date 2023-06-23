@@ -7,16 +7,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import webProject.togetherPartyTonight.domain.member.dto.MemberInfoDto;
+import webProject.togetherPartyTonight.domain.member.dto.response.MemberInfoResponseDto;
 import webProject.togetherPartyTonight.domain.member.service.MemberService;
 import webProject.togetherPartyTonight.global.common.ResponseWithData;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @RestController
@@ -29,13 +27,12 @@ public class MemberController {
     private final MemberService memberService;
 
     @GetMapping("/{userId}")
-    @ApiOperation(value = "유저정보를 불러요", notes = "유저정보를 불러요")
-    public ResponseEntity<ResponseWithData> requestInfo(@PathVariable Long userId) throws IOException {
+    @ApiOperation(value = "회원 정보 조회", notes = "회원 정보 조회 API 입니다.")
+    public ResponseEntity<ResponseWithData> requestInfo(@PathVariable Long userId){
 
+        MemberInfoResponseDto memberInfoResponseDto = memberService.findById(userId);
 
-        MemberInfoDto memberInfoDto = memberService.findById(userId);
-
-        return new ResponseEntity<>(new ResponseWithData("true",200,memberInfoDto),HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseWithData("true",200, memberInfoResponseDto),HttpStatus.OK);
 
     }
 

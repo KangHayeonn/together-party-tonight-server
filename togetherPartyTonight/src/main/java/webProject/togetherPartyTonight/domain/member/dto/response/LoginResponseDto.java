@@ -1,4 +1,4 @@
-package webProject.togetherPartyTonight.domain.member.dto;
+package webProject.togetherPartyTonight.domain.member.dto.response;
 
 
 import lombok.AllArgsConstructor;
@@ -6,7 +6,7 @@ import lombok.Data;
 
 @AllArgsConstructor
 @Data
-public class TokenWithIdDto {
+public class LoginResponseDto {
     private Long userId;
 
     private String accessToken;
