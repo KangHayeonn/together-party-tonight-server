@@ -6,12 +6,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import webProject.togetherPartyTonight.domain.club.info.dto.request.AddClubRequest;
-import webProject.togetherPartyTonight.domain.club.info.dto.request.DeleteAndSignupRequestDto;
-import webProject.togetherPartyTonight.domain.club.info.entity.Club;
-import webProject.togetherPartyTonight.domain.club.info.exception.ClubException;
-import webProject.togetherPartyTonight.domain.club.info.repository.ClubRepository;
-import webProject.togetherPartyTonight.domain.club.info.service.ClubService;
+import webProject.togetherPartyTonight.domain.club.dto.request.AddClubRequest;
+import webProject.togetherPartyTonight.domain.club.dto.request.DeleteAndSignupRequestDto;
+import webProject.togetherPartyTonight.domain.club.entity.Club;
+import webProject.togetherPartyTonight.domain.club.exception.ClubException;
+import webProject.togetherPartyTonight.domain.club.repository.ClubRepository;
+import webProject.togetherPartyTonight.domain.club.service.ClubService;
 import webProject.togetherPartyTonight.domain.member.entity.Member;
 import webProject.togetherPartyTonight.global.error.ErrorCode;
 

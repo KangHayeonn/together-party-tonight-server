@@ -1,13 +1,12 @@
 package webProject.togetherPartyTonight.domain.review.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import webProject.togetherPartyTonight.domain.club.info.entity.Club;
-import webProject.togetherPartyTonight.domain.club.info.entity.ClubMember;
-import webProject.togetherPartyTonight.domain.club.info.repository.ClubMemberRepository;
-import webProject.togetherPartyTonight.domain.club.info.repository.ClubRepository;
+import webProject.togetherPartyTonight.domain.club.entity.Club;
+import webProject.togetherPartyTonight.domain.club.entity.ClubMember;
+import webProject.togetherPartyTonight.domain.club.repository.ClubMemberRepository;
+import webProject.togetherPartyTonight.domain.club.repository.ClubRepository;
 import webProject.togetherPartyTonight.domain.review.dto.request.AddReviewRequest;
 import webProject.togetherPartyTonight.domain.review.dto.request.ModifyReviewRequest;
 import webProject.togetherPartyTonight.domain.review.dto.response.ReviewDetailResponse;
@@ -19,7 +18,6 @@ import webProject.togetherPartyTonight.infra.S3.S3Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

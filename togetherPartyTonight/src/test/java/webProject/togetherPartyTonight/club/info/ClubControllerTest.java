@@ -15,11 +15,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import webProject.togetherPartyTonight.domain.club.info.controller.ClubController;
-import webProject.togetherPartyTonight.domain.club.info.dto.response.ClubDetailResponse;
-import webProject.togetherPartyTonight.domain.club.info.dto.request.AddClubRequest;
-import webProject.togetherPartyTonight.domain.club.info.repository.ClubRepository;
-import webProject.togetherPartyTonight.domain.club.info.service.ClubService;
+import webProject.togetherPartyTonight.domain.club.controller.ClubController;
+import webProject.togetherPartyTonight.domain.club.dto.response.ClubDetailResponse;
+import webProject.togetherPartyTonight.domain.club.dto.request.AddClubRequest;
+import webProject.togetherPartyTonight.domain.club.repository.ClubRepository;
+import webProject.togetherPartyTonight.domain.club.service.ClubService;
 
 import java.time.LocalDate;
 
