@@ -35,11 +35,14 @@ public enum ErrorCode {
     FORBIDDEN(HttpStatus.FORBIDDEN,"권한이 없습니다"),
 
     //401 UNAUTHORIZED
-    UNAUTHORIZED (HttpStatus.UNAUTHORIZED, "인증이 필요합니다");
+    UNAUTHORIZED (HttpStatus.UNAUTHORIZED, "인증이 필요합니다"),
 
     /**
      * 필요한 에러코드 작성
      */
+    EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "만료된 토큰입니다."),
+    INVALID_TOKEN(HttpStatus.FORBIDDEN, "잘못된 토큰입니다."),
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND,"멤버를 찾지 못했어요");
 
 
     private final HttpStatus httpStatus;
