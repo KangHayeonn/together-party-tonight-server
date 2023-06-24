@@ -38,7 +38,7 @@ public class JwtProvider {
      * Access 토큰 생성
      */
     public String createAccessToken(Authentication authentication){
-        
+
         Claims claims = Jwts.claims().setSubject(String.valueOf(authentication.getName()));
         Date now = new Date();
         Date expireDate = new Date(now.getTime() + accessExpirationTime);
@@ -89,10 +89,10 @@ public class JwtProvider {
     }
 
     /**
-     * Bearer형식의 Access토큰을 순수한 토큰으로 바꾼다.
+     * Bearer형식의 토큰을 순수한 토큰으로 바꾼다.
      */
-    public String resolveAccessToken(HttpServletRequest req) {
-        String bearerToken = req.getHeader("Authorization");
+    public String resolveToken(String token) {
+        String bearerToken = token;
 
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
@@ -100,16 +100,6 @@ public class JwtProvider {
         return null;
     }
 
-    /**
-     * Bearer형식의 Refresh토큰을 순수한 토큰으로 바꾼다.
-     */
-    public String resolveRefreshToken(ReissueRequestDto dto) {
-        String bearerToken = dto.getRefreshToken();
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-        return null;
-    }
 
 
     /**

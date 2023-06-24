@@ -71,8 +71,7 @@ public class AuthService {
     public ReissueResponseDto reissue(ReissueRequestDto reissueRequestDto){
         //토큰 재발급을 위한 로직
 
-        String refreshToken = jwtProvider.resolveRefreshToken(reissueRequestDto);
-
+        String refreshToken = jwtProvider.resolveToken(reissueRequestDto.getRefreshToken());
 
         try{
             Authentication authentication = jwtProvider.getAuthentication(refreshToken);

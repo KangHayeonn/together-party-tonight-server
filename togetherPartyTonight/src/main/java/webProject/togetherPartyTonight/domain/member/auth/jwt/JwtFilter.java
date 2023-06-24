@@ -34,8 +34,10 @@ public class JwtFilter extends OncePerRequestFilter {
 
         log.info("들어오는 경로 - {}", request.getServletPath());
 
+        String accessToken = request.getHeader("Authorization");
+
         try {
-            String token = jwtProvider.resolveAccessToken(request);
+            String token = jwtProvider.resolveToken(accessToken);
             log.info("token 받아내기 - {}", token);
             if (token != null && jwtProvider.validateToken(token)) {
 

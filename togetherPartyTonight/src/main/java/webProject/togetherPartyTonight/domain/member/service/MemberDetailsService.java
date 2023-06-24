@@ -29,7 +29,7 @@ public class MemberDetailsService implements UserDetailsService {
         if(member.isPresent()){
             return new MemberDetails(member.get());
         }else {
-            System.out.println(email);
+            System.out.println(member.get().getEmail());
             throw new MemberException(ErrorCode.INVALID_MEMBER_ID);
         }
 

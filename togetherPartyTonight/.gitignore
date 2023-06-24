@@ -42,5 +42,6 @@ application-local.yml
 application-prod.yml
 application-test.yml
 aws-test.yml
+data.sql
 
 *.DS_Store
