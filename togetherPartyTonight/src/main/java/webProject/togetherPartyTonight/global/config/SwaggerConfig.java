@@ -21,6 +21,7 @@ public class SwaggerConfig {
                 .apis(RequestHandlerSelectors.basePackage("webProject.togetherPartyTonight")) //대상 패키지 설정
                 .paths(PathSelectors.ant("/**"))
                 .build();
+
     }
 
     private ApiInfo apiInfo() {
