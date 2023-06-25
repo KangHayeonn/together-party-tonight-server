@@ -66,7 +66,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // 실패 메시지 작성
         ObjectMapper objectMapper = new ObjectMapper();
-        ErrorResponse errorResponse = new ErrorResponse("false", errorCode);
+        ErrorResponse errorResponse = new ErrorResponse("false", errorCode.getHttpStatus().value(), errorCode.getMessage());
 
         String result = objectMapper.writeValueAsString(errorResponse);
         response.getWriter().write(result);

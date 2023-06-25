@@ -1,9 +1,6 @@
-package webProject.togetherPartyTonight.global.common;
+package webProject.togetherPartyTonight.global.common.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.http.HttpStatus;
 import webProject.togetherPartyTonight.global.error.ErrorCode;
 
@@ -14,8 +11,8 @@ import webProject.togetherPartyTonight.global.error.ErrorCode;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 public class CommonResponse {
     private String success;
     private int code;
-
 }

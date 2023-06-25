@@ -4,23 +4,16 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import webProject.togetherPartyTonight.domain.club.info.dto.*;
-import webProject.togetherPartyTonight.domain.club.info.exception.ClubException;
 import webProject.togetherPartyTonight.domain.club.info.service.ClubService;
-import webProject.togetherPartyTonight.global.common.CommonResponse;
-import webProject.togetherPartyTonight.global.common.ErrorResponse;
+import webProject.togetherPartyTonight.global.common.response.CommonResponse;
 import webProject.togetherPartyTonight.global.common.ResponseWithData;
-import webProject.togetherPartyTonight.global.error.ErrorCode;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.time.LocalDate;
 
 @RestController
 @RequiredArgsConstructor
