@@ -20,7 +20,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AddClubRequest {
+public class CreateClubRequestDto {
 
     @NotNull(message = "userId는 필수 입력 값입니다.")
     private Long userId;

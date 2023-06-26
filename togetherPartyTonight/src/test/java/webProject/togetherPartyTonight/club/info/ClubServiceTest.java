@@ -6,8 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import webProject.togetherPartyTonight.domain.club.dto.request.AddClubRequest;
-import webProject.togetherPartyTonight.domain.club.dto.request.DeleteAndSignupRequestDto;
+import webProject.togetherPartyTonight.domain.club.dto.request.CreateClubRequestDto;
+import webProject.togetherPartyTonight.domain.club.dto.request.DeleteClubAndSignupRequestDto;
 import webProject.togetherPartyTonight.domain.club.entity.Club;
 import webProject.togetherPartyTonight.domain.club.exception.ClubException;
 import webProject.togetherPartyTonight.domain.club.repository.ClubRepository;
@@ -34,7 +34,7 @@ public class ClubServiceTest {
     @DisplayName("모임 추가 성공")
     void addClubSuccess () {
         //given
-        AddClubRequest request = getRequest();
+        CreateClubRequestDto request = getRequest();
 
         Member master = new Member();
         master.setId(1L);
@@ -61,7 +61,7 @@ public class ClubServiceTest {
 
 //        doReturn(Optional.ofNullable(getResponse())).when(clubRepository).findById(clubId);
         //when
-        //ClubDetailResponse responseDto = clubService.getClub(clubId);
+        //GetClubResponseDto responseDto = clubService.getClub(clubId);
         //then
         //assertThat(responseDto.getClubName().equals("test"));
         /*
@@ -74,10 +74,10 @@ public class ClubServiceTest {
     void deleteClubSuccess () {
         //given
         Long clubId = 1L;
-        DeleteAndSignupRequestDto deleteAndSignupRequestDto = getDeleteAndSignupRequestDto();
+        DeleteClubAndSignupRequestDto deleteClubAndSignupRequestDto = getDeleteAndSignupRequestDto();
         doNothing().when(clubRepository).deleteById(clubId);
         //when
-        clubService.deleteClub(deleteAndSignupRequestDto);
+        clubService.deleteClub(deleteClubAndSignupRequestDto);
         //then
         assertDoesNotThrow(() -> new ClubException(ErrorCode.INVALID_CLUB_ID));
     }
@@ -100,8 +100,8 @@ public class ClubServiceTest {
                 .hasMessage(ErrorCode.INVALID_CLUB_ID.getMessage());
     }
 
-     AddClubRequest getRequest () {
-        return AddClubRequest.builder()
+     CreateClubRequestDto getRequest () {
+        return CreateClubRequestDto.builder()
                 .clubName("name")
                 .clubContent("content")
                 .clubCategory("category")
@@ -135,8 +135,8 @@ public class ClubServiceTest {
                 .build();
     }
 
-    DeleteAndSignupRequestDto getDeleteAndSignupRequestDto () {
-        return new DeleteAndSignupRequestDto(1L, 1L);
+    DeleteClubAndSignupRequestDto getDeleteAndSignupRequestDto () {
+        return new DeleteClubAndSignupRequestDto(1L, 1L);
     }
 
 }
