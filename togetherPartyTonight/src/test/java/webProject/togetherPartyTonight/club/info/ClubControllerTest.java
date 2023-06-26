@@ -15,20 +15,17 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import webProject.togetherPartyTonight.domain.club.info.controller.ClubController;
-import webProject.togetherPartyTonight.domain.club.info.dto.ClubDetailResponse;
-import webProject.togetherPartyTonight.domain.club.info.dto.AddClubRequest;
-import webProject.togetherPartyTonight.domain.club.info.entity.Club;
-import webProject.togetherPartyTonight.domain.club.info.repository.ClubRepository;
-import webProject.togetherPartyTonight.domain.club.info.service.ClubService;
-import webProject.togetherPartyTonight.domain.member.entity.Member;
+import webProject.togetherPartyTonight.domain.club.controller.ClubController;
+import webProject.togetherPartyTonight.domain.club.dto.response.ClubDetailResponse;
+import webProject.togetherPartyTonight.domain.club.dto.request.AddClubRequest;
+import webProject.togetherPartyTonight.domain.club.repository.ClubRepository;
+import webProject.togetherPartyTonight.domain.club.service.ClubService;
 
 import java.time.LocalDate;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Mockito를 이용한 controller test

@@ -1,7 +1,7 @@
 package webProject.togetherPartyTonight.domain.review.entity;
 
 import lombok.*;
-import webProject.togetherPartyTonight.domain.club.info.entity.Club;
+import webProject.togetherPartyTonight.domain.club.entity.Club;
 import webProject.togetherPartyTonight.domain.member.entity.Member;
 import webProject.togetherPartyTonight.global.common.BaseEntity;
 
