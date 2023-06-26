@@ -7,6 +7,6 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class ReceivedApplicationList {
-    private List<Application> applicationList;
+public class MyOwnedClubListDto {
+    private List<MyOwnedClubDto> myOwnedList;
 }

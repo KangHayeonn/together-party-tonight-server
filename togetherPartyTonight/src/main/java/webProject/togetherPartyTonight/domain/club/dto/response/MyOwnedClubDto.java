@@ -8,16 +8,16 @@ import java.util.List;
 
 @Data
 @Builder
-public class MyOwnedClub {
+public class MyOwnedClubDto {
     private String clubName;
     private ClubCategory clubCategory;
     private Integer clubMaximum;
     private Integer clubMinimum;
     private String clubContent;
     private List<String> clubTags;
-    Float latitude;
-    Float longitude;
-    String address;
+    private Float latitude;
+    private Float longitude;
+    private String address;
 
-    String meetingDate;
+    private String meetingDate;
 }

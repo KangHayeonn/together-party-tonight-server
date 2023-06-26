@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ModifyClubRequest extends AddClubRequest {
+public class UpdateClubRequestDto extends CreateClubRequestDto {
 
     @NotNull
     private Long clubId;

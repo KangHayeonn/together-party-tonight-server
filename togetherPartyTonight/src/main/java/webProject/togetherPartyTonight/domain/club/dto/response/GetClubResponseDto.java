@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ClubDetailResponse {
+public class GetClubResponseDto {
     private String nickName;
     private Long userId;
     private String clubName;
@@ -25,8 +25,8 @@ public class ClubDetailResponse {
     private LocalDate meetingDate;
     private String image;
 
-    public ClubDetailResponse toDto (Club club) {
-//        this.nickname=club.getNickname();
+    public GetClubResponseDto toDto (Club club) {
+        this.nickName=club.getMaster().getNickname();
         this.clubName= club.getClubName();
         this.clubCategory=club.getClubCategory();
         this.clubContent= club.getClubContent();

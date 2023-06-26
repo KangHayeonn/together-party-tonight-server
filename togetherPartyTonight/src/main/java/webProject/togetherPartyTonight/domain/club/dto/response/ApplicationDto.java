@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Application {
+public class ApplicationDto {
     private Long clubSignupId;
     private Long clubId;
     private String clubName;

@@ -16,8 +16,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import webProject.togetherPartyTonight.domain.club.controller.ClubController;
-import webProject.togetherPartyTonight.domain.club.dto.response.ClubDetailResponse;
-import webProject.togetherPartyTonight.domain.club.dto.request.AddClubRequest;
+import webProject.togetherPartyTonight.domain.club.dto.response.GetClubResponseDto;
+import webProject.togetherPartyTonight.domain.club.dto.request.CreateClubRequestDto;
 import webProject.togetherPartyTonight.domain.club.repository.ClubRepository;
 import webProject.togetherPartyTonight.domain.club.service.ClubService;
 
@@ -59,7 +59,7 @@ public class ClubControllerTest {
 //        Member master = new Member();
 //        master.setId(1L);
 //        clubRepository.save(request.toClub(master));
-//        ClubDetailResponse response = getResponse();
+//        GetClubResponseDto response = getResponse();
 //        Long clubId = 1L;
 
 //        //when
@@ -78,7 +78,7 @@ public class ClubControllerTest {
     @DisplayName("모임 추가 성공")
     void addSuccess () throws Exception{
         //given
-        AddClubRequest request = getRequest();
+        CreateClubRequestDto request = getRequest();
 
         ResultActions resultActions= mockMvc.perform(
                         MockMvcRequestBuilders.post("/api/clubs")
@@ -106,8 +106,8 @@ public class ClubControllerTest {
         //verify(clubService).deleteClub(1L);
     }
 
-    AddClubRequest getRequest() {
-        return AddClubRequest.builder()
+    CreateClubRequestDto getRequest() {
+        return CreateClubRequestDto.builder()
                 .clubName("test")
                 .clubContent("content")
                 .clubCategory("category")
@@ -122,8 +122,8 @@ public class ClubControllerTest {
                 .build();
     }
 
-    ClubDetailResponse getResponse () {
-        return ClubDetailResponse.builder()
+    GetClubResponseDto getResponse () {
+        return GetClubResponseDto.builder()
                 .clubName("test")
                 .clubContent("content")
                 //.clubCategory("category")
