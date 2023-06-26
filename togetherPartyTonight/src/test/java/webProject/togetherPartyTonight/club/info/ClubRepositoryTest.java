@@ -1,24 +1,12 @@
 package webProject.togetherPartyTonight.club.info;
 
-import org.geolatte.geom.M;
 import org.junit.jupiter.api.*;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.transaction.annotation.Transactional;
-import webProject.togetherPartyTonight.domain.club.info.entity.Club;
-import webProject.togetherPartyTonight.domain.club.info.repository.ClubRepository;
-import webProject.togetherPartyTonight.domain.member.entity.Member;
+import webProject.togetherPartyTonight.domain.club.repository.ClubRepository;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

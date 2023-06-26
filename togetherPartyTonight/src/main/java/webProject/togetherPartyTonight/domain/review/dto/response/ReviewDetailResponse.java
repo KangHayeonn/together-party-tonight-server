@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import webProject.togetherPartyTonight.domain.club.info.entity.Club;
+import webProject.togetherPartyTonight.domain.club.entity.Club;
 import webProject.togetherPartyTonight.domain.review.entity.Review;
 
 import java.time.LocalDate;

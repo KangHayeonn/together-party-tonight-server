@@ -2,8 +2,7 @@ package webProject.togetherPartyTonight.domain.review.dto.request;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Length;
-import webProject.togetherPartyTonight.domain.club.info.entity.Club;
+import webProject.togetherPartyTonight.domain.club.entity.Club;
 import webProject.togetherPartyTonight.domain.member.entity.Member;
 import webProject.togetherPartyTonight.domain.review.entity.Review;
 
