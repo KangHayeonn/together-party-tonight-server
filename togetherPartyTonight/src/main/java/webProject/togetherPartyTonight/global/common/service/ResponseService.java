@@ -32,8 +32,6 @@ public class ResponseService {
         return new FailureResponse(FAIL, code, errorMessage);
     }
 
-    //----------
-
     public void setSuccessResponse(CommonResponse commonResponse) {
         commonResponse.setSuccess(SUCCESS);
         commonResponse.setCode(200);
