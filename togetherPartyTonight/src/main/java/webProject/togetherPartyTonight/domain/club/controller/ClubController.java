@@ -14,8 +14,8 @@ import webProject.togetherPartyTonight.domain.club.dto.response.MyAppliedClubLis
 import webProject.togetherPartyTonight.domain.club.dto.response.MyOwnedClubList;
 import webProject.togetherPartyTonight.domain.club.dto.response.ReceivedApplicationList;
 import webProject.togetherPartyTonight.domain.club.service.ClubService;
-import webProject.togetherPartyTonight.global.common.CommonResponse;
 import webProject.togetherPartyTonight.global.common.ResponseWithData;
+import webProject.togetherPartyTonight.global.common.response.CommonResponse;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;

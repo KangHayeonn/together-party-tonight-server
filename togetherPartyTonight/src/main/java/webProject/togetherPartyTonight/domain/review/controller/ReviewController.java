@@ -11,7 +11,7 @@ import webProject.togetherPartyTonight.domain.review.dto.request.AddReviewReques
 import webProject.togetherPartyTonight.domain.review.dto.request.ModifyReviewRequest;
 import webProject.togetherPartyTonight.domain.review.dto.response.ReviewDetailResponse;
 import webProject.togetherPartyTonight.domain.review.service.ReviewService;
-import webProject.togetherPartyTonight.global.common.CommonResponse;
+import webProject.togetherPartyTonight.global.common.response.CommonResponse;
 import webProject.togetherPartyTonight.global.common.ResponseWithData;
 import webProject.togetherPartyTonight.infra.S3.S3Service;
 
