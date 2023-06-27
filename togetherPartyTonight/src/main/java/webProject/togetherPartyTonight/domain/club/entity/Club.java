@@ -11,6 +11,7 @@ import webProject.togetherPartyTonight.global.util.PointConverter;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Setter
@@ -58,7 +59,7 @@ public class Club extends BaseEntity {
     private String address;
 
     @Column(name = "club_meeting_date", nullable = false)
-    private LocalDate meetingDate;
+    private LocalDateTime meetingDate;
 
     @Column(name = "club_state", nullable = false, length = 1, columnDefinition = "tinyint")
     private Boolean clubState; //true: 모집중, false: 모집 완료

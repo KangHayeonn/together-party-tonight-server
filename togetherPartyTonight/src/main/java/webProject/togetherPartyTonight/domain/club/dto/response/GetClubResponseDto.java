@@ -22,7 +22,7 @@ public class GetClubResponseDto {
     private String address;
     private Float latitude;
     private Float longitude;
-    private LocalDate meetingDate;
+    private String meetingDate;
     private String image;
 
     public GetClubResponseDto toDto (Club club) {
@@ -37,7 +37,7 @@ public class GetClubResponseDto {
         this.longitude= (float) club.getClubPoint().getY();
         this.clubTags = club.getClubTags();
         this.address=club.getAddress();
-        this.meetingDate= club.getMeetingDate();
+        this.meetingDate= String.valueOf(club.getMeetingDate());
         this.image=club.getImage();
         return this;
     }

@@ -21,7 +21,7 @@ public class GetReviewDetailResponseDto {
     Integer rating;
     String clubName;
     String address;
-    LocalDate meetingDate;
+    String meetingDate;
     LocalDateTime createdDate;
     String image;
 
@@ -34,7 +34,7 @@ public class GetReviewDetailResponseDto {
                 .rating(review.getRating())
                 .clubName(club.getClubName())
                 .address(club.getAddress())
-                .meetingDate(club.getMeetingDate())
+                .meetingDate(String.valueOf(club.getMeetingDate()))
                 .createdDate(club.getCreatedDate())
                 .image(review.getImageUrl())
                 .build();
