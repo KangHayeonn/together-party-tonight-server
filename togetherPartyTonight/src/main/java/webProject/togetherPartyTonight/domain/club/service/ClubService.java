@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import webProject.togetherPartyTonight.domain.club.dto.request.*;
 import webProject.togetherPartyTonight.domain.club.dto.response.*;
 import webProject.togetherPartyTonight.domain.club.entity.*;
+import webProject.togetherPartyTonight.domain.club.exception.ClubErrorCode;
 import webProject.togetherPartyTonight.domain.club.exception.ClubException;
 import webProject.togetherPartyTonight.domain.club.repository.ClubMemberRepository;
 import webProject.togetherPartyTonight.domain.club.repository.ClubRepository;
@@ -79,7 +80,7 @@ public class ClubService {
      */
     public GetClubResponseDto getClub(Long id) {
         Club club = clubRepository.findById(id)
-                .orElseThrow(() -> new ClubException(ErrorCode.INVALID_CLUB_ID));
+                .orElseThrow(() -> new ClubException(ClubErrorCode.INVALID_CLUB_ID));
         return new GetClubResponseDto().toDto(club);
     }
 
@@ -89,7 +90,7 @@ public class ClubService {
         Long userId = requestDto.getUserId();
         // TODO: 2023/06/17 JWT 내부 유저정보와 requestBody의 userId가 다르면 '권한 없음' exception
         Club club = clubRepository.findById(requestDto.getClubId()).orElseThrow(
-                ()-> new ClubException(ErrorCode.INVALID_CLUB_ID)
+                ()-> new ClubException(ClubErrorCode.INVALID_CLUB_ID)
         );
 
         if (!club.getImage().contains("default"))
@@ -107,7 +108,7 @@ public class ClubService {
         Long userId = clubRequest.getUserId();
         // TODO: 2023/06/17 JWT 내부 유저정보와 requestBody의 userId가 다르면 '권한 없음' exception
         Club club = clubRepository.findByClubIdAndMasterId(clubId, userId)
-                .orElseThrow(()-> new ClubException(ErrorCode.INVALID_CLUB_ID));
+                .orElseThrow(()-> new ClubException(ClubErrorCode.INVALID_CLUB_ID));
         compareChange(clubRequest, club, image);
 
     }
@@ -140,11 +141,8 @@ public class ClubService {
     public void checkMeetingDateIsPassed() {
         List<Club> clubList = clubRepository.findAll();
         for (Club c : clubList) {
-            if (c.getMeetingDate().isBefore(LocalDate.now())) {
-                System.out.println("지났다!!");
-            } else {
-                System.out.println("아직 안지났어");
-            }
+            if (c.getMeetingDate().isBefore(LocalDate.now()))
+                clubRepository.updateClubState();
         }
     }
 

@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.Point;
 import webProject.togetherPartyTonight.domain.club.entity.Club;
 import webProject.togetherPartyTonight.domain.club.entity.ClubCategory;
+import webProject.togetherPartyTonight.domain.club.exception.ClubErrorCode;
 import webProject.togetherPartyTonight.domain.club.exception.ClubException;
 import webProject.togetherPartyTonight.global.error.ErrorCode;
 
@@ -32,7 +33,7 @@ public class UpdateClubRequestDto extends CreateClubRequestDto {
         club.setImage(image);
 
         if (flag ==-1) {
-            throw new ClubException(ErrorCode.INVALID_CLUB_MAXIMUM);
+            throw new ClubException(ClubErrorCode.INVALID_CLUB_MAXIMUM);
         }
         else if (flag ==0) {
             club.setClubMaximum(this.getClubMaximum());

@@ -5,12 +5,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import webProject.togetherPartyTonight.domain.club.entity.Club;
 import webProject.togetherPartyTonight.domain.club.entity.ClubMember;
+import webProject.togetherPartyTonight.domain.club.exception.ClubErrorCode;
 import webProject.togetherPartyTonight.domain.club.repository.ClubMemberRepository;
 import webProject.togetherPartyTonight.domain.club.repository.ClubRepository;
-import webProject.togetherPartyTonight.domain.review.dto.request.AddReviewRequest;
-import webProject.togetherPartyTonight.domain.review.dto.request.ModifyReviewRequest;
-import webProject.togetherPartyTonight.domain.review.dto.response.ReviewDetailResponse;
+import webProject.togetherPartyTonight.domain.review.dto.request.CreateReviewRequestDto;
+import webProject.togetherPartyTonight.domain.review.dto.request.UpdateReviewRequestDto;
+import webProject.togetherPartyTonight.domain.review.dto.response.GetReviewDetailResponseDto;
 import webProject.togetherPartyTonight.domain.review.entity.Review;
+import webProject.togetherPartyTonight.domain.review.exception.ReviewErrorCode;
 import webProject.togetherPartyTonight.domain.review.exception.ReviewException;
 import webProject.togetherPartyTonight.domain.review.repository.ReviewRepository;
 import webProject.togetherPartyTonight.global.error.ErrorCode;
@@ -32,15 +34,15 @@ public class ReviewService {
     private final String directory = "review/";
 
     @Transactional
-    public void addReview(AddReviewRequest request, MultipartFile image) {
+    public void addReview(CreateReviewRequestDto request, MultipartFile image) {
         Long clubId = request.getClubId();
         Long userId = request.getUserId();
 
         if(reviewRepository.findByClubClubIdAndMemberId(clubId, userId).isPresent())
-            throw new ReviewException(ErrorCode.IS_ALREADY_WRITTEN);
+            throw new ReviewException(ReviewErrorCode.IS_ALREADY_WRITTEN);
 
         Club club = clubRepository.findById(clubId).orElseThrow(
-                () -> new ReviewException(ErrorCode.INVALID_CLUB_ID)
+                () -> new ReviewException(ClubErrorCode.INVALID_CLUB_ID)
         );
 
         ClubMember clubMember = clubMemberRepository.findByClubClubIdAndMemberId(clubId, userId).orElseThrow(
@@ -59,22 +61,22 @@ public class ReviewService {
             Review review = request.toEntity(club, clubMember.getMember(),imageUrl);
             reviewRepository.save(review);
         }
-        else throw new ReviewException(ErrorCode.INVALID_REVIEW_DATE);
+        else throw new ReviewException(ReviewErrorCode.INVALID_REVIEW_DATE);
     }
 
-    public ReviewDetailResponse getReviewDetail(Long reviewId){
+    public GetReviewDetailResponseDto getReviewDetail(Long reviewId){
         Review review = reviewRepository.findById(reviewId).orElseThrow(
-                () -> new ReviewException(ErrorCode.INVALID_REVIEW_ID)
+                () -> new ReviewException(ReviewErrorCode.INVALID_REVIEW_ID)
         );
-        return new ReviewDetailResponse().toDto(review);
+        return new GetReviewDetailResponseDto().toDto(review);
 
     }
 
     @Transactional
-    public void modifyReview(ModifyReviewRequest request, MultipartFile image) {
+    public void modifyReview(UpdateReviewRequestDto request, MultipartFile image) {
         Long reviewId = request.getReviewId();
         Review review = reviewRepository.findById(reviewId).orElseThrow(
-                () -> new ReviewException(ErrorCode.INVALID_REVIEW_ID)
+                () -> new ReviewException(ReviewErrorCode.INVALID_REVIEW_ID)
         );
 
         String imageUrl="";
@@ -92,7 +94,7 @@ public class ReviewService {
     public void deleteReview(Long reviewId) {
         // TODO: 2023/06/21 권한없음 exception
         Review review = reviewRepository.findById(reviewId).orElseThrow(
-                ()-> new ReviewException(ErrorCode.INVALID_REVIEW_ID)
+                ()-> new ReviewException(ReviewErrorCode.INVALID_REVIEW_ID)
         );
         if (!review.getImageUrl().contains("default"))
             s3Service.deleteImage(review.getImageUrl());

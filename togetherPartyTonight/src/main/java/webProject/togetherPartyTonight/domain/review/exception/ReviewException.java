@@ -2,14 +2,13 @@ package webProject.togetherPartyTonight.domain.review.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import webProject.togetherPartyTonight.global.error.CommonException;
 import webProject.togetherPartyTonight.global.error.ErrorCode;
+import webProject.togetherPartyTonight.global.error.ErrorInterface;
 
 @Getter
-public class ReviewException extends RuntimeException{
-    private ErrorCode errorCode;
-
-    public ReviewException(ErrorCode errorCode) {
-        super(errorCode.getMessage());
-        this.errorCode= errorCode;
+public class ReviewException extends CommonException {
+    public ReviewException(ErrorInterface errorCode) {
+        super(errorCode);
     }
 }

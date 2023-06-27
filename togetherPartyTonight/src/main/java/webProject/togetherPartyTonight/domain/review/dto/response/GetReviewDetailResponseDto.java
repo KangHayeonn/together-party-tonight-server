@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ReviewDetailResponse {
+public class GetReviewDetailResponseDto {
     Long userId; //작성자 아이디
     String nickname; //작성자 닉네임
     String reviewContent;
@@ -25,11 +25,11 @@ public class ReviewDetailResponse {
     LocalDateTime createdDate;
     String image;
 
-    public ReviewDetailResponse toDto(Review review) {
+    public GetReviewDetailResponseDto toDto(Review review) {
         Club club = review.getClub();
-        return ReviewDetailResponse.builder()
+        return GetReviewDetailResponseDto.builder()
                 .userId(review.getMember().getId())
-//                .nickname(review.getMember().getNickname())
+                .nickname(review.getMember().getNickname())
                 .reviewContent(review.getReviewContent())
                 .rating(review.getRating())
                 .clubName(club.getClubName())

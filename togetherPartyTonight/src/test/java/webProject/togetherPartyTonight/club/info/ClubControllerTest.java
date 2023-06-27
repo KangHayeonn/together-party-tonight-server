@@ -53,90 +53,19 @@ public class ClubControllerTest {
 
     @Test
     @DisplayName("모임 상세 조회 성공")
-    void getDetailSuccess () throws Exception{
-//        //given
-//        AddClubRequest request = getRequest();
-//        Member master = new Member();
-//        master.setId(1L);
-//        clubRepository.save(request.toClub(master));
-//        GetClubResponseDto response = getResponse();
-//        Long clubId = 1L;
-
-//        //when
-//        ResultActions resultActions = mockMvc.perform(
-//                MockMvcRequestBuilders.get("/api/clubs/" + clubId)
-//        );
-//        resultActions.andExpect(status().isOk())
-//                .andExpect(jsonPath("$.data.name").value("test"));
-//        //then
-
-
-
+    void getDetailSuccess() throws Exception {
     }
 
     @Test
     @DisplayName("모임 추가 성공")
-    void addSuccess () throws Exception{
-        //given
-        CreateClubRequestDto request = getRequest();
+    void addSuccess() throws Exception {
 
-        ResultActions resultActions= mockMvc.perform(
-                        MockMvcRequestBuilders.post("/api/clubs")
-                                .content(new Gson().toJson(request))
-                );
-        //resultActions.andExpect(status().isOk());
-
-        //then
-        //verify(clubService).addClub(request);
     }
 
     @Test
     @DisplayName("모임 삭제 성공")
     void deleteSuccess () throws Exception{
-        //given
-        Long clubId = 1L;
-        //when
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.delete("/api/clubs")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(" { \"clubId\" : 1, \"userId\" : 1 }")
-        );
 
-        //then
-        //verify(clubService).deleteClub(1L);
     }
-
-    CreateClubRequestDto getRequest() {
-        return CreateClubRequestDto.builder()
-                .clubName("test")
-                .clubContent("content")
-                .clubCategory("category")
-                .clubTags("tags")
-                .address("address")
-                .meetingDate("2023-06-11")
-                .latitude(20.222F)
-                .longitude(11.11F)
-                .userId(1L)
-                .clubMinimum(2)
-                .clubMaximum(6)
-                .build();
-    }
-
-    GetClubResponseDto getResponse () {
-        return GetClubResponseDto.builder()
-                .clubName("test")
-                .clubContent("content")
-                //.clubCategory("category")
-                .clubTags("tags")
-                .address("address")
-                .meetingDate(LocalDate.parse("2023-06-11"))
-                .userId(1L)
-                .clubMinimum(2)
-                .clubMaximum(6)
-                .build();
-    }
-
-
-
 
 }

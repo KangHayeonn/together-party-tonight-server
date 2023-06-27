@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import webProject.togetherPartyTonight.domain.review.exception.ReviewException;
+import webProject.togetherPartyTonight.global.error.CommonException;
 import webProject.togetherPartyTonight.global.error.ErrorCode;
 import webProject.togetherPartyTonight.global.util.YamlPropertySourceFactory;
 
@@ -84,7 +85,7 @@ public class S3Service {
             return checkImageExtension(extension);
         }
         catch (StringIndexOutOfBoundsException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "잘못된 형식의 파일 file: " + fileName);
+            throw new CommonException(ErrorCode.INVALID_EXTENSION);
         }
     }
 
@@ -98,8 +99,7 @@ public class S3Service {
                 break;
             }
         }
-        //ErrorResponse refactoring 때문에 아직 주석처리
-        //if (!check)  exception
+        if (!check)  throw new CommonException(ErrorCode.INVALID_IMAGE_EXTENSION);
         return extension;
     }
 
