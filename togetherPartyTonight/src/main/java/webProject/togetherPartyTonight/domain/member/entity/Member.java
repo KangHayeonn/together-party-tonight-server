@@ -51,8 +51,7 @@ public class Member extends BaseEntity {
     @Column(name = "member_provider")
     private OAuthProvider oAuthProvider;
 
-    @OneToMany(mappedBy = "chatMemberA") // ChatRoom 의 member 필드와 매핑
-
+    @OneToMany(mappedBy = "chatMemberA", fetch = LAZY) // ChatRoom 의 member 필드와 매핑
     private List<ChatRoom> aChatRooms = new ArrayList<>();
 
     @OneToMany(mappedBy = "chatMemberB", fetch = LAZY) // ChatRoom 의 member 필드와 매핑
