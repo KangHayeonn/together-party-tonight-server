@@ -11,6 +11,7 @@ import webProject.togetherPartyTonight.domain.club.entity.ApprovalState;
 import webProject.togetherPartyTonight.domain.club.entity.Club;
 import webProject.togetherPartyTonight.domain.club.entity.ClubMember;
 import webProject.togetherPartyTonight.domain.club.entity.ClubSignup;
+import webProject.togetherPartyTonight.domain.club.exception.ClubErrorCode;
 import webProject.togetherPartyTonight.domain.club.exception.ClubException;
 import webProject.togetherPartyTonight.domain.club.repository.ClubMemberRepository;
 import webProject.togetherPartyTonight.domain.club.repository.ClubRepository;
@@ -25,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,12 +44,18 @@ public class ClubJoinService {
      */
     public void signup (DeleteClubAndSignupRequestDto requestDto) {
         Club club = clubRepository.getReferenceById(requestDto.getClubId());
-        if (club==null) throw new ClubException(ErrorCode.INVALID_CLUB_ID);
+        if (club==null) throw new ClubException(ClubErrorCode.INVALID_CLUB_ID);
         Member member = memberRepository.getReferenceById(requestDto.getUserId());
         // TODO: 2023/06/17 JWT 내부 유저정보와 requestBody의 userId가 다르면 '권한 없음' exception
 
-        ClubSignup clubSignup = requestDto.toClubSignup(club, member, club.getMaster());
-        clubSignupRepository.save(clubSignup);
+        Optional<ClubSignup> alreadySignup = clubSignupRepository.findByClubClubIdAndClubMemberId(requestDto.getClubId(), requestDto.getUserId());
+        if(alreadySignup.isEmpty()) {
+            ClubSignup clubSignup = requestDto.toClubSignup(club, member, club.getMaster());
+            clubSignupRepository.save(clubSignup);
+        }
+        else {
+            throw new ClubException(ClubErrorCode.ALREADY_SIGNUP);
+        }
     }
 
     /**
@@ -67,17 +75,19 @@ public class ClubJoinService {
         // TODO: 2023/06/17 JWT 내부 유저정보와 userId가 다르면 '권한 없음' exception
 
         ClubSignup clubSignup = clubSignupRepository.findById(clubSignupId).orElseThrow(
-                () -> new ClubException(ErrorCode.INVALID_CLUB_SIGNUP_ID)
+                () -> new ClubException(ClubErrorCode.INVALID_CLUB_SIGNUP_ID)
         );
 
         if (clubSignup.getClubSignupApprovalState().equals(ApprovalState.PENDING)) {
             clubSignupRepository.deleteById(clubSignupId);
         }
         else if (clubSignup.getClubSignupApprovalState().equals(ApprovalState.APPROVE)){
-            //throw new ClubException()
+            clubMemberRepository.deleteByClubClubIdAndMemberId(clubSignup.getClub().getClubId(), requestDto.getUserId());
+            clubSignupRepository.deleteById(clubSignupId);
+            checkIfRecruitComplete(clubSignup);
         }
         else {
-            //이미 거절당했습니다
+            //
         }
     }
 
@@ -89,7 +99,7 @@ public class ClubJoinService {
         // TODO: 2023/06/17 JWT 내부 유저정보와 masterId가 다르면 '권한 없음' exception
 
         ClubSignup clubSignup = clubSignupRepository.findById(clubSignupId).orElseThrow(
-                () -> new ClubException(ErrorCode.INVALID_CLUB_SIGNUP_ID)
+                () -> new ClubException(ClubErrorCode.INVALID_CLUB_SIGNUP_ID)
         );
         if (clubSignup.getClubSignupApprovalState().equals(ApprovalState.PENDING)) {
             //아직 수락/거절을 하지 않았을 경우
@@ -110,7 +120,7 @@ public class ClubJoinService {
         }
         else {
             //이미 수락/거절을 한 경우
-            throw new ClubException(ErrorCode.ALREADY_APPROVED);
+            throw new ClubException(ClubErrorCode.ALREADY_APPROVED);
         }
 
 
@@ -120,7 +130,7 @@ public class ClubJoinService {
     // TODO: 2023/06/21  pending, refuse, approve, kicked 모두 보내고 있음 -> pending, approve 만?
     public ReceivedApplicationListDto getRequestListPerClub (Long userId, Long clubId) {
         Club club = clubRepository.findById(clubId).orElseThrow(
-                () -> new ClubException(ErrorCode.INVALID_CLUB_ID)
+                () -> new ClubException(ClubErrorCode.INVALID_CLUB_ID)
         );
 
         memberRepository.findById(userId).orElseThrow(
@@ -139,7 +149,7 @@ public class ClubJoinService {
                     .clubName(c.getClub().getClubName())
                     .clubId(c.getClub().getClubId())
                     .userId(c.getClubMember().getId())
-                    //      nickname
+                    .nickName(c.getClubMember().getNickname())
                     .signupDate(c.getClubSignupDate().toString())
                     .approvalStatus(c.getClubSignupApprovalState().name())
                     .build();
@@ -167,7 +177,7 @@ public class ClubJoinService {
                     .clubName(c.getClub().getClubName())
                     .clubId(c.getClub().getClubId())
                     .userId(c.getClub().getMaster().getId())
-                    //nickname
+                    .nickName(c.getClubMaster().getNickname())
                     .signupDate(c.getClubSignupDate().toString())
                     .approvalStatus(c.getClubSignupApprovalState().name())
                     .build();
@@ -213,7 +223,7 @@ public class ClubJoinService {
         Long clubSignupId = request.getClubSignupId();
         Long userId = request.getUserId(); //모임장 아이디
         ClubSignup signup = clubSignupRepository.findById(clubSignupId).orElseThrow(
-                () -> new ClubException(ErrorCode.INVALID_CLUB_SIGNUP_ID)
+                () -> new ClubException(ClubErrorCode.INVALID_CLUB_SIGNUP_ID)
         );
         if (signup.getClubMaster().getId() != userId) throw new ClubException(ErrorCode.INVALID_MEMBER_ID);
 
@@ -231,10 +241,10 @@ public class ClubJoinService {
 
     public void checkIfRecruitComplete(ClubSignup clubSignup) {
         //현재 승인된 모임 인원이 모집 최대 인원에 도달했는지 여부 반환
-        boolean res= false;
         Club club = clubSignup.getClub();
         Integer memberCnt = clubMemberRepository.getMemberCnt(club.getClubId()); //현재 승인된 인원
         Integer maximum = club.getClubMaximum(); //모임의 최대인원
         if (memberCnt==maximum) club.setClubState(false); //모임이 꽉 찼으면 모집완료 상태로 변경
+        else club.setClubState(true);
     }
 }

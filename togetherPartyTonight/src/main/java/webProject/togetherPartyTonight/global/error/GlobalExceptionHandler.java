@@ -53,21 +53,18 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ClubException.class)
-    public ResponseEntity<ErrorResponse> clubException (ClubException e) {
+    public FailureResponse clubException (ClubException e) {
         e.printStackTrace();
-        logger.error("club exception : {}",e.getErrorCode().getMessage());
-        ErrorResponse errorResponse = new ErrorResponse(FAIL, e.getErrorCode().getHttpStatus().value(), e.getErrorCode().getMessage());
-        return ResponseEntity.status(200)
-                .body(errorResponse);
+        logger.error("club exception : {}",e.getErrorInterface().getErrorMessage());
+        return responseService.getFailureResponse(e.getErrorInterface().getStatusCode(), e.getErrorInterface().getErrorMessage());
     }
 
     @ExceptionHandler(ReviewException.class)
-    public ResponseEntity<ErrorResponse> reviewException (ReviewException e) {
+    public FailureResponse reviewException (ReviewException e) {
         e.printStackTrace();
-        logger.error("review exception : {}",e.getErrorCode().getMessage());
-        ErrorResponse errorResponse = new ErrorResponse(FAIL, e.getErrorCode().getHttpStatus().value(), e.getErrorCode().getMessage());
-        return ResponseEntity.status(200)
-                .body(errorResponse);
+        logger.error("review exception : {}",e.getErrorInterface().getErrorMessage());
+        return responseService.getFailureResponse(e.getErrorInterface().getStatusCode(), e.getErrorInterface().getErrorMessage());
+
     }
 
     @ExceptionHandler(CommonException.class)
@@ -78,31 +75,25 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> fieldValueException (MethodArgumentNotValidException e) {
+    public FailureResponse fieldValueException (MethodArgumentNotValidException e) {
         e.printStackTrace();
         StringBuilder sb = new StringBuilder();
         for (FieldError fe : e.getFieldErrors()) {
             sb.append(fe.getDefaultMessage()).append("  ");
         }
-        ErrorResponse errorResponse = new ErrorResponse(FAIL, String.valueOf(sb));
-        return ResponseEntity.status(200)
-                .body(errorResponse);
+        return responseService.getFailureResponse(400, sb.toString());
     }
   
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorResponse> httpMessageNotReadableException (HttpMessageNotReadableException e) {
+    public FailureResponse httpMessageNotReadableException (HttpMessageNotReadableException e) {
         e.printStackTrace();
-        ErrorResponse errorResponse = new ErrorResponse(FAIL, ErrorCode.INVALID_REQUEST_BODY_PARAMETER_TYPE.getHttpStatus().value(), ErrorCode.INVALID_REQUEST_BODY_PARAMETER_TYPE.getMessage());
-        return ResponseEntity.status(200)
-                .body(errorResponse);
+        return responseService.getFailureResponse(ErrorCode.INVALID_REQUEST_BODY_PARAMETER_TYPE.getHttpStatus().value(), ErrorCode.INVALID_REQUEST_BODY_PARAMETER_TYPE.getMessage());
     }
 
     @ExceptionHandler(DateTimeParseException.class)
-    public ResponseEntity<ErrorResponse> dateParseException (DateTimeParseException e) {
+    public FailureResponse dateParseException (DateTimeParseException e) {
         e.printStackTrace();
-        ErrorResponse errorResponse = new ErrorResponse(FAIL, ErrorCode.DATE_PARSING_EXCEPTION.getHttpStatus().value(), ErrorCode.DATE_PARSING_EXCEPTION.getMessage());
-        return ResponseEntity.status(200)
-                .body(errorResponse);
+        return responseService.getFailureResponse(ErrorCode.DATE_PARSING_EXCEPTION.getHttpStatus().value(), ErrorCode.DATE_PARSING_EXCEPTION.getMessage());
     }
 
 
