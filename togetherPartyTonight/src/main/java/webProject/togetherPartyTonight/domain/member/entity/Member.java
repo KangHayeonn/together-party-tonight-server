@@ -14,6 +14,8 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static javax.persistence.FetchType.LAZY;
+
 @Entity
 @Getter
 @Setter
@@ -50,8 +52,9 @@ public class Member extends BaseEntity {
     private OAuthProvider oAuthProvider;
 
     @OneToMany(mappedBy = "chatMemberA") // ChatRoom 의 member 필드와 매핑
+
     private List<ChatRoom> aChatRooms = new ArrayList<>();
 
-    @OneToMany(mappedBy = "chatMemberB") // ChatRoom 의 member 필드와 매핑
+    @OneToMany(mappedBy = "chatMemberB", fetch = LAZY) // ChatRoom 의 member 필드와 매핑
     private List<ChatRoom> bChatRooms = new ArrayList<>();
 }
