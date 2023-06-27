@@ -1,20 +1,23 @@
 package webProject.togetherPartyTonight.domain.club.dto.request;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.aspectj.lang.annotation.After;
 import org.locationtech.jts.geom.Point;
+import org.springframework.format.annotation.DateTimeFormat;
 import webProject.togetherPartyTonight.domain.club.entity.Club;
 import webProject.togetherPartyTonight.domain.club.entity.ClubCategory;
 import webProject.togetherPartyTonight.domain.member.entity.Member;
 import webProject.togetherPartyTonight.global.common.Enum;
-import webProject.togetherPartyTonight.global.common.IsAfter;
 
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -66,9 +69,10 @@ public class CreateClubRequestDto {
     @Max(value = 180, message = "유효한 경도 범위를 벗어났습니다.")
     private Float longitude; //경도
 
-    @NotEmpty (message = "meetingDate는 필수 입력 값입니다.")
-    @IsAfter
-    private String meetingDate;
+    @NotNull (message = "meetingDate는 필수 입력 값입니다.")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm", timezone = "Asia/Seoul")
+    @Future(message = "모임 날짜가 현재 날짜와 시각보다 미래여야 합니다.")
+    private LocalDateTime meetingDate;
 
     public Club toClub (Member master, Point point, String url) {
 
@@ -80,7 +84,7 @@ public class CreateClubRequestDto {
                 .clubMinimum(clubMinimum)
                 .clubTags(clubTags)
                 .address(address)
-                .meetingDate(LocalDate.parse(meetingDate))
+                .meetingDate(meetingDate)
                 .clubPoint(point)
                 .clubCategory(ClubCategory.valueOf(clubCategory))
                 .clubState(true) //모집중

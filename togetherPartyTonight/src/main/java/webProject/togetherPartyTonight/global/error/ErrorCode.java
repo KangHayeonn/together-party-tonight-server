@@ -13,7 +13,6 @@ public enum ErrorCode implements ErrorInterface {
 
     //400 BAD_REQUEST
     INVALID_REQUEST_BODY_PARAMETER_TYPE(HttpStatus.BAD_REQUEST, "Request Body의 parameter type이 일치하지 않습니다"),
-    DATE_PARSING_EXCEPTION(HttpStatus.BAD_REQUEST, "LocalDate형식에 맞게 보내야 합니다"),
     INVALID_IMAGE_EXTENSION(HttpStatus.BAD_REQUEST,"이미지 파일이 아닙니다. 파일 형식을 확인하세요."),
     INVALID_EXTENSION(HttpStatus.BAD_REQUEST, "정상적인 파일이 아닙니다. 확장자 명을 확인하세요"),
     INVALID_MEMBER_ID(HttpStatus.NOT_FOUND, "유효하지 않은 사용자 ID 입니다."),

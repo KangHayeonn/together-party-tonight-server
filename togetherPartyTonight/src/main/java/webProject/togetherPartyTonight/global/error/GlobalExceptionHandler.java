@@ -83,17 +83,13 @@ public class GlobalExceptionHandler {
         }
         return responseService.getFailureResponse(400, sb.toString());
     }
-  
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public FailureResponse httpMessageNotReadableException (HttpMessageNotReadableException e) {
         e.printStackTrace();
-        return responseService.getFailureResponse(ErrorCode.INVALID_REQUEST_BODY_PARAMETER_TYPE.getHttpStatus().value(), ErrorCode.INVALID_REQUEST_BODY_PARAMETER_TYPE.getMessage());
-    }
-
-    @ExceptionHandler(DateTimeParseException.class)
-    public FailureResponse dateParseException (DateTimeParseException e) {
-        e.printStackTrace();
-        return responseService.getFailureResponse(ErrorCode.DATE_PARSING_EXCEPTION.getHttpStatus().value(), ErrorCode.DATE_PARSING_EXCEPTION.getMessage());
+        String[] split = e.getMessage().split("\\[");
+        String parameter = split[2].substring(1, split[2].length() - 3);
+        return responseService.getFailureResponse(400, parameter+"의 형식이 잘못되었습니다.");
     }
 
 

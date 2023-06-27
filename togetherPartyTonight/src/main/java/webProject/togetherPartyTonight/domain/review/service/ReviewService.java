@@ -20,6 +20,7 @@ import webProject.togetherPartyTonight.infra.S3.S3Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -50,7 +51,7 @@ public class ReviewService {
         );
 
         //clubMember에 사용자가 존재하고, 현재날짜가 meetingDate보다 이후일 경우에만 리뷰 작성가능
-        if(LocalDate.now().isAfter(club.getMeetingDate()))  {
+        if(LocalDateTime.now().isAfter(club.getMeetingDate()))  {
             String imageUrl;
             if (image==null) {
                 imageUrl = s3Service.getImage("review_default.jpg");

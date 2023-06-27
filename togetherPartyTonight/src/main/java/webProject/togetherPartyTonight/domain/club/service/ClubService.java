@@ -141,7 +141,7 @@ public class ClubService {
     public void checkMeetingDateIsPassed() {
         List<Club> clubList = clubRepository.findAll();
         for (Club c : clubList) {
-            if (c.getMeetingDate().isBefore(LocalDate.now()))
+            if (c.getMeetingDate().isBefore(LocalDateTime.now()))
                 clubRepository.updateClubState();
         }
     }
