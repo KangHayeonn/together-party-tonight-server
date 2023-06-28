@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import webProject.togetherPartyTonight.domain.chat.service.ChatService;
 import webProject.togetherPartyTonight.domain.chat.service.WebSocketService;
 
 @RestController
@@ -13,6 +14,8 @@ import webProject.togetherPartyTonight.domain.chat.service.WebSocketService;
 public class ChatController {
 
     private WebSocketService webSocketService;
+    @Autowired
+    private ChatService chatService;
 
 
     @Autowired
@@ -20,5 +23,8 @@ public class ChatController {
         this.webSocketService = webSocketService;
     }
 
-
+    @GetMapping("/")
+    public void get() {
+        chatService.exceptionTest();
+    }
 }
