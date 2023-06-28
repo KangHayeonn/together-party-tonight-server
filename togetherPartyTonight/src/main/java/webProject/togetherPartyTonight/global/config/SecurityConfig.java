@@ -3,10 +3,13 @@ package webProject.togetherPartyTonight.global.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
@@ -45,10 +48,8 @@ public class SecurityConfig {
                     .authenticationEntryPoint(authenticationEntryPoint)
                 .and()
                     .authorizeRequests(auth->auth
-                            .mvcMatchers("/v2/api-docs", "/swagger-resources/**", "/swagger-ui/index.html", "/swagger-ui.html","/webjars/**", "/swagger/**",   // swagger
-                                "/h2-console/**",
-                                "/favicon.ico").permitAll()
-                        .mvcMatchers(HttpMethod.POST,"/members/login","/members/reissue").permitAll()
+                            .mvcMatchers(HttpMethod.POST,"/members/login","/members/reissue").permitAll()
+
                         .anyRequest().authenticated()); // Authentication 필요한 주소
 
 
@@ -61,6 +62,14 @@ public class SecurityConfig {
     ) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().antMatchers("csrf","/v2/api-docs", "/swagger-resources/**", "/swagger-ui/index.html", "/swagger-ui.html","/webjars/**", "/swagger/**",
+                "/h2-console/**",
+                "/favicon.ico");
+    }
+
 
 
     @Bean
