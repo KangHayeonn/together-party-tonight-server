@@ -48,12 +48,9 @@ public class AuthService {
                 new UsernamePasswordAuthenticationToken(email,password);
         Authentication authentication = null;
 
-        try{
-            //password를 비교하는 로직
-             authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
-        }catch(BadCredentialsException e){
-            throw new MemberException(MemberErrorCode.INVALID_PASSWORD);
-        }
+        //password를 비교하는 로직
+        authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+
 
 
         MemberDetails memberDetails = (MemberDetails)authentication.getPrincipal();
