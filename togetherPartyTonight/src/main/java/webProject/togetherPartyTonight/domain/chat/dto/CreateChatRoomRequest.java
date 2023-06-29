@@ -12,9 +12,9 @@ public class CreateChatRoomRequest {
 
     //내 멤버 아이디
     @ApiModelProperty(dataType = "long", required = true, notes = "내 멤버 아이디")
-    long memberId;
+    Long memberId;
 
     //상대방 맴버 아이디
     @ApiModelProperty(dataType = "long", required = true, notes = "상대방 맴버 아이디")
-    long otherMemberId;
+    Long otherMemberId;
 }

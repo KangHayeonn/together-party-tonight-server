@@ -15,9 +15,9 @@ import lombok.Getter;
 public class ChatLogRequestDto {
 
     @ApiModelProperty(notes = "요청 채팅방 id")
-    long chatRoomId;
+    Long chatRoomId;
     @ApiModelProperty(notes = "마지막으로 가지고있던 채팅 seq, 최초입장 : -1")
-    long lastChatSeq;
+    Long lastChatSeq;
     @ApiModelProperty(notes = "요청 개수, 100 이하로 가능, 100 초과는 exception")
-    int listCount;
+    Integer listCount;
 }

@@ -8,21 +8,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import webProject.togetherPartyTonight.domain.chat.dto.*;
 import webProject.togetherPartyTonight.domain.chat.entity.Chat;
+import webProject.togetherPartyTonight.domain.chat.exception.ChatErrorCode;
 import webProject.togetherPartyTonight.domain.chat.exception.ChatException;
 import webProject.togetherPartyTonight.domain.chat.entity.ChatRoom;
 import webProject.togetherPartyTonight.domain.chat.repository.ChatRepository;
 import webProject.togetherPartyTonight.domain.chat.repository.ChatRoomRepository;
 import webProject.togetherPartyTonight.domain.member.entity.Member;
 import webProject.togetherPartyTonight.domain.member.repository.MemberRepository;
+import webProject.togetherPartyTonight.global.common.BaseEntity;
 import webProject.togetherPartyTonight.global.common.response.ListResponse;
 import webProject.togetherPartyTonight.global.common.response.SingleResponse;
 import webProject.togetherPartyTonight.global.common.service.ResponseService;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import static webProject.togetherPartyTonight.domain.chat.exception.ChatErrorCode.*;
 
@@ -47,7 +46,7 @@ public class ChatService {
 
     private static final int maxCount = 100;        //채팅 기록 최대 요청 수
     private static final int defaultSeq = -1;       //채팅 기록 조회 시 첫 조회 요청 seq
-    private static final int maxChatMessageBytes = 500;
+    private static final int maxChatMessageBytes = 500;     //db 설정 상 컬럼 최대 바이트
 
     //방 생성.
     public SingleResponse<CreateChatRoomResponseDto> createChatRoom(CreateChatRoomRequest createChatRoomRequestDto) {
@@ -59,24 +58,22 @@ public class ChatService {
             throw new ChatException(ALREADY_CHATROOM_EXIST);
         }
 
-        Optional<Member> aMember = memberRepository.findById(createChatRoomRequestDto.getMemberId());
-        Optional<Member> bMember = memberRepository.findById(createChatRoomRequestDto.getOtherMemberId());
-
-        if (aMember.isEmpty()) {
-            log.warn("[ChatService] createChatRoom member doesn't exist memberId: {}", createChatRoomRequestDto.getMemberId());
-            throw new ChatException(CHAT_MEMBER_NOT_FOUND);
-        }
-
-        if (bMember.isEmpty()) {
-            log.warn("[ChatService] createChatRoom otherMember doesn't exist otherMemberId: {}", createChatRoomRequestDto.getOtherMemberId());
-            throw new ChatException(OTHER_CHAT_MEMBER_NOT_FOUND);
-        }
+        Member aMember = memberRepository.findById(createChatRoomRequestDto.getMemberId())
+                .orElseThrow(() -> {
+                    log.warn("[ChatService] createChatRoom member doesn't exist memberId: {}", createChatRoomRequestDto.getMemberId());
+                    throw new ChatException(CHAT_MEMBER_NOT_FOUND);
+                });
+        Member bMember = memberRepository.findById(createChatRoomRequestDto.getOtherMemberId())
+                .orElseThrow(() -> {
+                    log.warn("[ChatService] createChatRoom otherMember doesn't exist otherMemberId: {}", createChatRoomRequestDto.getOtherMemberId());
+                    throw new ChatException(OTHER_CHAT_MEMBER_NOT_FOUND);
+                });
 
         ChatRoom chatRoom = ChatRoom.builder()
-                .chatMemberA(aMember.get())
-                .chatMemberB(bMember.get())
-                .chatRoomAName(bMember.get().getNickname())
-                .chatRoomBName(aMember.get().getNickname())
+                .chatMemberA(aMember)
+                .chatMemberB(bMember)
+                .chatRoomAName(bMember.getNickname())
+                .chatRoomBName(aMember.getNickname())
                 .build();
 
         ChatRoom saveRoom = chatRoomRepository.save(chatRoom);
@@ -89,51 +86,32 @@ public class ChatService {
     }
 
     //채팅방 목록을 불러온다  혹시 한 사람이 채팅 목록이 100개가 넘어거는 경우가 있다면 페이징 처리 필요.
-    public ListResponse<ChatRoomListResponseDto> getChatRoomList(long memberId) {
-        Optional<Member> member = memberRepository.findById(memberId);
+    public ListResponse<ChatRoomListResponseDto> getChatRoomList(long memberId, int page, int listCount) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> {
+                    log.error("[ChatService] getChatRoomList member doesn't exist memberId: {}", memberId);
+                    throw new ChatException(CHAT_MEMBER_NOT_FOUND);
+                });
 
-        if (member.isEmpty()) {
-            log.error("[ChatService] getChatRoomList member doesn't exist memberId: {}", memberId);
-            throw new ChatException(CHAT_MEMBER_NOT_FOUND);
+        List<ChatRoom> chatRooms = member.getAChatRooms();
+        chatRooms.addAll(member.getBChatRooms());
+
+        chatRooms.sort(Comparator.comparing(BaseEntity::getModifiedDate));
+
+        int startIdx = (page - 1) * listCount;
+        if (chatRooms.size() <=startIdx) {
+            throw new ChatException(OVER_CHAT_ROOM_PAGE);
         }
 
-        List<ChatRoom> chatRooms = member.get().getAChatRooms();
-        chatRooms.addAll(member.get().getBChatRooms());
+        chatRooms = chatRooms.subList(startIdx, startIdx + listCount);
 
         List<ChatRoomListResponseDto> chatRoomListResponseListDto = new ArrayList<>();
 
-        for (ChatRoom chatRoom : chatRooms) {
-            String chatRoomName = "";
-
-            if (Objects.equals(chatRoom.getChatMemberA().getId(), memberId)) {
-                chatRoomName = chatRoom.getChatRoomAName();
-            } else if (Objects.equals(chatRoom.getChatMemberB().getId(), memberId)) {
-                chatRoomName = chatRoom.getChatRoomBName();
-            } else {
-                //여기에 올 일 없음.
-                log.error("[ChatService] getChatRoomList room is not available roomId: {}, memberId: {}", chatRoom.getId(), memberId);
-                continue;
-            }
-
-            //가장 최근 채팅 한개만 들어온다.
-            List<Chat> chats = getChats(chatRoom.getId(), defaultSeq, 1);
-            String chatMessage = "";
-
-            if (chats.size() == 1) {
-                chatMessage = chats.get(0).getChatMsg();
-            }
-
-            ChatRoomListResponseDto chatRoomListResponseDto = ChatRoomListResponseDto.builder()
-                    .chatRoomName(chatRoomName)
-                    .chatRoomId(chatRoom.getId())
-                    .latestMessage(chatMessage)
-                    .build();
-            chatRoomListResponseListDto.add(chatRoomListResponseDto);
-        }
+        chatRooms.forEach(chatRoom -> addChatRoomListResponseDto(memberId, chatRoomListResponseListDto, chatRoom));
 
         return responseService.getListResponse(chatRoomListResponseListDto);
-
     }
+
 
     //채팅 목록 반환
     public ListResponse<ChatDto> getChatLogList(ChatLogRequestDto chatLogRequestDto) {
@@ -147,41 +125,38 @@ public class ChatService {
         List<Chat> chats = getChats(chatLogRequestDto.getChatRoomId(), chatLogRequestDto.getLastChatSeq(), chatLogRequestDto.getListCount());
 
         List<ChatDto> chatDtoList = new ArrayList<>();
-        for (Chat chat : chats) {
-            chatDtoList.add(chat.toChatDto());
-        }
+
+        chats.forEach(chat -> chatDtoList.add(chat.toChatDto()));
 
         return responseService.getListResponse(chatDtoList);
     }
 
     public SingleResponse<ChatSendResponseDto> sendChat(ChatSendRequestDto chatLogRequestDto) {
 
-        Optional<ChatRoom> chatRoom = chatRoomRepository.findById(chatLogRequestDto.getChatRoomId());
-        Optional<Member> sender = memberRepository.findById(chatLogRequestDto.getSenderMemberId());
+        ChatRoom chatRoom = chatRoomRepository.findById(chatLogRequestDto.getChatRoomId())
+                .orElseThrow(() -> {
+                    log.error("[ChatService] sendChat CHATROOM_NOT_FOUNT requestMemberId: {}, chatRoomId: {}", chatLogRequestDto.getSenderMemberId(), chatLogRequestDto.getChatRoomId());
+                    throw new ChatException(CHATROOM_NOT_FOUNT);
+                });
 
-        if (chatRoom.isEmpty()) {
-            log.error("[ChatService] sendChat CHATROOM_NOT_FOUNT requestMemberId: {}, chatRoomId: {}",
-                    chatLogRequestDto.getSenderMemberId(), chatLogRequestDto.getChatRoomId());
-            throw new ChatException(CHATROOM_NOT_FOUNT);
-        }
-
-        if (sender.isEmpty()) {
-            log.error("[ChatService] sendChat CHAT_MEMBER_NOT_FOUND requestMemberId: {}, chatRoomId: {}",
-                    chatLogRequestDto.getSenderMemberId(), chatLogRequestDto.getChatRoomId());
-            throw new ChatException(CHAT_MEMBER_NOT_FOUND);
-        }
+        Member sender = memberRepository.findById(chatLogRequestDto.getSenderMemberId())
+                .orElseThrow(() -> {
+                    log.error("[ChatService] sendChat CHAT_MEMBER_NOT_FOUND requestMemberId: {}, chatRoomId: {}", chatLogRequestDto.getSenderMemberId(), chatLogRequestDto.getChatRoomId());
+                    throw new ChatException(CHAT_MEMBER_NOT_FOUND);
+                });
 
         if (isMessageExceedsBytes(chatLogRequestDto.getChatMsg())) {
-            log.error("[ChatService] sendChat OVER_MAX_LENGTH requestMemberId: {}, chatRoomId: {}",
-                    chatLogRequestDto.getSenderMemberId(), chatLogRequestDto.getChatRoomId());
+            log.error("[ChatService] sendChat OVER_MAX_LENGTH requestMemberId: {}, chatRoomId: {}", chatLogRequestDto.getSenderMemberId(), chatLogRequestDto.getChatRoomId());
             throw new ChatException(OVER_MAX_LENGTH);
         }
 
-        Chat chat = saveChat(chatLogRequestDto.getChatMsg(), chatRoom.get(), sender.get());
+        Chat chat = saveChat(chatLogRequestDto.getChatMsg(), chatRoom, sender);
         ChatSendResponseDto chatSendResponseDto = ChatSendResponseDto.builder()
                 .chatId(chat.getId())
                 .build();
 
+        chatRoom.setModifiedDate(chat.getCreatedDate());
+        chatRoomRepository.save(chatRoom);
         //TodoSm 소켓 추후 연결해주기.
 
         return responseService.getSingleResponse(chatSendResponseDto);
@@ -208,6 +183,34 @@ public class ChatService {
             chats = chatRepository.findLatestChatsByRoomIdWithMaxChatId(chatRoomId, latestSeq, pageable);
         }
         return chats.orElse(new ArrayList<>());
+    }
+
+    private void addChatRoomListResponseDto(long memberId, List<ChatRoomListResponseDto> chatRoomListResponseListDto, ChatRoom chatRoom) {
+        String chatRoomName = "";
+        if (Objects.equals(chatRoom.getChatMemberA().getId(), memberId)) {
+            chatRoomName = chatRoom.getChatRoomAName();
+        } else if (Objects.equals(chatRoom.getChatMemberB().getId(), memberId)) {
+            chatRoomName = chatRoom.getChatRoomBName();
+        } else {
+            //여기에 올 일 없음.
+            log.error("[ChatService] getChatRoomList room is not available roomId: {}, memberId: {}", chatRoom.getId(), memberId);
+            return;
+        }
+
+        //가장 최근 채팅 한개만 들어온다.
+        List<Chat> chats = getChats(chatRoom.getId(), defaultSeq, 1);
+        String chatMessage = "";
+
+        if (chats.size() == 1) {
+            chatMessage = chats.get(0).getChatMsg();
+        }
+
+        ChatRoomListResponseDto chatRoomListResponseDto = ChatRoomListResponseDto.builder()
+                .chatRoomName(chatRoomName)
+                .chatRoomId(chatRoom.getId())
+                .latestMessage(chatMessage)
+                .build();
+        chatRoomListResponseListDto.add(chatRoomListResponseDto);
     }
 
     //------------- 조건 함수

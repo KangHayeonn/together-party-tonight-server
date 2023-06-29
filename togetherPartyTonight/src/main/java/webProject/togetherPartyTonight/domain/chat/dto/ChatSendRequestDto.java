@@ -8,9 +8,9 @@ import lombok.Getter;
 @ApiModel("채팅 발송 요청")
 public class ChatSendRequestDto {
     @ApiModelProperty(notes = "발송자 멤버 id")
-    long senderMemberId;
+    Long senderMemberId;
     @ApiModelProperty(notes = "채팅방 id")
-    long chatRoomId;
+    Long chatRoomId;
     @ApiModelProperty(notes = "채팅 메시지(500 byte 이내)")
     String chatMsg;
 }

@@ -13,5 +13,5 @@ import lombok.Setter;
 @ApiModel("채팅발송 응답")
 public class ChatSendResponseDto {
     @ApiModelProperty(notes = "채팅 아이디")
-    long chatId;
+    Long chatId;
 }

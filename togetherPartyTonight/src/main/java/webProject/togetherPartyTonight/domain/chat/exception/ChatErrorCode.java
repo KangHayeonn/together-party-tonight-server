@@ -12,6 +12,7 @@ public enum ChatErrorCode implements ErrorInterface {
     //400 BAD_REQUEST
     OVER_MAX_LIST_COUNT(HttpStatus.BAD_REQUEST, "채팅 요청 가능 수를 초과하였습니다"),
     OVER_MAX_LENGTH(HttpStatus.BAD_REQUEST, "채팅 최대 글자 수를 초과하였습니다"),
+    OVER_CHAT_ROOM_PAGE(HttpStatus.BAD_REQUEST, "더 이상 채팅방이 없습니다"),
 
     //409 CONFLICT
     ALREADY_CHATROOM_EXIST(HttpStatus.CONFLICT, "이미 채팅방이 존재합니다"),
