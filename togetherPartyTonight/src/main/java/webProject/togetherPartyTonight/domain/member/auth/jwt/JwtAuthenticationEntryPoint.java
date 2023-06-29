@@ -24,10 +24,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
 
         response.setStatus(HttpStatus.SC_OK);
-
-        if(authException instanceof BadCredentialsException){
-            throw new MemberException(MemberErrorCode.INVALID_PASSWORD);
-        }
+        
         if(request.getHeader("Authorization") == null){ // 헤더에 액세스 토큰이 아예 없이 인증이 필요한 요청했을경우
             response.setCharacterEncoding("UTF-8");
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);

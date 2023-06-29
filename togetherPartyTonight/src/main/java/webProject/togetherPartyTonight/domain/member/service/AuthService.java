@@ -39,7 +39,7 @@ public class AuthService {
     @Value("${spring.jwt.token.refresh-expiration-time}")
     private long refreshTokenExpireTime;
 
-    public LoginResponseDto login(LoginRequestDto userLoginReqDto) {
+    public LoginResponseDto login(LoginRequestDto userLoginReqDto){
 
         String email = userLoginReqDto.getEmail();
         String password = userLoginReqDto.getPassword();
@@ -48,9 +48,12 @@ public class AuthService {
                 new UsernamePasswordAuthenticationToken(email,password);
         Authentication authentication = null;
 
-        //password를 비교하는 로직
-        authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
-
+        try{
+            //password를 비교하는 로직
+            authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+        }catch(BadCredentialsException e){
+            throw new MemberException(MemberErrorCode.INVALID_PASSWORD);
+        }
 
 
         MemberDetails memberDetails = (MemberDetails)authentication.getPrincipal();
