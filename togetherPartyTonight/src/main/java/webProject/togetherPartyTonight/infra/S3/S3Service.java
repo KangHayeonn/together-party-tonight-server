@@ -7,36 +7,25 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;
-import org.springframework.boot.context.properties.ConstructorBinding;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import webProject.togetherPartyTonight.domain.review.exception.ReviewException;
 import webProject.togetherPartyTonight.global.error.ErrorCode;
-import webProject.togetherPartyTonight.global.util.YamlPropertySourceFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
-
-import static com.google.common.io.Files.getFileExtension;
 
 @RequiredArgsConstructor
 @Service
-@ConfigurationProperties(prefix= "cloud.aws.s3")
-@Component
 @Setter
-@PropertySource(value = "classpath:aws.yml", factory = YamlPropertySourceFactory.class)
 public class S3Service {
     private final AmazonS3Client amazonS3Client;
 
+    @Value("${cloud.aws.s3.bucket}")
     private String bucket;
     private final String s3regionUrl  = ".s3.ap-northeast-2.amazonaws.com/";
 
@@ -51,7 +40,7 @@ public class S3Service {
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentLength(multipartFile.getSize());
         objectMetadata.setContentType(multipartFile.getContentType());
-
+        System.out.println("bucket = " + bucket);
         try(InputStream inputStream = multipartFile.getInputStream()) {
             amazonS3Client.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
                         .withCannedAcl(CannedAccessControlList.PublicRead));
