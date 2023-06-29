@@ -15,7 +15,7 @@ jobs:
     defaults:
       run:
         working-directory:
-          - "./togetherPartyTonight"
+          "./togetherPartyTonight"
 
     steps:
       - uses: actions/checkout@v3
