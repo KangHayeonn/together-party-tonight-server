@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 import webProject.togetherPartyTonight.domain.club.entity.ClubCategory;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -12,7 +13,6 @@ public class MyOwnedClubDto {
     private String clubName;
     private ClubCategory clubCategory;
     private Integer clubMaximum;
-    private Integer clubMinimum;
     private String clubContent;
     private List<String> clubTags;
     private Float latitude;
@@ -20,4 +20,7 @@ public class MyOwnedClubDto {
     private String address;
 
     private String meetingDate;
+
+    private LocalDateTime createdDate;
+    private LocalDateTime modifiedDate;
 }

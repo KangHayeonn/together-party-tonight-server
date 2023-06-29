@@ -52,21 +52,6 @@ public class GlobalExceptionHandler {
                 .body(errorResponse);
     }
 
-    @ExceptionHandler(ClubException.class)
-    public FailureResponse clubException (ClubException e) {
-        e.printStackTrace();
-        logger.error("club exception : {}",e.getErrorInterface().getErrorMessage());
-        return responseService.getFailureResponse(e.getErrorInterface().getStatusCode(), e.getErrorInterface().getErrorMessage());
-    }
-
-    @ExceptionHandler(ReviewException.class)
-    public FailureResponse reviewException (ReviewException e) {
-        e.printStackTrace();
-        logger.error("review exception : {}",e.getErrorInterface().getErrorMessage());
-        return responseService.getFailureResponse(e.getErrorInterface().getStatusCode(), e.getErrorInterface().getErrorMessage());
-
-    }
-
     @ExceptionHandler(CommonException.class)
     public FailureResponse commonException (CommonException e) {
         e.printStackTrace();

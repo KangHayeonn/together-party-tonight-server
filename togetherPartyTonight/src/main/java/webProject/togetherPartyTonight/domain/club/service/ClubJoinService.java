@@ -38,10 +38,7 @@ public class ClubJoinService {
     private final ClubSignupRepository clubSignupRepository;
     private final ClubMemberRepository clubMemberRepository;
 
-    /**
-     * 모임 신청
-     * @param requestDto clubId : 신청하는 모임, userId : 신청하는 사람
-     */
+
     public void signup (DeleteClubAndSignupRequestDto requestDto) {
         Club club = clubRepository.getReferenceById(requestDto.getClubId());
         if (club==null) throw new ClubException(ClubErrorCode.INVALID_CLUB_ID);
@@ -58,10 +55,6 @@ public class ClubJoinService {
         }
     }
 
-    /**
-     * 모임 신청 취소
-     * @param requestDto clubSignupId : 취소하려는 모임, userId : 취소하는 사람
-     */
 
     @Transactional
     public void deleteAppliedClub (DeleteMyAppliedRequestDto requestDto) {
@@ -102,24 +95,17 @@ public class ClubJoinService {
                 () -> new ClubException(ClubErrorCode.INVALID_CLUB_SIGNUP_ID)
         );
         if (clubSignup.getClubSignupApprovalState().equals(ApprovalState.PENDING)) {
-            //아직 수락/거절을 하지 않았을 경우
-            if (requestDto.getApprove()) { //true 이면
+            if (requestDto.getApprove()) {
                 clubSignup.setClubSignupApprovalState(ApprovalState.APPROVE);
-                //clubSignup 의 approvalState 를 APPROVE 로 변경
                 clubSignup.setClubSignupApprovalDate(LocalDateTime.now());
-                //clubSignupApprovalDate 를 현재 시각으로 update
                 ClubMember clubMember = new ClubMember(clubSignup.getClub(), clubSignup.getClubMember());
                 clubMemberRepository.save(clubMember);
-                //ClubMember 에 추가
                 checkIfRecruitComplete(clubSignup);
-                //최대 모집 인원에 도달 했는지 확인하고 모집완료 상태로 변경
             } else {
                 clubSignup.setClubSignupApprovalState(ApprovalState.REFUSE);
-                //clubSignup 의 approvalState 를 REFUSE 로 변경
             }
         }
         else {
-            //이미 수락/거절을 한 경우
             throw new ClubException(ClubErrorCode.ALREADY_APPROVED);
         }
 
@@ -152,6 +138,8 @@ public class ClubJoinService {
                     .nickName(c.getClubMember().getNickname())
                     .signupDate(c.getClubSignupDate().toString())
                     .approvalStatus(c.getClubSignupApprovalState().name())
+                    .createdDate(c.getCreatedDate())
+                    .modifiedDate(c.getModifiedDate())
                     .build();
 
             list.add(applicationDto);
@@ -180,6 +168,8 @@ public class ClubJoinService {
                     .nickName(c.getClubMaster().getNickname())
                     .signupDate(c.getClubSignupDate().toString())
                     .approvalStatus(c.getClubSignupApprovalState().name())
+                    .createdDate(c.getCreatedDate())
+                    .modifiedDate(c.getModifiedDate())
                     .build();
 
             list.add(applicationDto);
@@ -204,7 +194,6 @@ public class ClubJoinService {
             MyOwnedClubDto myOwnedClubDto = MyOwnedClubDto.builder()
                     .clubName(c.getClubName())
                     .clubCategory(c.getClubCategory())
-                    .clubMinimum(c.getClubMinimum())
                     .clubMaximum(c.getClubMaximum())
                     .clubContent(c.getClubContent())
                     .clubTags(tags)
@@ -212,6 +201,8 @@ public class ClubJoinService {
                     .longitude((float) point.getY())
                     .address(c.getAddress())
                     .meetingDate(String.valueOf(c.getMeetingDate()))
+                    .createdDate(c.getCreatedDate())
+                    .modifiedDate(c.getModifiedDate())
                     .build();
 
             list.add(myOwnedClubDto);
@@ -228,9 +219,7 @@ public class ClubJoinService {
         if (signup.getClubMaster().getId() != userId) throw new ClubException(ErrorCode.INVALID_MEMBER_ID);
 
         signup.setClubSignupApprovalState(ApprovalState.KICKOUT);
-        // 상태를 '강퇴'로 변경
         clubMemberRepository.deleteByMemberId(signup.getClubMember().getId());
-        // 멤버 목록에서 삭제
 
     }
 
@@ -242,9 +231,9 @@ public class ClubJoinService {
     public void checkIfRecruitComplete(ClubSignup clubSignup) {
         //현재 승인된 모임 인원이 모집 최대 인원에 도달했는지 여부 반환
         Club club = clubSignup.getClub();
-        Integer memberCnt = clubMemberRepository.getMemberCnt(club.getClubId()); //현재 승인된 인원
-        Integer maximum = club.getClubMaximum(); //모임의 최대인원
-        if (memberCnt==maximum) club.setClubState(false); //모임이 꽉 찼으면 모집완료 상태로 변경
+        Integer memberCnt = clubMemberRepository.getMemberCnt(club.getClubId());
+        Integer maximum = club.getClubMaximum();
+        if (memberCnt==maximum) club.setClubState(false);
         else club.setClubState(true);
     }
 }
