@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @ApiModel("채팅")
 public class ChatDto {
     @ApiModelProperty(notes = "채팅 id")
-    long chatId;
+    Long chatId;
     @ApiModelProperty(notes = "채팅 내용", dataType = "String")
     String message;
 }

@@ -47,13 +47,14 @@ public class ChatController {
     @ApiOperation(value = "채팅방 목록 요청")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "성공"),
-            @ApiResponse(code = 409, message = "채팅 회원이 존재하지 않습니다"),
+            @ApiResponse(code = 400, message = "채팅 회원이 존재하지 않습니다"),
+            @ApiResponse(code = 409, message = "더 이상 채팅방이 없습니다"),
             @ApiResponse(code = 500, message = "내부 서버 오류")
     })
     @GetMapping("/chatRoom")
-    public ListResponse<ChatRoomListResponseDto> getChatRoom(@ApiParam(value = "멤버 아이디", required = true) @RequestParam long memberId, HttpServletRequest request) {
+    public ListResponse<ChatRoomListResponseDto> getChatRoom(@ApiParam(value = "멤버 아이디", required = true) @RequestParam long memberId,@ApiParam(value = "페이지", required = true) @RequestParam int page,@ApiParam(value = "페이지당 수", required = true) @RequestParam int listCount, HttpServletRequest request) {
         requestLog(request);
-        return chatService.getChatRoomList(memberId);
+        return chatService.getChatRoomList(memberId, page, listCount);
     }
 
     @ApiOperation(value = "채팅 목록 요청")

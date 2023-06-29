@@ -17,7 +17,7 @@ public class ChatRoomListResponseDto {
     @ApiModelProperty(notes = "채팅방 이름", dataType = "String")
     String chatRoomName;
     @ApiModelProperty(notes = "채팅방 아이디", dataType = "Long")
-    long chatRoomId;
+    Long chatRoomId;
     @ApiModelProperty(notes = "가장 최근 채팅", dataType = "String")
     String latestMessage;
 }

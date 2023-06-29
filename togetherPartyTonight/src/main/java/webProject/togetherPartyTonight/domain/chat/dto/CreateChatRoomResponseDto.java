@@ -14,5 +14,5 @@ import lombok.Setter;
 @Builder
 public class CreateChatRoomResponseDto {
     @ApiModelProperty (notes = "생성된 방의 id", example = "1")
-    long chatRoomId;
+    Long chatRoomId;
 }
