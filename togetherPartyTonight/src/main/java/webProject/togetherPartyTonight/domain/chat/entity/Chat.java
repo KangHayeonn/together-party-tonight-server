@@ -1,8 +1,7 @@
 package webProject.togetherPartyTonight.domain.chat.entity;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import webProject.togetherPartyTonight.domain.chat.dto.ChatDto;
 import webProject.togetherPartyTonight.domain.member.entity.Member;
 import webProject.togetherPartyTonight.global.common.BaseEntity;
 
@@ -13,6 +12,8 @@ import static javax.persistence.FetchType.LAZY;
 @Entity
 @Setter
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class Chat extends BaseEntity {
     @Id
@@ -30,4 +31,11 @@ public class Chat extends BaseEntity {
 
     @Column(length = 500, nullable = false)
     private String chatMsg;
+
+    public ChatDto toChatDto() {
+        return ChatDto.builder()
+                .chatId(getId())
+                .message(getChatMsg())
+                .build();
+    }
 }
