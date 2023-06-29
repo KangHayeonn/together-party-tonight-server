@@ -1,14 +1,14 @@
 package webProject.togetherPartyTonight.domain.member.exception;
 
 import lombok.Getter;
+import webProject.togetherPartyTonight.global.error.CommonException;
 import webProject.togetherPartyTonight.global.error.ErrorCode;
+import webProject.togetherPartyTonight.global.error.ErrorInterface;
 
 @Getter
-public class MemberException extends RuntimeException{
-    private ErrorCode errorCode;
+public class MemberException extends CommonException {
 
-    public MemberException(ErrorCode errorCode) {
-        super(errorCode.getMessage());
-        this.errorCode= errorCode;
+    public MemberException(ErrorInterface errorCode) {
+        super(errorCode);
     }
 }

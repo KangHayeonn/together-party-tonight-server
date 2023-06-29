@@ -10,8 +10,11 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
+import webProject.togetherPartyTonight.domain.member.exception.MemberErrorCode;
+import webProject.togetherPartyTonight.domain.member.exception.errorCode.TokenErrorCode;
 import webProject.togetherPartyTonight.global.common.ErrorResponse;
 import webProject.togetherPartyTonight.global.error.ErrorCode;
+import webProject.togetherPartyTonight.global.error.ErrorInterface;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -51,7 +54,7 @@ public class JwtFilter extends OncePerRequestFilter {
             inValidTokenResponse(invalidTokenError,request,response,filterChain);
         }catch (ExpiredJwtException e){
 
-            ErrorCode invalidTokenError = ErrorCode.EXPIRED_TOKEN;
+            TokenErrorCode invalidTokenError = TokenErrorCode.EXPIRED_TOKEN;
             inValidTokenResponse(invalidTokenError,request,response,filterChain);
         }
 
@@ -59,14 +62,14 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
 
-    private void inValidTokenResponse(ErrorCode errorCode,HttpServletRequest request,HttpServletResponse response,FilterChain filterChain) throws IOException, ServletException {
+    private void inValidTokenResponse(ErrorInterface errorCode, HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
 
         response.setCharacterEncoding("UTF-8");
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
         // 실패 메시지 작성
         ObjectMapper objectMapper = new ObjectMapper();
-        ErrorResponse errorResponse = new ErrorResponse("false", errorCode.getHttpStatus().value(), errorCode.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse("false", errorCode.getStatusCode(), errorCode.getErrorMessage());
 
         String result = objectMapper.writeValueAsString(errorResponse);
         response.getWriter().write(result);

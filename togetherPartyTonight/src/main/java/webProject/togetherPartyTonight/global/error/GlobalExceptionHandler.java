@@ -43,14 +43,6 @@ public class GlobalExceptionHandler {
      * 매개변수만 다르고 메서드 내용이 중복되는 부분을 어떻게 고칠지 생각해봐야할 것 같습니다
      */
 
-    @ExceptionHandler(MemberException.class)
-    public ResponseEntity<ErrorResponse> memberException (MemberException e) {
-        e.printStackTrace();
-        logger.error("member exception : {}",e.getErrorCode().getMessage());
-        ErrorResponse errorResponse = new ErrorResponse(FAIL, e.getErrorCode().getHttpStatus().value(), e.getErrorCode().getMessage());
-        return ResponseEntity.status(200)
-                .body(errorResponse);
-    }
 
     @ExceptionHandler(ClubException.class)
     public ResponseEntity<ErrorResponse> clubException (ClubException e) {

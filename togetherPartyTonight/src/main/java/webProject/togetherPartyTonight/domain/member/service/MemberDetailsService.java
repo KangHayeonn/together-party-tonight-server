@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import webProject.togetherPartyTonight.domain.member.auth.MemberDetails;
 import webProject.togetherPartyTonight.domain.member.entity.Member;
+import webProject.togetherPartyTonight.domain.member.exception.MemberErrorCode;
 import webProject.togetherPartyTonight.domain.member.exception.MemberException;
 import webProject.togetherPartyTonight.domain.member.repository.MemberRepository;
 import webProject.togetherPartyTonight.global.error.ErrorCode;
@@ -29,7 +30,7 @@ public class MemberDetailsService implements UserDetailsService {
         if(member.isPresent()){
             return new MemberDetails(member.get());
         }else {
-            throw new MemberException(ErrorCode.INVALID_MEMBER_ID);
+            throw new MemberException(MemberErrorCode.MEMBER_NOT_FOUND);
         }
 
 
