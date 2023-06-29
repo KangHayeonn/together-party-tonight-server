@@ -44,40 +44,27 @@ public class ClubService {
     private final String directory = "club/";
 
 
-// TODO: 2023/06/18 meetingDate가 지나면 clubState=false -> 스케줄러
-
-
     @Transactional
     public void addClub (CreateClubRequestDto clubRequest, MultipartFile image) {
         Member master = memberRepository.getReferenceById(clubRequest.getUserId());
         // TODO: 2023/06/17 JWT 내부 유저정보와 requestBody의 userId가 다르면 '권한 없음' exception
 
         Point point = makePoint(clubRequest.getLatitude(), clubRequest.getLongitude());
-        //point 생성
 
         String url="";
         if (image != null) {
             url = s3Service.uploadImage(image, directory, clubRequest.getUserId());
         }
         else {
-            //카테고리별 디폴트 이미지
             url = getDefaultImage(clubRequest.getClubCategory());
         }
 
         Club club = clubRequest.toClub(master, point, url);
-        //엔티티 생성
 
         clubRepository.save(club);
-        //저장
 
     }
 
-    /**
-     *
-     * @param id 조회하고자 하는 club id
-     * 해당 모임이 없으면 throw exception
-     * @return ClubResponseDto
-     */
     public GetClubResponseDto getClub(Long id) {
         Club club = clubRepository.findById(id)
                 .orElseThrow(() -> new ClubException(ClubErrorCode.INVALID_CLUB_ID));
@@ -94,10 +81,9 @@ public class ClubService {
         );
 
         if (!club.getImage().contains("default"))
-            s3Service.deleteImage(club.getImage()); //s3에서 이미지삭제
+            s3Service.deleteImage(club.getImage());
         clubRepository.deleteById(clubId);
 
-        //단방향 매핑이기 때문에 cascade 옵션을 주지 않고, 개별로 club_member, club_signup 엔티티 삭제
         clubMemberRepository.deleteByClubClubId(clubId);
         clubSignupRepository.deleteByClubClubId(clubId);
         }
@@ -123,10 +109,10 @@ public class ClubService {
         else flag =1;
 
         String imageUrl;
-        if(image!=null){ //수정할 새로운 이미지가 있으면
-            imageUrl = s3Service.uploadImage(image, directory, clubDto.getUserId()); //s3에 업로드하고 url받아옴
-            if(!clubEntity.getImage().contains("default")) { //기존 이미지가 default 이미지가 아니라면
-                s3Service.deleteImage(clubEntity.getImage()); //s3에서 삭제
+        if(image!=null){
+            imageUrl = s3Service.uploadImage(image, directory, clubDto.getUserId());
+            if(!clubEntity.getImage().contains("default")) {
+                s3Service.deleteImage(clubEntity.getImage());
             }
         }
         else {

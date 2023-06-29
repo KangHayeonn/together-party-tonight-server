@@ -42,11 +42,6 @@ public class CreateClubRequestDto {
     //clubMinimum 이상이여야하는 조건
     private Integer clubMaximum;
 
-    @NotNull(message = "clubMinimum은 필수 입력 값입니다.")
-    @Min(value = 1, message = "최소 1이상 이여야 합니다.")
-    @Max(value = Integer.MAX_VALUE, message = "최대 "+Integer.MAX_VALUE+ "를 넘을 수 없습니다.")
-    private Integer clubMinimum;
-
     @NotEmpty (message = "clubContent는 필수 입력 값입니다.")
     @Size(max = 1000, message = "최대 1000자를 넘을 수 없습니다.")
     private String clubContent;

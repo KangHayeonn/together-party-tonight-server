@@ -5,6 +5,7 @@ import webProject.togetherPartyTonight.domain.club.entity.Club;
 import webProject.togetherPartyTonight.domain.club.entity.ClubCategory;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -16,7 +17,6 @@ public class GetClubResponseDto {
     private String clubName;
     private ClubCategory clubCategory;
     private Integer clubMaximum;
-    private Integer clubMinimum;
     private String clubContent;
     private String clubTags;
     private String address;
@@ -24,6 +24,8 @@ public class GetClubResponseDto {
     private Float longitude;
     private String meetingDate;
     private String image;
+    private LocalDateTime createdDate;
+    private LocalDateTime modifiedDate;
 
     public GetClubResponseDto toDto (Club club) {
         this.nickName=club.getMaster().getNickname();
@@ -31,7 +33,6 @@ public class GetClubResponseDto {
         this.clubCategory=club.getClubCategory();
         this.clubContent= club.getClubContent();
         this.clubMaximum = club.getClubMaximum();
-        this.clubMinimum= club.getClubMinimum();
         this.userId = club.getMaster().getId();
         this.latitude= (float) club.getClubPoint().getX();
         this.longitude= (float) club.getClubPoint().getY();
@@ -39,6 +40,8 @@ public class GetClubResponseDto {
         this.address=club.getAddress();
         this.meetingDate= String.valueOf(club.getMeetingDate());
         this.image=club.getImage();
+        this.createdDate=club.getCreatedDate();
+        this.modifiedDate=club.getModifiedDate();
         return this;
     }
 }

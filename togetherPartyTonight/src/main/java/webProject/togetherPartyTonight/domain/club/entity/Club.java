@@ -38,9 +38,6 @@ public class Club extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ClubCategory clubCategory;
 
-    @Column(name="club_minimum", nullable = false, length = 11)
-    private Integer clubMinimum;
-
     @Column(name = "club_maximum",nullable = false, length = 11)
     private Integer clubMaximum;
 

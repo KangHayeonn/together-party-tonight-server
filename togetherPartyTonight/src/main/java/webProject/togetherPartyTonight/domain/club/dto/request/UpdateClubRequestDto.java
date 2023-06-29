@@ -28,7 +28,6 @@ public class UpdateClubRequestDto extends CreateClubRequestDto {
         club.setClubTags(this.getClubTags());
         club.setAddress(this.getAddress());
         club.setMeetingDate(this.getMeetingDate());
-        club.setClubMinimum(this.getClubMinimum());
         club.setClubPoint(point);
         club.setImage(image);
 

@@ -30,6 +30,12 @@ public class ResponseService {
         return listResponse;
     }
 
+    public CommonResponse getCommonResponse () {
+        CommonResponse commonResponse = new CommonResponse();
+        setSuccessResponse(commonResponse);
+        return commonResponse;
+    }
+
     public FailureResponse getFailureResponse(int code, String errorMessage) {
         return new FailureResponse(FAIL, code, errorMessage);
     }
