@@ -8,8 +8,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import webProject.togetherPartyTonight.domain.member.auth.MemberDetails;
 import webProject.togetherPartyTonight.domain.member.entity.Member;
-import webProject.togetherPartyTonight.domain.member.exception.MemberErrorCode;
 import webProject.togetherPartyTonight.domain.member.exception.MemberException;
+import webProject.togetherPartyTonight.domain.member.exception.errorCode.MemberErrorCode;
 import webProject.togetherPartyTonight.domain.member.repository.MemberRepository;
 import webProject.togetherPartyTonight.global.error.ErrorCode;
 
@@ -26,7 +26,7 @@ public class MemberDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
         log.info("loadByUserName - {}",email);
-        Member member = memberRepository.findMemberByEmail(email).orElseThrow(()->new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
+        Member member = memberRepository.findMemberByEmail(email).orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
 
         return new MemberDetails(member);
 

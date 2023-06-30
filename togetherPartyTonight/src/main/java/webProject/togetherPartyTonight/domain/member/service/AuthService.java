@@ -17,9 +17,9 @@ import webProject.togetherPartyTonight.domain.member.dto.request.LoginRequestDto
 import webProject.togetherPartyTonight.domain.member.dto.request.ReissueRequestDto;
 import webProject.togetherPartyTonight.domain.member.dto.response.LoginResponseDto;
 import webProject.togetherPartyTonight.domain.member.dto.response.ReissueResponseDto;
-import webProject.togetherPartyTonight.domain.member.exception.MemberErrorCode;
 import webProject.togetherPartyTonight.domain.member.exception.MemberException;
 import webProject.togetherPartyTonight.domain.member.auth.jwt.JwtProvider;
+import webProject.togetherPartyTonight.domain.member.exception.errorCode.MemberErrorCode;
 import webProject.togetherPartyTonight.domain.member.exception.errorCode.TokenErrorCode;
 import webProject.togetherPartyTonight.global.error.ErrorCode;
 
