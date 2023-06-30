@@ -76,7 +76,6 @@ public class CreateClubRequestDto {
                 .clubName(clubName)
                 .clubContent(clubContent)
                 .clubMaximum(clubMaximum)
-                .clubMinimum(clubMinimum)
                 .clubTags(clubTags)
                 .address(address)
                 .meetingDate(meetingDate)
