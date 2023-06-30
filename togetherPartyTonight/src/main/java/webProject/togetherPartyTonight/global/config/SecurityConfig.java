@@ -41,6 +41,8 @@ public class SecurityConfig {
                     .csrf().disable()       // csrf 보안 X (rest api)
                     .formLogin().disable()
                     .logout().disable()
+                .cors()
+                .and()
                     .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // jwt token으로 인증 > 세션 필요없음
                 .and()
                     .addFilterBefore(new JwtFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
@@ -65,9 +67,8 @@ public class SecurityConfig {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().antMatchers("/","/csrf","/v2/api-docs", "/swagger-resources/**", "/swagger-ui/index.html", "/swagger-ui.html","/webjars/**", "/swagger/**",
-                "/h2-console/**",
-                "/favicon.ico");
+        return (web) -> web.ignoring().antMatchers("/v2/api-docs", "/swagger-resources/**", "/swagger-ui/index.html", "/swagger-ui.html","/webjars/**", "/swagger/**",
+                "/h2-console/**","/configuration/security");
     }
 
 
