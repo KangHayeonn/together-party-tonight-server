@@ -13,7 +13,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import webProject.togetherPartyTonight.global.common.ErrorResponse;
 import webProject.togetherPartyTonight.global.error.ErrorCode;
 
-import javax.servlet.*;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -59,7 +60,7 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
 
-    private void inValidTokenResponse(ErrorCode errorCode,HttpServletRequest request,HttpServletResponse response,FilterChain filterChain) throws IOException, ServletException {
+    private void inValidTokenResponse(ErrorCode errorCode, HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
 
         response.setCharacterEncoding("UTF-8");
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
