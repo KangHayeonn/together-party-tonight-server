@@ -50,7 +50,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         }catch (SignatureException  | MalformedJwtException | IllegalStateException e) {
 
-            ErrorCode invalidTokenError = ErrorCode.FORBIDDEN;
+            TokenErrorCode invalidTokenError = TokenErrorCode.INVALID_TOKEN;
             inValidTokenResponse(invalidTokenError,request,response,filterChain);
         }catch (ExpiredJwtException e){
 

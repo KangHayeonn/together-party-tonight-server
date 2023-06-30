@@ -9,6 +9,7 @@ import webProject.togetherPartyTonight.domain.member.exception.MemberErrorCode;
 import webProject.togetherPartyTonight.domain.member.exception.MemberException;
 import webProject.togetherPartyTonight.domain.member.repository.MemberRepository;
 
+
 @Service
 @RequiredArgsConstructor
 @Transactional

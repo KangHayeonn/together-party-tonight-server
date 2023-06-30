@@ -1,4 +1,4 @@
-package webProject.togetherPartyTonight.domain.member.exception;
+package webProject.togetherPartyTonight.domain.member.exception.errorCode;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
