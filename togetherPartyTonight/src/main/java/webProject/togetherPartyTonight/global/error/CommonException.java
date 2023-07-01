@@ -1,6 +1,7 @@
 package webProject.togetherPartyTonight.global.error;
 
 
+
 import lombok.Getter;
 
 @Getter

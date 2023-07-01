@@ -3,9 +3,11 @@ package webProject.togetherPartyTonight.domain.member.auth.jwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
+import webProject.togetherPartyTonight.domain.member.exception.MemberException;
 import webProject.togetherPartyTonight.global.common.ErrorResponse;
 import webProject.togetherPartyTonight.global.error.ErrorCode;
 
@@ -21,6 +23,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
 
         response.setStatus(HttpStatus.SC_OK);
+        
         if(request.getHeader("Authorization") == null){ // 헤더에 액세스 토큰이 아예 없이 인증이 필요한 요청했을경우
             response.setCharacterEncoding("UTF-8");
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
