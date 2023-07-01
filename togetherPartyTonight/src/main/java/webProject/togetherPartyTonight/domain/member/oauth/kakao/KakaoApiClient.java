@@ -63,7 +63,7 @@ public class KakaoApiClient implements OAuthApiClient {
         httpHeaders.set("Authorization", "Bearer " + accessToken);
         HttpEntity<?> request = new HttpEntity<>(httpHeaders);
         ResponseEntity<KakaoInfoResponse> response= restTemplate.exchange(url, HttpMethod.GET, request, KakaoInfoResponse.class);
-        
+
         return restTemplate.postForObject(url, request, KakaoInfoResponse.class);
     }
 }

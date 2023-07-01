@@ -28,7 +28,7 @@ public class SocialLoginController {
 
     private final SocialLoginService socialLoginService;
     @PostMapping("/oauth/kakao/token")
-    @ApiOperation(value = "소셜로그인", notes = "소셜로그인 API 입니다.")
+    @ApiOperation(value = "카카오 로그인", notes = "카카오로그인 API 입니다.")
     public ResponseEntity<ResponseWithData> kakaoLogin(@RequestBody KakaoLoginRequestDto kakaoDto){
         try{
             LoginResponseDto response = socialLoginService.login(KakaoLoginParam.of(kakaoDto));
