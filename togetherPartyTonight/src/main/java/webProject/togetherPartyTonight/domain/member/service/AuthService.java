@@ -78,7 +78,7 @@ public class AuthService {
 
             log.info("authentication정보 - {}",authentication);
 
-            return ReissueResponseDto.from(jwtProvider.createAccessToken(authentication));
+            return ReissueResponseDto.from(jwtProvider.createAccessToken(authentication),refreshToken);
 
         }catch (SignatureException e){
             throw new MemberException(ErrorCode.INVALID_TOKEN);

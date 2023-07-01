@@ -38,7 +38,6 @@ public class JwtProvider {
      * Access 토큰 생성
      */
     public String createAccessToken(Authentication authentication){
-
         Claims claims = Jwts.claims().setSubject(String.valueOf(authentication.getName()));
         Date now = new Date();
         Date expireDate = new Date(now.getTime() + accessExpirationTime);
@@ -55,7 +54,6 @@ public class JwtProvider {
      * Refresh 토큰 생성
      */
     public String createRefreshToken(Authentication authentication){
-
 
         Claims claims = Jwts.claims().setSubject(authentication.getName());
         Date now = new Date();

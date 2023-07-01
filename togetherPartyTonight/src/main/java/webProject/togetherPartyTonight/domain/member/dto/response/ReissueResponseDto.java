@@ -9,8 +9,10 @@ public class ReissueResponseDto {
 
     private String accessToken;
 
-    public static ReissueResponseDto from(String accessToken){
-        return new ReissueResponseDto(accessToken);
+    private String refreshToken;
+
+    public static ReissueResponseDto from(String accessToken,String refreshToken){
+        return new ReissueResponseDto(accessToken,refreshToken);
     }
 
 }
