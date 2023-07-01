@@ -33,9 +33,7 @@ public enum ErrorCode implements ErrorInterface {
     /**
      * 필요한 에러코드 작성
      */
-    EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "만료된 토큰입니다."),
-    INVALID_TOKEN(HttpStatus.FORBIDDEN, "잘못된 토큰입니다."),
-    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "멤버를 찾지 못했어요"),
+
     ;
 
 

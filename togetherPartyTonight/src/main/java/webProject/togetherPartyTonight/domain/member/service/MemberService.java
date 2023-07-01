@@ -6,8 +6,9 @@ import org.springframework.transaction.annotation.Transactional;
 import webProject.togetherPartyTonight.domain.member.dto.response.MemberInfoResponseDto;
 import webProject.togetherPartyTonight.domain.member.entity.Member;
 import webProject.togetherPartyTonight.domain.member.exception.MemberException;
+import webProject.togetherPartyTonight.domain.member.exception.errorCode.MemberErrorCode;
 import webProject.togetherPartyTonight.domain.member.repository.MemberRepository;
-import webProject.togetherPartyTonight.global.error.ErrorCode;
+
 
 @Service
 @RequiredArgsConstructor
@@ -19,7 +20,7 @@ public class MemberService {
     @Transactional(readOnly = true)
     public MemberInfoResponseDto findById(Long userId){
 
-        Member member = memberRepository.findById(userId).orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+        Member member = memberRepository.findById(userId).orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
 
         return MemberInfoResponseDto.from(member);
 

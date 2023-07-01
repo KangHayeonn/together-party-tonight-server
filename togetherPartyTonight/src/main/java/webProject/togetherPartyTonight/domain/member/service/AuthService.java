@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,8 @@ import webProject.togetherPartyTonight.domain.member.dto.response.LoginResponseD
 import webProject.togetherPartyTonight.domain.member.dto.response.ReissueResponseDto;
 import webProject.togetherPartyTonight.domain.member.exception.MemberException;
 import webProject.togetherPartyTonight.domain.member.auth.jwt.JwtProvider;
+import webProject.togetherPartyTonight.domain.member.exception.errorCode.MemberErrorCode;
+import webProject.togetherPartyTonight.domain.member.exception.errorCode.TokenErrorCode;
 import webProject.togetherPartyTonight.global.error.ErrorCode;
 
 import java.util.concurrent.TimeUnit;
@@ -36,16 +39,22 @@ public class AuthService {
     @Value("${spring.jwt.token.refresh-expiration-time}")
     private long refreshTokenExpireTime;
 
-    public LoginResponseDto login(LoginRequestDto userLoginReqDto) {
+    public LoginResponseDto login(LoginRequestDto userLoginReqDto){
 
         String email = userLoginReqDto.getEmail();
         String password = userLoginReqDto.getPassword();
 
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                 new UsernamePasswordAuthenticationToken(email,password);
+        Authentication authentication = null;
 
-        //password를 비교하는 로직
-        Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+        try{
+            //password를 비교하는 로직
+            authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+        }catch(BadCredentialsException e){
+            throw new MemberException(MemberErrorCode.INVALID_PASSWORD);
+        }
+
 
         MemberDetails memberDetails = (MemberDetails)authentication.getPrincipal();
 
@@ -81,11 +90,11 @@ public class AuthService {
             return ReissueResponseDto.from(jwtProvider.createAccessToken(authentication));
 
         }catch (SignatureException e){
-            throw new MemberException(ErrorCode.INVALID_TOKEN);
+            throw new MemberException(TokenErrorCode.INVALID_TOKEN);
         }catch (IllegalArgumentException e){
             throw new MemberException(ErrorCode.FORBIDDEN);
         }catch (ExpiredJwtException e){
-            throw new MemberException(ErrorCode.EXPIRED_TOKEN);
+            throw new MemberException(TokenErrorCode.EXPIRED_TOKEN);
         }
     }
 
