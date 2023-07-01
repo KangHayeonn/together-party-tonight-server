@@ -32,15 +32,14 @@ public class S3Service {
     private final String http = "https://";
 
     public String uploadImage(MultipartFile multipartFile, String directory, Long userId) {
-        //directory : review사진과 club사진을 구분하기 위한 디렉토리
-        //userId : 위 디렉토리 내에서도 사용자별로 사진을 구분하기 위한 디렉토리
+
         String s3Url = http+bucket+ s3regionUrl;
 
         String fileName = directory+ userId.toString()+"/"+ createFileName(multipartFile.getOriginalFilename());
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentLength(multipartFile.getSize());
         objectMetadata.setContentType(multipartFile.getContentType());
-        System.out.println("bucket = " + bucket);
+
         try(InputStream inputStream = multipartFile.getInputStream()) {
             amazonS3Client.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
                         .withCannedAcl(CannedAccessControlList.PublicRead));
