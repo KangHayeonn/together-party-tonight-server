@@ -4,7 +4,7 @@
     <title>WebSocket Chat</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        var socket = new WebSocket("ws://localhost:8080/chat"); // WebSocket 연결
+        var socket = new WebSocket("ws://localhost:8080/chatting"); // WebSocket 연결
 
         // 메시지 수신 이벤트 핸들러
         socket.onmessage = function(event) {

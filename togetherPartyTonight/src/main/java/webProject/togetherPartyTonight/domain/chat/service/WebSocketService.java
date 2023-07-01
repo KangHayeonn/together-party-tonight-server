@@ -56,12 +56,12 @@ public class WebSocketService {
     public void broadcastAll(String message, String sessionId) {
 
         // 받은 메시지를 다른 클라이언트들에게 전달
-        sessionMap.forEach((key,value)-> {
+        sessionMap.forEach((key,session)-> {
             try {
-                if (!value.isOpen()) {
-                    removeMember(value);
+                if (!session.isOpen()) {
+                    removeMember(session);
                 } else {
-                    value.sendMessage(new TextMessage("sender :"+sessionId+", message: "+message));
+                    session.sendMessage(new TextMessage("sender :"+sessionId+", message: "+message));
                 }
             } catch (IOException e) {
                 e.printStackTrace();
