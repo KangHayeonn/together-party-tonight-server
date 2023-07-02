@@ -12,9 +12,11 @@ import org.springframework.web.client.RestClientException;
 import webProject.togetherPartyTonight.domain.member.auth.jwt.JwtProvider;
 import webProject.togetherPartyTonight.domain.member.dto.response.LoginResponseDto;
 import webProject.togetherPartyTonight.domain.member.entity.Member;
+import webProject.togetherPartyTonight.domain.member.exception.MemberException;
 import webProject.togetherPartyTonight.domain.member.oauth.OAuthInfoResponse;
 import webProject.togetherPartyTonight.domain.member.oauth.OAuthLoginParam;
 import webProject.togetherPartyTonight.domain.member.repository.MemberRepository;
+import webProject.togetherPartyTonight.global.error.ErrorCode;
 
 import java.util.concurrent.TimeUnit;
 
@@ -34,30 +36,35 @@ public class SocialLoginService {
     private long refreshTokenExpireTime;
 
 
-    public LoginResponseDto login(OAuthLoginParam loginParam) throws RestClientException {
-        OAuthInfoResponse userInfo = oAuthUserInfoService.request(loginParam);
-        Long memberId = findOrCreateMember(userInfo);
-        Authentication authentication = new UsernamePasswordAuthenticationToken(memberId,null);
+    public LoginResponseDto login(OAuthLoginParam loginParam){
+        try{
+            OAuthInfoResponse userInfo = oAuthUserInfoService.request(loginParam);
+            Long memberId = findOrCreateMember(userInfo);
+            Authentication authentication = new UsernamePasswordAuthenticationToken(memberId,null);
 
-        String accessToken = jwtProvider.createAccessToken(authentication);
-        String refreshToken = jwtProvider.createRefreshToken(authentication);
-        LoginResponseDto responseDto = new LoginResponseDto(memberId, accessToken, refreshToken);
+            String accessToken = jwtProvider.createAccessToken(authentication);
+            String refreshToken = jwtProvider.createRefreshToken(authentication);
+            LoginResponseDto responseDto = new LoginResponseDto(memberId, accessToken, refreshToken);
 
 
-        // redis에 저장
-        redisTemplate.opsForValue().set(
-                authentication.getName(),
-                refreshToken,
-                refreshTokenExpireTime,
-                TimeUnit.MILLISECONDS
-        );
+            // redis에 저장
+            redisTemplate.opsForValue().set(
+                    authentication.getName(),
+                    refreshToken,
+                    refreshTokenExpireTime,
+                    TimeUnit.MILLISECONDS
+            );
 
-        return responseDto;
+            return responseDto;
+        }catch (RestClientException e){
+            throw new MemberException(ErrorCode.INTERNAL_SERVER_ERROR);
+        }
+
 
     }
 
     private Long findOrCreateMember(OAuthInfoResponse userInfo) {
-        return memberRepository.findMemberByEmail(userInfo.getEmail())
+        return memberRepository.findMemberByEmailAndOauthProvider(userInfo.getEmail(),userInfo.getOAuthProvider())
                 .map(Member::getId)
                 .orElseGet(() -> newMember(userInfo));
     }

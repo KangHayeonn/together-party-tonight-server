@@ -26,7 +26,7 @@ public class Member extends BaseEntity {
     @Column(name = "member_id")
     private Long id;
 
-    @Column(nullable = false,unique = true,name = "member_email")
+    @Column(nullable = false, name = "member_email")
     private String email;
 
     @Column(name = "member_password")
@@ -47,9 +47,9 @@ public class Member extends BaseEntity {
     @Column(name = "member_profile_image")
     private String profileImage;
 
-    @Enumerated(value = EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     @Column(name = "member_provider")
-    private OAuthProvider oAuthProvider;
+    private OAuthProvider oauthProvider;
 
     @OneToMany(mappedBy = "chatMemberA", fetch = LAZY) // ChatRoom 의 member 필드와 매핑
     private List<ChatRoom> aChatRooms = new ArrayList<>();
@@ -65,7 +65,7 @@ public class Member extends BaseEntity {
         this.reviewCount = reviewCount;
         this.ratingAvg = ratingAvg;
         this.profileImage = profileImage;
-        this.oAuthProvider = oAuthProvider;
+        this.oauthProvider = oAuthProvider;
     }
 
 }

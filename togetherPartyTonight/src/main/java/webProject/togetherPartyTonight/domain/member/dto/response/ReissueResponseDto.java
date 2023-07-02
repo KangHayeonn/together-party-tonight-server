@@ -11,8 +11,4 @@ public class ReissueResponseDto {
 
     private String refreshToken;
 
-    public static ReissueResponseDto from(String accessToken,String refreshToken){
-        return new ReissueResponseDto(accessToken,refreshToken);
-    }
-
 }

@@ -30,12 +30,10 @@ public class SocialLoginController {
     @PostMapping("/oauth/kakao/token")
     @ApiOperation(value = "카카오 로그인", notes = "카카오로그인 API 입니다.")
     public ResponseEntity<ResponseWithData> kakaoLogin(@RequestBody KakaoLoginRequestDto kakaoDto){
-        try{
-            LoginResponseDto response = socialLoginService.login(KakaoLoginParam.of(kakaoDto));
-            return new ResponseEntity<>(new ResponseWithData("true",200, response),HttpStatus.OK);
-        }catch (RestClientException e){
-            return new ResponseEntity<>(new ResponseWithData("false",500,ErrorCode.INTERNAL_SERVER_ERROR.getErrorMessage()),HttpStatus.OK);
-        }
+
+        LoginResponseDto response = socialLoginService.login(KakaoLoginParam.of(kakaoDto));
+        return new ResponseEntity<>(new ResponseWithData("true",200, response),HttpStatus.OK);
+
 
     }
 }
