@@ -18,6 +18,7 @@ import webProject.togetherPartyTonight.domain.club.repository.ClubRepository;
 import webProject.togetherPartyTonight.domain.club.repository.ClubSignupRepository;
 import webProject.togetherPartyTonight.domain.member.entity.Member;
 import webProject.togetherPartyTonight.domain.member.exception.MemberException;
+import webProject.togetherPartyTonight.domain.member.exception.errorCode.MemberErrorCode;
 import webProject.togetherPartyTonight.domain.member.repository.MemberRepository;
 import webProject.togetherPartyTonight.global.error.ErrorCode;
 
@@ -40,9 +41,10 @@ public class ClubJoinService {
 
 
     public void signup (DeleteClubAndSignupRequestDto requestDto) {
+        Member member = memberRepository.getReferenceById(requestDto.getUserId());
+        if (member == null) throw new MemberException(MemberErrorCode.MEMBER_NOT_FOUND);
         Club club = clubRepository.getReferenceById(requestDto.getClubId());
         if (club==null) throw new ClubException(ClubErrorCode.INVALID_CLUB_ID);
-        Member member = memberRepository.getReferenceById(requestDto.getUserId());
         // TODO: 2023/06/17 JWT 내부 유저정보와 requestBody의 userId가 다르면 '권한 없음' exception
 
         Optional<ClubSignup> alreadySignup = clubSignupRepository.findByClubClubIdAndClubMemberId(requestDto.getClubId(), requestDto.getUserId());
@@ -127,23 +129,12 @@ public class ClubJoinService {
 
         List<ClubSignup> clubSignups = clubSignupRepository.findAllByClubClubId(clubId);
 
-        List<ApplicationDto> list = new ArrayList<>();
-        for (ClubSignup c : clubSignups) {
-            ApplicationDto applicationDto = ApplicationDto.builder()
-                    .clubSignupId(c.getClubSignupId())
-                    .clubId(c.getClub().getClubId())
-                    .clubName(c.getClub().getClubName())
-                    .clubId(c.getClub().getClubId())
-                    .userId(c.getClubMember().getId())
-                    .nickName(c.getClubMember().getNickname())
-                    .signupDate(c.getClubSignupDate().toString())
-                    .approvalStatus(c.getClubSignupApprovalState().name())
-                    .createdDate(c.getCreatedDate())
-                    .modifiedDate(c.getModifiedDate())
-                    .build();
+        List<ApplicationDto> list = clubSignups.stream()
+                .map(c -> new ApplicationDto(c.getClubSignupId(), c.getClub().getClubId(), c.getClub().getClubName(),
+                        c.getClubMember().getId(), c.getClubMember().getNickname(), c.getClubSignupDate(), c.getClubSignupApprovalState().toString(),
+                        c.getCreatedDate(), c.getModifiedDate()))
+                .collect(Collectors.toList());
 
-            list.add(applicationDto);
-        }
         return new ReceivedApplicationListDto(list);
     }
 
@@ -157,23 +148,13 @@ public class ClubJoinService {
         // TODO: 2023/06/17 JWT 내부 유저정보와 userId가 다르면 '권한 없음' exception
 
         List<ClubSignup> signupMemberId = clubSignupRepository.findAllByClubMemberId(userId);
-        List<ApplicationDto> list = new ArrayList<>();
-        for (ClubSignup c : signupMemberId) {
-            ApplicationDto applicationDto = ApplicationDto.builder()
-                    .clubSignupId(c.getClubSignupId())
-                    .clubId(c.getClub().getClubId())
-                    .clubName(c.getClub().getClubName())
-                    .clubId(c.getClub().getClubId())
-                    .userId(c.getClub().getMaster().getId())
-                    .nickName(c.getClubMaster().getNickname())
-                    .signupDate(c.getClubSignupDate().toString())
-                    .approvalStatus(c.getClubSignupApprovalState().name())
-                    .createdDate(c.getCreatedDate())
-                    .modifiedDate(c.getModifiedDate())
-                    .build();
 
-            list.add(applicationDto);
-        }
+        List<ApplicationDto> list = signupMemberId.stream()
+                .map(c -> new ApplicationDto(c.getClubSignupId(), c.getClub().getClubId(), c.getClub().getClubName(),
+                        c.getClubMember().getId(), c.getClubMember().getNickname(), c.getClubSignupDate(), c.getClubSignupApprovalState().toString(),
+                        c.getCreatedDate(), c.getModifiedDate()))
+                .collect(Collectors.toList());
+
         return new MyAppliedClubListDto(list);
     }
 
@@ -186,27 +167,13 @@ public class ClubJoinService {
         // TODO: 2023/06/17 JWT 내부 유저정보와 userId가 다르면 '권한 없음' exception
 
         List<Club> clubs = clubRepository.findClubByMasterId(userId);
-        List<MyOwnedClubDto> list = new ArrayList<>();
-        for (Club c : clubs) {
 
-            Point point = c.getClubPoint();
-            List<String> tags = splitTags(c.getClubTags());
-            MyOwnedClubDto myOwnedClubDto = MyOwnedClubDto.builder()
-                    .clubName(c.getClubName())
-                    .clubCategory(c.getClubCategory())
-                    .clubMaximum(c.getClubMaximum())
-                    .clubContent(c.getClubContent())
-                    .clubTags(tags)
-                    .latitude((float) point.getX())
-                    .longitude((float) point.getY())
-                    .address(c.getAddress())
-                    .meetingDate(String.valueOf(c.getMeetingDate()))
-                    .createdDate(c.getCreatedDate())
-                    .modifiedDate(c.getModifiedDate())
-                    .build();
+        List<MyOwnedClubDto> list = clubs.stream()
+                .map(c -> new MyOwnedClubDto(c.getClubName(), c.getClubCategory(), c.getClubMaximum(),
+                        c.getClubContent(), splitTags(c.getClubTags()), (float)c.getClubPoint().getX(), (float)c.getClubPoint().getY(),
+                        c.getAddress(),c.getMeetingDate(),c.getCreatedDate(), c.getModifiedDate()))
+                .collect(Collectors.toList());
 
-            list.add(myOwnedClubDto);
-        }
         return new MyOwnedClubListDto(list);
     }
 

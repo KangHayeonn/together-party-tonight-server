@@ -66,6 +66,7 @@ public class GlobalExceptionHandler {
         e.printStackTrace();
         String[] split = e.getMessage().split("\\[");
         String parameter = split[2].substring(1, split[2].length() - 3);
+        //잘못된 형식의 파라미터 이름을 얻기 위한 파싱
         return responseService.getFailureResponse(400, parameter+"의 형식이 잘못되었습니다.");
     }
 

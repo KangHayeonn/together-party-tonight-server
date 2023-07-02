@@ -17,7 +17,7 @@ public class ApplicationDto {
     private String clubName;
     private Long userId;
     private String nickName;
-    private String signupDate;
+    private LocalDateTime signupDate;
     private String approvalStatus;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;

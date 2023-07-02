@@ -26,6 +26,10 @@ public class GetClubResponseDto {
     private String image;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
+    private Boolean isRecruit;
+    private Integer memberCount;
+    private Float ratingAvg;
+    private Integer reviewCnt;
 
     public GetClubResponseDto toDto (Club club) {
         this.nickName=club.getMaster().getNickname();
@@ -42,6 +46,10 @@ public class GetClubResponseDto {
         this.image=club.getImage();
         this.createdDate=club.getCreatedDate();
         this.modifiedDate=club.getModifiedDate();
+        this.isRecruit=club.getClubState();
+        this.memberCount=club.getClubMembers().size();
+        this.ratingAvg= club.getMaster().getRatingAvg();
+        this.reviewCnt= club.getMaster().getReviewCount();
         return this;
     }
 }
