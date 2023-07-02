@@ -8,10 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import webProject.togetherPartyTonight.domain.club.entity.Club;
-import webProject.togetherPartyTonight.domain.search.dto.PageDto;
 import webProject.togetherPartyTonight.domain.search.dto.SearchListDto;
 import webProject.togetherPartyTonight.domain.search.dto.SearchResponseDto;
-import webProject.togetherPartyTonight.domain.search.exception.SearchException;
 import webProject.togetherPartyTonight.domain.search.repository.SearchRepository;
 
 import java.time.LocalDateTime;
@@ -26,13 +24,13 @@ import java.util.stream.Collectors;
 public class SearchService {
     private final SearchRepository searchRepository;
 
-    public ArrayList searchByAddress(Float lat, Float lng, Pageable pageable) {
+    public SearchListDto searchByAddress(Float lat, Float lng, Pageable pageable) {
         String pointWKT = makePointWKT(lat, lng);
         Optional<Page<Club>> clubList = searchRepository.findByAddress(pointWKT, pageable);
         return makeResponseDto(clubList);
     }
 
-    public ArrayList searchByConditions(Float lat, Float lng, Integer distance, String category, String state, Integer userNum, String tags, String sortFilter, Pageable pageable) {
+    public SearchListDto searchByConditions(Float lat, Float lng, Integer distance, String category, String state, Integer userNum, String tags, String sortFilter, Pageable pageable) {
         String pointWKT = makePointWKT(lat, lng);
         String regexpTag = makeRegexp(tags);
         if (category.equals("전체")) category = convertCategory();
@@ -81,18 +79,15 @@ public class SearchService {
         return point.toText();
     }
 
-    public ArrayList makeResponseDto (Optional<Page<Club>> clubList) {
-
-        PageDto pageDto = new PageDto(clubList.get().getNumberOfElements(), clubList.get().getTotalElements());
-
+    public SearchListDto makeResponseDto (Optional<Page<Club>> clubList) {
         SearchListDto searchListDto = new SearchListDto();
+        searchListDto.setCount(clubList.get().getNumberOfElements());
+        searchListDto.setTotalCount(clubList.get().getTotalElements());
+
         if (clubList.isPresent()) searchListDto.setClubList(makeSearchResponseDto(clubList.get()));
         else searchListDto.setClubList(new ArrayList<>());
 
-        ArrayList<Object> list = new ArrayList<>();
-        list.add(pageDto);
-        list.add(searchListDto);
-        return list;
+        return searchListDto;
     }
 
 
