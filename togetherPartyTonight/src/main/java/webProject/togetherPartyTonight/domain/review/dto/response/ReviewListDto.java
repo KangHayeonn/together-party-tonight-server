@@ -9,6 +9,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReviewList {
-    List<ReviewDetailResponse> reviewList;
+public class ReviewListDto {
+    List<GetReviewDetailResponseDto> reviewList;
 }

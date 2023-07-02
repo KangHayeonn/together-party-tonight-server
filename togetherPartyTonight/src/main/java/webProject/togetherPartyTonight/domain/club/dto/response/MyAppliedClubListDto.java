@@ -7,6 +7,6 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class MyAppliedClubList {
-    private List<Application> myAppliedList ;
+public class MyAppliedClubListDto {
+    private List<ApplicationDto> myAppliedList ;
 }

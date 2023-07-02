@@ -5,40 +5,51 @@ import webProject.togetherPartyTonight.domain.club.entity.Club;
 import webProject.togetherPartyTonight.domain.club.entity.ClubCategory;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ClubDetailResponse {
+public class GetClubResponseDto {
     private String nickName;
     private Long userId;
     private String clubName;
     private ClubCategory clubCategory;
     private Integer clubMaximum;
-    private Integer clubMinimum;
     private String clubContent;
     private String clubTags;
     private String address;
     private Float latitude;
     private Float longitude;
-    private LocalDate meetingDate;
+    private String meetingDate;
     private String image;
+    private LocalDateTime createdDate;
+    private LocalDateTime modifiedDate;
+    private Boolean isRecruit;
+    private Integer memberCount;
+    private Float ratingAvg;
+    private Integer reviewCnt;
 
-    public ClubDetailResponse toDto (Club club) {
-//        this.nickname=club.getNickname();
+    public GetClubResponseDto toDto (Club club) {
+        this.nickName=club.getMaster().getNickname();
         this.clubName= club.getClubName();
         this.clubCategory=club.getClubCategory();
         this.clubContent= club.getClubContent();
         this.clubMaximum = club.getClubMaximum();
-        this.clubMinimum= club.getClubMinimum();
         this.userId = club.getMaster().getId();
         this.latitude= (float) club.getClubPoint().getX();
         this.longitude= (float) club.getClubPoint().getY();
         this.clubTags = club.getClubTags();
         this.address=club.getAddress();
-        this.meetingDate= club.getMeetingDate();
+        this.meetingDate= String.valueOf(club.getMeetingDate());
         this.image=club.getImage();
+        this.createdDate=club.getCreatedDate();
+        this.modifiedDate=club.getModifiedDate();
+        this.isRecruit=club.getClubState();
+        this.memberCount=club.getClubMembers().size();
+        this.ratingAvg= club.getMaster().getRatingAvg();
+        this.reviewCnt= club.getMaster().getReviewCount();
         return this;
     }
 }

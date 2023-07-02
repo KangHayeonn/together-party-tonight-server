@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.Point;
 import webProject.togetherPartyTonight.domain.club.entity.Club;
 import webProject.togetherPartyTonight.domain.club.entity.ClubCategory;
+import webProject.togetherPartyTonight.domain.club.exception.ClubErrorCode;
 import webProject.togetherPartyTonight.domain.club.exception.ClubException;
 import webProject.togetherPartyTonight.global.error.ErrorCode;
 
@@ -15,7 +16,7 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ModifyClubRequest extends AddClubRequest {
+public class UpdateClubRequestDto extends CreateClubRequestDto {
 
     @NotNull
     private Long clubId;
@@ -26,13 +27,12 @@ public class ModifyClubRequest extends AddClubRequest {
         club.setClubContent(this.getClubContent());
         club.setClubTags(this.getClubTags());
         club.setAddress(this.getAddress());
-        club.setMeetingDate(LocalDate.parse(this.getMeetingDate()));
-        club.setClubMinimum(this.getClubMinimum());
+        club.setMeetingDate(this.getMeetingDate());
         club.setClubPoint(point);
         club.setImage(image);
 
         if (flag ==-1) {
-            throw new ClubException(ErrorCode.INVALID_CLUB_MAXIMUM);
+            throw new ClubException(ClubErrorCode.INVALID_CLUB_MAXIMUM);
         }
         else if (flag ==0) {
             club.setClubMaximum(this.getClubMaximum());
