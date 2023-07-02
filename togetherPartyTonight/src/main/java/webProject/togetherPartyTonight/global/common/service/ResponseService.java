@@ -1,5 +1,6 @@
 package webProject.togetherPartyTonight.global.common.service;
 
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
 import webProject.togetherPartyTonight.global.common.response.CommonResponse;
 import webProject.togetherPartyTonight.global.common.response.FailureResponse;
@@ -9,6 +10,7 @@ import webProject.togetherPartyTonight.global.common.response.SingleResponse;
 import java.util.List;
 
 @Service
+@NoArgsConstructor
 public class ResponseService {
 
     private static final String SUCCESS = "success";
@@ -26,6 +28,12 @@ public class ResponseService {
         listResponse.setDataList(dataList);
         setSuccessResponse(listResponse);
         return listResponse;
+    }
+
+    public CommonResponse getCommonResponse () {
+        CommonResponse commonResponse = new CommonResponse();
+        setSuccessResponse(commonResponse);
+        return commonResponse;
     }
 
     public FailureResponse getFailureResponse(int code, String errorMessage) {

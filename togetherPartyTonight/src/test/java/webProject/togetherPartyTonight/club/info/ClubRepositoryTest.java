@@ -12,7 +12,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 public class ClubRepositoryTest {
-    // TODO: 2023/06/18 h2 DB에서 POINT type 사용 방법 숙지. 현재 unknown data type이라고 떠서 table 생성이 안돼서 테스트 불가. 빌드를 위해 주석처리
     @Autowired
     private ClubRepository clubRepository;
 

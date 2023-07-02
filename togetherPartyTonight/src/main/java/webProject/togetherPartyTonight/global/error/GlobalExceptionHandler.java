@@ -43,32 +43,6 @@ public class GlobalExceptionHandler {
      * 매개변수만 다르고 메서드 내용이 중복되는 부분을 어떻게 고칠지 생각해봐야할 것 같습니다
      */
 
-    @ExceptionHandler(MemberException.class)
-    public ResponseEntity<ErrorResponse> memberException (MemberException e) {
-        e.printStackTrace();
-        logger.error("member exception : {}",e.getErrorCode().getMessage());
-        ErrorResponse errorResponse = new ErrorResponse(FAIL, e.getErrorCode().getHttpStatus().value(), e.getErrorCode().getMessage());
-        return ResponseEntity.status(200)
-                .body(errorResponse);
-    }
-
-    @ExceptionHandler(ClubException.class)
-    public ResponseEntity<ErrorResponse> clubException (ClubException e) {
-        e.printStackTrace();
-        logger.error("club exception : {}",e.getErrorCode().getMessage());
-        ErrorResponse errorResponse = new ErrorResponse(FAIL, e.getErrorCode().getHttpStatus().value(), e.getErrorCode().getMessage());
-        return ResponseEntity.status(200)
-                .body(errorResponse);
-    }
-
-    @ExceptionHandler(ReviewException.class)
-    public ResponseEntity<ErrorResponse> reviewException (ReviewException e) {
-        e.printStackTrace();
-        logger.error("review exception : {}",e.getErrorCode().getMessage());
-        ErrorResponse errorResponse = new ErrorResponse(FAIL, e.getErrorCode().getHttpStatus().value(), e.getErrorCode().getMessage());
-        return ResponseEntity.status(200)
-                .body(errorResponse);
-    }
 
     @ExceptionHandler(CommonException.class)
     public FailureResponse commonException (CommonException e) {
@@ -78,31 +52,22 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> fieldValueException (MethodArgumentNotValidException e) {
+    public FailureResponse fieldValueException (MethodArgumentNotValidException e) {
         e.printStackTrace();
         StringBuilder sb = new StringBuilder();
         for (FieldError fe : e.getFieldErrors()) {
             sb.append(fe.getDefaultMessage()).append("  ");
         }
-        ErrorResponse errorResponse = new ErrorResponse(FAIL, String.valueOf(sb));
-        return ResponseEntity.status(200)
-                .body(errorResponse);
-    }
-  
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorResponse> httpMessageNotReadableException (HttpMessageNotReadableException e) {
-        e.printStackTrace();
-        ErrorResponse errorResponse = new ErrorResponse(FAIL, ErrorCode.INVALID_REQUEST_BODY_PARAMETER_TYPE.getHttpStatus().value(), ErrorCode.INVALID_REQUEST_BODY_PARAMETER_TYPE.getMessage());
-        return ResponseEntity.status(200)
-                .body(errorResponse);
+        return responseService.getFailureResponse(400, sb.toString());
     }
 
-    @ExceptionHandler(DateTimeParseException.class)
-    public ResponseEntity<ErrorResponse> dateParseException (DateTimeParseException e) {
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public FailureResponse httpMessageNotReadableException (HttpMessageNotReadableException e) {
         e.printStackTrace();
-        ErrorResponse errorResponse = new ErrorResponse(FAIL, ErrorCode.DATE_PARSING_EXCEPTION.getHttpStatus().value(), ErrorCode.DATE_PARSING_EXCEPTION.getMessage());
-        return ResponseEntity.status(200)
-                .body(errorResponse);
+        String[] split = e.getMessage().split("\\[");
+        String parameter = split[2].substring(1, split[2].length() - 3);
+        //잘못된 형식의 파라미터 이름을 얻기 위한 파싱
+        return responseService.getFailureResponse(400, parameter+"의 형식이 잘못되었습니다.");
     }
 
 

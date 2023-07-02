@@ -1,23 +1,28 @@
 package webProject.togetherPartyTonight.domain.club.dto.response;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import webProject.togetherPartyTonight.domain.club.entity.ClubCategory;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
 @Builder
-public class MyOwnedClub {
+@AllArgsConstructor
+public class MyOwnedClubDto {
     private String clubName;
     private ClubCategory clubCategory;
     private Integer clubMaximum;
-    private Integer clubMinimum;
     private String clubContent;
     private List<String> clubTags;
-    Float latitude;
-    Float longitude;
-    String address;
+    private Float latitude;
+    private Float longitude;
+    private String address;
 
-    String meetingDate;
+    private LocalDateTime meetingDate;
+
+    private LocalDateTime createdDate;
+    private LocalDateTime modifiedDate;
 }
