@@ -1,9 +1,9 @@
 package webProject.togetherPartyTonight.domain.review.dto.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import webProject.togetherPartyTonight.domain.club.entity.Club;
+import webProject.togetherPartyTonight.domain.member.entity.Member;
 import webProject.togetherPartyTonight.domain.review.entity.Review;
 
 import javax.validation.constraints.NotNull;
@@ -11,15 +11,12 @@ import javax.validation.constraints.Size;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class ModifyReviewRequest {
-    @NotNull(message = "reviewId는 필수 입력 값입니다.")
-    Long reviewId;
+public class CreateReviewRequestDto {
+    @NotNull(message = "clubId는 필수 입력 값입니다.")
+    Long clubId;
 
     @NotNull(message = "userId는 필수 입력 값입니다.")
     Long userId;
-
     @NotNull(message = "rating은 필수 입력 값입니다.")
     Integer rating;
 
@@ -27,9 +24,13 @@ public class ModifyReviewRequest {
     @NotNull(message = "reviewContent는 필수 입력 값입니다.")
     String reviewContent;
 
-    public void modify(Review review, String imageUrl) {
-        review.setRating(rating);
-        review.setReviewContent(reviewContent);
-        review.setImageUrl(imageUrl);
+    public Review toEntity(Club club, Member member, String image) {
+        return Review.builder()
+                .club(club)
+                .member(member)
+                .reviewContent(this.reviewContent)
+                .rating(rating)
+                .imageUrl(image)
+                .build();
     }
 }

@@ -8,11 +8,11 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import webProject.togetherPartyTonight.domain.review.exception.ReviewException;
+import webProject.togetherPartyTonight.global.error.CommonException;
 import webProject.togetherPartyTonight.global.error.ErrorCode;
 
 import java.io.IOException;
@@ -50,29 +50,42 @@ public class S3Service {
         return s3Url + fileName;
     }
 
-    //  https://topato.s3.ap-northeast-2.amazonaws.com/review/1/name.jpg
-
     public void deleteImage(String fileName) {
         String[] split = fileName.split("/");
 
         String key = fileName.substring(72);
-        System.out.println("key: "+key);
         amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, key));
     }
 
     private String createFileName(String fileName) {
-        //같은 이름의 파일 중복 방지
-        return UUID.randomUUID().toString().concat(getFileExtension(fileName));
-
+        //같은 이름의 파일 중복 방지하기 위해 UUID사용
+        String extension = getFileExtension(fileName);
+        String uuid = UUID.randomUUID().toString().concat(extension);
+        return uuid;
     }
 
     private String getFileExtension(String fileName) {
         try {
-            return fileName.substring(fileName.lastIndexOf("."));
+            String extension = fileName.substring(fileName.lastIndexOf("."));
+            return checkImageExtension(extension);
         }
         catch (StringIndexOutOfBoundsException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "잘못된 형식의 파일 file: " + fileName);
+            throw new CommonException(ErrorCode.INVALID_EXTENSION);
         }
+    }
+
+    private String  checkImageExtension(String extension) {
+        String[] image = {".jpg", ".png", ".jpeg", ".bmp", ".gif", ".tiff", ".svg", ".heic"};
+        boolean check = false;
+        System.out.println(extension);
+        for (String ex : image) {
+            if (extension.equals(ex) || extension.equals(ex.toUpperCase())) {
+                check = true;
+                break;
+            }
+        }
+        if (!check)  throw new CommonException(ErrorCode.INVALID_IMAGE_EXTENSION);
+        return extension;
     }
 
     public String getImage(String name) {

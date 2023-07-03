@@ -7,12 +7,15 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotNull;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class DeleteMyAppliedRequest {
-    @NotNull (message = "userId는 필수 입력 값입니다.")
-    private Long userId;
+@NoArgsConstructor
+public class ApproveRequestDto {
 
     @NotNull (message = "clubSignupId는 필수 입력 값입니다.")
     private Long clubSignupId;
+
+    @NotNull (message = "approve는 필수 입력 값입니다.")
+    private Boolean approve;
+
+
 }
