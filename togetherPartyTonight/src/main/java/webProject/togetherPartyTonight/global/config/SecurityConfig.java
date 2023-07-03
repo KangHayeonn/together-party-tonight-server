@@ -50,7 +50,7 @@ public class SecurityConfig {
                     .authenticationEntryPoint(authenticationEntryPoint)
                 .and()
                     .authorizeRequests(auth->auth
-                            .mvcMatchers(HttpMethod.POST,"/members/login","/members/reissue").permitAll()
+                            .mvcMatchers(HttpMethod.POST,"/members/login","/members/reissue","members/oauth/**").permitAll()
 
                         .anyRequest().authenticated()); // Authentication 필요한 주소
 
