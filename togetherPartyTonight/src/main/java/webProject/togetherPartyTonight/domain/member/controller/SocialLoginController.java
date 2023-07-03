@@ -17,6 +17,8 @@ import webProject.togetherPartyTonight.domain.member.oauth.kakao.KakaoLoginParam
 import webProject.togetherPartyTonight.domain.member.service.OAuthUserInfoService;
 import webProject.togetherPartyTonight.domain.member.service.SocialLoginService;
 import webProject.togetherPartyTonight.global.common.ResponseWithData;
+import webProject.togetherPartyTonight.global.common.response.SingleResponse;
+import webProject.togetherPartyTonight.global.common.service.ResponseService;
 import webProject.togetherPartyTonight.global.error.ErrorCode;
 
 @RestController
@@ -27,12 +29,14 @@ import webProject.togetherPartyTonight.global.error.ErrorCode;
 public class SocialLoginController {
 
     private final SocialLoginService socialLoginService;
+    private final ResponseService responseService;
     @PostMapping("/oauth/kakao/token")
     @ApiOperation(value = "카카오 로그인", notes = "카카오로그인 API 입니다.")
-    public ResponseEntity<ResponseWithData> kakaoLogin(@RequestBody KakaoLoginRequestDto kakaoDto){
+    public SingleResponse<LoginResponseDto> kakaoLogin(@RequestBody KakaoLoginRequestDto kakaoDto){
 
-        LoginResponseDto response = socialLoginService.login(KakaoLoginParam.of(kakaoDto));
-        return new ResponseEntity<>(new ResponseWithData("true",200, response),HttpStatus.OK);
+        LoginResponseDto responseDto = socialLoginService.login(KakaoLoginParam.of(kakaoDto));
+        SingleResponse<LoginResponseDto> response = responseService.getSingleResponse(responseDto);
+        return response;
 
 
     }
