@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClientException;
 import webProject.togetherPartyTonight.domain.member.dto.request.KakaoLoginRequestDto;
+import webProject.togetherPartyTonight.domain.member.dto.request.NaverLoginRequestDto;
 import webProject.togetherPartyTonight.domain.member.dto.response.LoginResponseDto;
 import webProject.togetherPartyTonight.domain.member.oauth.kakao.KakaoLoginParam;
+import webProject.togetherPartyTonight.domain.member.oauth.naver.NaverLoginParam;
 import webProject.togetherPartyTonight.domain.member.service.OAuthUserInfoService;
 import webProject.togetherPartyTonight.domain.member.service.SocialLoginService;
 import webProject.togetherPartyTonight.global.common.ResponseWithData;
@@ -38,6 +40,14 @@ public class SocialLoginController {
         SingleResponse<LoginResponseDto> response = responseService.getSingleResponse(responseDto);
         return response;
 
+    }
 
+    @PostMapping("/oauth/naver/token")
+    @ApiOperation(value = "네이버 로그인", notes = "네이버로그인 API입니다.")
+    public SingleResponse<LoginResponseDto> naverLogin(@RequestBody NaverLoginRequestDto naverDto){
+
+        LoginResponseDto responseDto = socialLoginService.login(NaverLoginParam.of(naverDto));
+        SingleResponse<LoginResponseDto> response = responseService.getSingleResponse(responseDto);
+        return response;
     }
 }
