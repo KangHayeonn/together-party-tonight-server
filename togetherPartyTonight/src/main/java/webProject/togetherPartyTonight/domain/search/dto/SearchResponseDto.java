@@ -5,13 +5,18 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.locationtech.jts.geom.Point;
+import org.springframework.security.core.parameters.P;
+import webProject.togetherPartyTonight.domain.club.entity.Club;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-@Builder
+@NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @ApiModel(value = "개별 모임")
 public class SearchResponseDto {
     @ApiModelProperty(name = "모임 id", example = "1")
@@ -52,4 +57,28 @@ public class SearchResponseDto {
     private LocalDateTime createdDate;
     @ApiModelProperty(name = "모임 글 수정 일자", example = "2023-07-03T15:30:41.568606")
     private LocalDateTime modifiedDate;
+
+    public SearchResponseDto toDto (Club c, List<String> tags, Point point) {
+        return SearchResponseDto.builder()
+                .clubId(c.getClubId())
+                .clubName(c.getClubName())
+                .clubCategory(String.valueOf(c.getClubCategory()))
+                .clubTags(tags)
+                .clubContent(c.getClubContent())
+                .clubMaximum(c.getClubMaximum())
+                .longitude((float)point.getX())
+                .latitude((float)point.getY())
+                .isRecruit(c.getClubState())
+                .meetingDate(c.getMeetingDate())
+                .image(c.getImage())
+                .address(c.getAddress())
+                .memberCount(c.getClubMembers().size())
+                .memberId(c.getMaster().getId())
+                .nickName(c.getMaster().getNickname())
+                .ratingAvg(c.getMaster().getRatingAvg())
+                .reviewCnt(c.getMaster().getReviewCount())
+                .createdDate(c.getCreatedDate())
+                .modifiedDate(c.getModifiedDate())
+                .build();
+    }
 }

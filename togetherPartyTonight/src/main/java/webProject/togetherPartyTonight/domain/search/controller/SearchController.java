@@ -52,8 +52,8 @@ public class SearchController {
      */
     @GetMapping("")
     @ApiOperation(value = "옵션 기반 검색", notes = "사용자가 선택한 여러 옵션에 따라 모임을 검색한다.")
-    public SingleResponse<SearchListDto> searchByConditions (@RequestParam @ApiParam(required = true, value = "위도", example = "37.55920", allowableValues = "[-90,90]") @NotNull (message = "위도는 필수 입력 값입니다.") @Min(value = -90, message = "유효한 위도 범위를 벗어났습니다.")  @Max(value = 90, message = "유효한 위도 범위를 벗어났습니다.")Float lat,
-                                            @RequestParam @ApiParam(required = true, value = "경도", example = "126.942310", allowableValues = "[-180,180]") @NotNull (message = "경도는 필수 입력 값입니다.") @Min(value = -90, message = "유효한 경도 범위를 벗어났습니다.") @Max(value = 90, message = "유효한 경도 범위를 벗어났습니다.")Float lng,
+    public SingleResponse<SearchListDto> searchByConditions (@RequestParam @ApiParam(required = true, value = "위도", example = "37.55920", allowableValues = "[-90,90]")  @Min(value = -90, message = "유효한 위도 범위를 벗어났습니다.")  @Max(value = 90, message = "유효한 위도 범위를 벗어났습니다.")Float lat,
+                                            @RequestParam @ApiParam(required = true, value = "경도", example = "126.942310", allowableValues = "[-180,180]")  @Min(value = -180, message = "유효한 경도 범위를 벗어났습니다.") @Max(value = 180, message = "유효한 경도 범위를 벗어났습니다.")Float lng,
                                             @RequestParam  @ApiParam(required = true, value = "검색할 거리 반경", example = "5", allowableValues = "[0,10]") @Min (value = 0, message = "검색 가능 최소 거리는 0km입니다.") @Max(value = 10, message = "검색 가능 최대 거리는 10km입니다.") Integer distance,
                                             @RequestParam @ApiParam(required = true, value = "모임 카테고리", example = "취미", allowableValues = "취미,봉사,운동,스터디,맛집,여행,친목,전체") @Enum(enumClass = ClubCategory.class, ignoreCase = true) String category,
                                             @RequestParam @ApiParam(required = true, value = "모임 상태", example = "all", allowableValues = "recruit,all") @Enum(enumClass = SearchState.class, ignoreCase = true, message = "검색할 수 없는 모임 상태입니다.") String status,

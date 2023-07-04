@@ -24,7 +24,6 @@ import static javax.persistence.FetchType.LAZY;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@DynamicInsert
 @Table(name = "club")
 public class Club extends BaseEntity {
     @Id

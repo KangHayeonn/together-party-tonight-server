@@ -53,14 +53,13 @@ public class SearchService {
     }
 
     public List<SearchResponseDto> makeSearchResponseDto(Page<Club> clubs) {
-        List<SearchResponseDto> list = clubs.stream()
-                .map(c -> new SearchResponseDto(c.getClubId(), c.getClubName(), String.valueOf(c.getClubCategory()), splitTags(c.getClubTags()),
-                        c.getClubContent(), c.getClubMaximum(), (float) c.getClubPoint().getX(), (float) c.getClubPoint().getY(), c.getAddress(),
-                        LocalDateTime.now(),
-                        c.getImage(), c.getClubState(),c.getClubMembers().size(),
-                        c.getMaster().getId(), c.getMaster().getNickname(), c.getMaster().getRatingAvg(), c.getMaster().getReviewCount(),
-                        c.getCreatedDate(), c.getModifiedDate()))
-                .collect(Collectors.toList());
+
+        List<SearchResponseDto> list = new ArrayList<>();
+        for (Club c : clubs) {
+            List<String> tags = splitTags(c.getClubTags());
+            Point point= c.getClubPoint();
+            list.add(new SearchResponseDto().toDto(c, tags, point));
+        }
 
         return list;
     }
