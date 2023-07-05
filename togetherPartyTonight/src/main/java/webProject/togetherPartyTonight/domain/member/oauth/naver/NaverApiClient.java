@@ -51,10 +51,9 @@ public class NaverApiClient implements OAuthApiClient {
         body.add("client_id", clientId);
         body.add("client_secret", clientSecret);
 
-        HttpEntity<?> request = new HttpEntity<>(body,httpHeaders);
+        HttpEntity<MultiValueMap<String,String>> request = new HttpEntity<>(body,httpHeaders);
 
         ResponseEntity<NaverTokens> response = restTemplate.postForEntity(authUrl, request, NaverTokens.class);
-        System.out.println(response.getBody().getAccessToken());
         return response.getBody().getAccessToken();
     }
 
