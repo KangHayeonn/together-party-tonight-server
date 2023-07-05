@@ -81,8 +81,7 @@ public class JwtProvider {
                 .parseClaimsJws(token)
                 .getBody().getSubject();
 
-        UserDetails principal = new User(sub, "", List.of());
-
+        UserDetails principal = new User(sub,"",List.of());
         return new UsernamePasswordAuthenticationToken(principal, "",null);
     }
 
