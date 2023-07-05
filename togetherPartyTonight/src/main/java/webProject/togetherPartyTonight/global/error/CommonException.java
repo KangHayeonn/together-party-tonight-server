@@ -10,6 +10,5 @@ public class CommonException extends RuntimeException {
 
     public CommonException(ErrorInterface errorInterface) {
         super(errorInterface.getErrorMessage());
-        this.errorInterface = errorInterface;
     }
 }

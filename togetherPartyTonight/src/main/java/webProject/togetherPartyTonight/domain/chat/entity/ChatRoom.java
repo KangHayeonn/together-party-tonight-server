@@ -8,6 +8,7 @@ import javax.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static javax.persistence.FetchType.LAZY;
 
@@ -38,4 +39,18 @@ public class ChatRoom extends BaseEntity {
     //chatMemberB 가 보는 채팅창 이름 . (초깃값 : chatMemberA 닉네임)
     @Column(name = "chat_room_b_name",length = 20, nullable = false)
     private String chatRoomBName;
+
+    public Long getOtherMemberId(Member sender) {
+        if (Objects.equals(chatMemberA.getId(), sender.getId())) {
+            return chatMemberB.getId();
+        }
+        return chatMemberA.getId();
+    }
+
+    public Boolean isChatMember(Member sender) {
+        if (Objects.equals(chatMemberA.getId(), sender.getId())) {
+            return true;
+        }
+        return Objects.equals(chatMemberB.getId(), sender.getId());
+    }
 }
