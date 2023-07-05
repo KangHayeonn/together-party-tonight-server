@@ -1,6 +1,7 @@
 package webProject.togetherPartyTonight.domain.search.repository;
 
 import org.locationtech.jts.geom.Point;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -20,32 +21,32 @@ public interface SearchRepository extends JpaRepository<Club,Long> {
             "club_category, club_content, club_maximum, club_minimum, club_name,club_state," +
             "club_tags, club_image, club_meeting_date, club_master_id, ST_AsText(club_point) AS club_point " +
             "FROM club c ";
-    String where = "WHERE ST_DISTANCE_SPHERE(ST_GEOMFROMTEXT(:standard_point,4326), club_point) <= :distance " +
+    String OptionWhere = "WHERE ST_DISTANCE_SPHERE(ST_GEOMFROMTEXT(:standard_point,4326), club_point) <= :distance " +
             "AND club_maximum <= :userNum " +
             "AND :category LIKE CONCAT('%', club_category , '%') " +
             "AND club_tags REGEXP CONCAT('\\\\b',:tags,'\\\\b') " +
             "AND ((:state = 'recruit' AND club_state = 1) OR (:state = 'all')) ";
 
+    String noOptionWhere = "WHERE ST_DISTANCE_SPHERE(ST_GEOMFROMTEXT(:standard_point,4326), club_point) <= 5000 ";
 
-    @Query(nativeQuery = true, value = searchDefaultQuery+
-            "WHERE ST_DISTANCE_SPHERE(ST_GEOMFROMTEXT(:standard_point,4326), club_point) <= 5000;" )
-    Optional<List<Club>> findByAddress(@Param("standard_point") String point);
+    @Query(nativeQuery = true, value = searchDefaultQuery+ noOptionWhere)
+    Optional<Page<Club>> findByAddress(@Param("standard_point") String point, Pageable pageable);
 
 
     @Query(nativeQuery = true, value = searchDefaultQuery+
             "JOIN member m ON c.club_master_id = m.member_id "
-            +where +
-            "ORDER BY m.member_rating_avg DESC;")
-    Optional<List<Club>>  findByConditionsOrderByReviewScore (@Param("standard_point") String point, @Param("distance")Integer distance,
+            +OptionWhere +
+            "ORDER BY m.member_rating_avg DESC ")
+    Optional<Page<Club>>  findByConditionsOrderByReviewScore (@Param("standard_point") String point, @Param("distance")Integer distance,
                                           @Param("state")String state, @Param("category")String category, @Param("userNum")Integer userNum,
-                                          @Param("tags")String tags);
+                                          @Param("tags")String tags, Pageable pageable);
 
 
-    @Query(nativeQuery = true, value = searchDefaultQuery+ where +
+    @Query(nativeQuery = true, value = searchDefaultQuery+ OptionWhere +
             "ORDER BY created_date DESC")
-    Optional<List<Club>> findByConditionsOrderByDate (@Param("standard_point") String point, @Param("distance")Integer distance,
+    Optional<Page<Club>> findByConditionsOrderByDate (@Param("standard_point") String point, @Param("distance")Integer distance,
                                                       @Param("state")String state, @Param("category")String category, @Param("userNum")Integer userNum,
-                                                      @Param("tags")String tags);
+                                                      @Param("tags")String tags, Pageable pageable);
 
 
     /**
