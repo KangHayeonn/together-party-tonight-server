@@ -2,6 +2,7 @@ package webProject.togetherPartyTonight.domain.club.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -30,8 +31,6 @@ import java.util.List;
 public class ClubController {
     private final ClubService clubService;
     private final ClubJoinService clubJoinService;
-    private final String SUCCESS = "true";
-    private final String FAIL = "false";
 
     private final ResponseService responseService;
 

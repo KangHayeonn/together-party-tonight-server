@@ -21,6 +21,7 @@ import webProject.togetherPartyTonight.domain.member.exception.MemberException;
 import webProject.togetherPartyTonight.domain.member.exception.errorCode.MemberErrorCode;
 import webProject.togetherPartyTonight.domain.member.repository.MemberRepository;
 import webProject.togetherPartyTonight.global.error.ErrorCode;
+import webProject.togetherPartyTonight.global.util.ClubUtils;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
@@ -38,6 +39,7 @@ public class ClubJoinService {
     private final ClubRepository clubRepository;
     private final ClubSignupRepository clubSignupRepository;
     private final ClubMemberRepository clubMemberRepository;
+    private final ClubUtils clubUtils;
 
 
     public void signup (DeleteClubAndSignupRequestDto requestDto) {
@@ -170,7 +172,7 @@ public class ClubJoinService {
 
         List<MyOwnedClubDto> list = clubs.stream()
                 .map(c -> new MyOwnedClubDto(c.getClubName(), c.getClubCategory(), c.getClubMaximum(),
-                        c.getClubContent(), splitTags(c.getClubTags()), (float)c.getClubPoint().getX(), (float)c.getClubPoint().getY(),
+                        c.getClubContent(), clubUtils.splitTags(c.getClubTags()), (float)c.getClubPoint().getX(), (float)c.getClubPoint().getY(),
                         c.getAddress(),c.getMeetingDate(),c.getCreatedDate(), c.getModifiedDate()))
                 .collect(Collectors.toList());
 
@@ -190,10 +192,7 @@ public class ClubJoinService {
 
     }
 
-    public List<String> splitTags (String tags) {
-        String[] split = tags.split(",");
-        return Arrays.stream(split).collect(Collectors.toList());
-    }
+
 
     public void checkIfRecruitComplete(ClubSignup clubSignup) {
         //현재 승인된 모임 인원이 모집 최대 인원에 도달했는지 여부 반환

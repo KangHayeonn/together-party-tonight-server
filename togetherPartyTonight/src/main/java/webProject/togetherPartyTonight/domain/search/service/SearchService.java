@@ -11,6 +11,7 @@ import webProject.togetherPartyTonight.domain.club.entity.Club;
 import webProject.togetherPartyTonight.domain.search.dto.SearchListDto;
 import webProject.togetherPartyTonight.domain.search.dto.SearchResponseDto;
 import webProject.togetherPartyTonight.domain.search.repository.SearchRepository;
+import webProject.togetherPartyTonight.global.util.ClubUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SearchService {
     private final SearchRepository searchRepository;
+    private final ClubUtils clubUtils;
 
     public SearchListDto searchByAddress(Float lat, Float lng, Pageable pageable) {
         String pointWKT = makePointWKT(lat, lng);
@@ -47,16 +49,11 @@ public class SearchService {
 
     }
 
-    public List<String> splitTags (String tags) {
-        String[] split = tags.split(",");
-        return Arrays.stream(split).collect(Collectors.toList());
-    }
-
     public List<SearchResponseDto> makeSearchResponseDto(Page<Club> clubs) {
 
         List<SearchResponseDto> list = new ArrayList<>();
         for (Club c : clubs) {
-            List<String> tags = splitTags(c.getClubTags());
+            List<String> tags = clubUtils.splitTags(c.getClubTags());
             Point point= c.getClubPoint();
             list.add(new SearchResponseDto().toDto(c, tags, point));
         }
@@ -80,7 +77,7 @@ public class SearchService {
 
     public SearchListDto makeResponseDto (Optional<Page<Club>> clubList) {
         SearchListDto searchListDto = new SearchListDto();
-        searchListDto.setCount(clubList.get().getNumberOfElements());
+        searchListDto.setCount(clubList.get().getNumberOfElements());ㄴ
         searchListDto.setTotalCount(clubList.get().getTotalElements());
 
         if (clubList.isPresent()) searchListDto.setClubList(makeSearchResponseDto(clubList.get()));

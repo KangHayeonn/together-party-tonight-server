@@ -47,7 +47,7 @@ public class ReviewService {
         );
 
         ClubMember clubMember = clubMemberRepository.findByClubClubIdAndMemberId(clubId, memberId).orElseThrow(
-                () -> new ReviewException(ErrorCode.INVALID_MEMBER_ID)
+                () -> new ReviewException(ReviewErrorCode.NOT_A_MEMBER)
         );
 
         //clubMember에 사용자가 존재하고, 현재날짜가 meetingDate보다 이후일 경우에만 리뷰 작성가능

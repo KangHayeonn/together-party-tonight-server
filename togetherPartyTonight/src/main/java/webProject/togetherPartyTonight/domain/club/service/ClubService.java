@@ -21,6 +21,7 @@ import webProject.togetherPartyTonight.domain.member.entity.Member;
 import webProject.togetherPartyTonight.domain.member.exception.MemberException;
 import webProject.togetherPartyTonight.domain.member.repository.MemberRepository;
 import webProject.togetherPartyTonight.global.error.ErrorCode;
+import webProject.togetherPartyTonight.global.util.ClubUtils;
 import webProject.togetherPartyTonight.infra.S3.S3Service;
 
 import javax.transaction.Transactional;
@@ -42,6 +43,7 @@ public class ClubService {
     private final S3Service s3Service;
 
     private final String directory = "club/";
+    private final ClubUtils clubUtils;
 
 
     @Transactional
@@ -68,7 +70,8 @@ public class ClubService {
     public GetClubResponseDto getClub(Long id) {
         Club club = clubRepository.findById(id)
                 .orElseThrow(() -> new ClubException(ClubErrorCode.INVALID_CLUB_ID));
-        return new GetClubResponseDto().toDto(club);
+        List<String> tags = clubUtils.splitTags(club.getClubTags());
+        return new GetClubResponseDto().toDto(club, tags);
     }
 
     @Transactional
