@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public enum BillingState {
 
-    결제대기 ("결제대기"),
-    정산완료("정산완료");
+    wait ("결제대기"),
+    completed ("정산완료");
 
     private String billingState;
 }

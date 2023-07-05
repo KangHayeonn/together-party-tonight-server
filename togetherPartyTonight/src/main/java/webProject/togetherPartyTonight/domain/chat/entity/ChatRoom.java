@@ -40,14 +40,14 @@ public class ChatRoom extends BaseEntity {
     @Column(name = "chat_room_b_name",length = 20, nullable = false)
     private String chatRoomBName;
 
-    public long getOtherMemberId(Member sender) {
+    public Long getOtherMemberId(Member sender) {
         if (Objects.equals(chatMemberA.getId(), sender.getId())) {
             return chatMemberB.getId();
         }
         return chatMemberA.getId();
     }
 
-    public boolean isChatMember(Member sender) {
+    public Boolean isChatMember(Member sender) {
         if (Objects.equals(chatMemberA.getId(), sender.getId())) {
             return true;
         }
