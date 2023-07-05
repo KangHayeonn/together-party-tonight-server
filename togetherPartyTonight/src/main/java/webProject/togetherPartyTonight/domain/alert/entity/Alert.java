@@ -1,4 +1,4 @@
-package webProject.togetherPartyTonight.domain.notification.entity;
+package webProject.togetherPartyTonight.domain.alert.entity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +13,7 @@ import javax.persistence.Id;
 @Setter
 @Getter
 @NoArgsConstructor
-public class Notification {
+public class Alert {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

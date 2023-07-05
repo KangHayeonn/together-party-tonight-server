@@ -8,7 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import webProject.togetherPartyTonight.domain.chat.dto.*;
 import webProject.togetherPartyTonight.domain.chat.entity.Chat;
-import webProject.togetherPartyTonight.domain.chat.exception.ChatErrorCode;
 import webProject.togetherPartyTonight.domain.chat.exception.ChatException;
 import webProject.togetherPartyTonight.domain.chat.entity.ChatRoom;
 import webProject.togetherPartyTonight.domain.chat.repository.ChatRepository;
@@ -19,9 +18,11 @@ import webProject.togetherPartyTonight.global.common.BaseEntity;
 import webProject.togetherPartyTonight.global.common.response.ListResponse;
 import webProject.togetherPartyTonight.global.common.response.SingleResponse;
 import webProject.togetherPartyTonight.global.common.service.ResponseService;
+import webProject.togetherPartyTonight.global.websocket.WebSocketService;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static webProject.togetherPartyTonight.domain.chat.exception.ChatErrorCode.*;
 
@@ -35,13 +36,15 @@ public class ChatService {
     private MemberRepository memberRepository;
     private ResponseService responseService;
     private ChatRepository chatRepository;
+    private WebSocketService webSocketService;
 
     @Autowired
-    public ChatService(ChatRoomRepository chatRoomRepository, MemberRepository memberRepository, ResponseService responseService, ChatRepository chatRepository) {
+    public ChatService(ChatRoomRepository chatRoomRepository, MemberRepository memberRepository, ResponseService responseService, ChatRepository chatRepository, WebSocketService webSocketService) {
         this.chatRoomRepository = chatRoomRepository;
         this.memberRepository = memberRepository;
         this.responseService = responseService;
         this.chatRepository = chatRepository;
+        this.webSocketService = webSocketService;
     }
 
     private static final int maxCount = 100;        //채팅 기록 최대 요청 수
@@ -50,8 +53,8 @@ public class ChatService {
 
     //방 생성.
     public SingleResponse<CreateChatRoomResponseDto> createChatRoom(CreateChatRoomRequest createChatRoomRequestDto) {
-        Optional<List<ChatRoom>> chatRoomByA = chatRoomRepository.findByChatMemberAIdAndChatMemberBId(createChatRoomRequestDto.getMemberId(), createChatRoomRequestDto.getOtherMemberId());
-        Optional<List<ChatRoom>> chatRoomByB = chatRoomRepository.findByChatMemberAIdAndChatMemberBId(createChatRoomRequestDto.getOtherMemberId(), createChatRoomRequestDto.getMemberId());
+        Optional<ChatRoom> chatRoomByA = chatRoomRepository.findByChatMemberAIdAndChatMemberBId(createChatRoomRequestDto.getMemberId(), createChatRoomRequestDto.getOtherMemberId());
+        Optional<ChatRoom> chatRoomByB = chatRoomRepository.findByChatMemberAIdAndChatMemberBId(createChatRoomRequestDto.getOtherMemberId(), createChatRoomRequestDto.getMemberId());
 
         if (chatRoomByA.isPresent() || chatRoomByB.isPresent()) {
             log.warn("[ChatService] createChatRoom chatRoom is Already Exist memberId: {}, otherMemberId: {}", createChatRoomRequestDto.getMemberId(), createChatRoomRequestDto.getOtherMemberId());
@@ -86,7 +89,7 @@ public class ChatService {
     }
 
     //채팅방 목록을 불러온다  혹시 한 사람이 채팅 목록이 100개가 넘어거는 경우가 있다면 페이징 처리 필요.
-    public ListResponse<ChatRoomListResponseDto> getChatRoomList(long memberId, int page, int listCount) {
+    public SingleResponse<ChatRoomListDto> getChatRoomList(long memberId, int page, int perPage) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> {
                     log.error("[ChatService] getChatRoomList member doesn't exist memberId: {}", memberId);
@@ -98,23 +101,25 @@ public class ChatService {
 
         chatRooms.sort(Comparator.comparing(BaseEntity::getModifiedDate));
 
-        int startIdx = (page - 1) * listCount;
-        if (chatRooms.size() <=startIdx) {
+        int startIdx = (page - 1) * perPage;
+        if (chatRooms.size() <= startIdx) {
             throw new ChatException(OVER_CHAT_ROOM_PAGE);
         }
 
-        chatRooms = chatRooms.subList(startIdx, startIdx + listCount);
+        chatRooms = chatRooms.subList(startIdx, startIdx + perPage);
 
-        List<ChatRoomListResponseDto> chatRoomListResponseListDto = new ArrayList<>();
+        List<ChatRoomListResponseDto> chatRoomList = new ArrayList<>();
 
-        chatRooms.forEach(chatRoom -> addChatRoomListResponseDto(memberId, chatRoomListResponseListDto, chatRoom));
+        chatRooms.forEach(chatRoom -> addChatRoomListResponseDto(memberId, chatRoomList, chatRoom));
 
-        return responseService.getListResponse(chatRoomListResponseListDto);
+        ChatRoomListDto chatRoomListDto = ChatRoomListDto.builder().chatRoomList(chatRoomList).build();
+
+        return responseService.getSingleResponse(chatRoomListDto);
     }
 
 
     //채팅 목록 반환
-    public ListResponse<ChatDto> getChatLogList(ChatLogRequestDto chatLogRequestDto) {
+    public SingleResponse<ChatListDto> getChatLogList(ChatLogRequestDto chatLogRequestDto) {
 
         if (chatLogRequestDto.getListCount() > maxCount) {
             log.info("[ChatService] getChatLogList listCount over MaxCount, chatRoomId: {}", chatLogRequestDto.getChatRoomId());
@@ -128,7 +133,9 @@ public class ChatService {
 
         chats.forEach(chat -> chatDtoList.add(chat.toChatDto()));
 
-        return responseService.getListResponse(chatDtoList);
+        ChatListDto chatListDto = ChatListDto.builder().chatList(chatDtoList).build();
+
+        return responseService.getSingleResponse(chatListDto);
     }
 
     public SingleResponse<ChatSendResponseDto> sendChat(ChatSendRequestDto chatLogRequestDto) {
@@ -150,6 +157,11 @@ public class ChatService {
             throw new ChatException(OVER_MAX_LENGTH);
         }
 
+        if (!chatRoom.isChatMember(sender)) {
+            log.error("[ChatService] sendChat sender is not this chatRoom requestMemberId: {}, chatRoomId: {}", chatLogRequestDto.getSenderMemberId(), chatLogRequestDto.getChatRoomId());
+            throw new ChatException(CHAT_MEMBER_NOT_FOUND);
+        }
+
         Chat chat = saveChat(chatLogRequestDto.getChatMsg(), chatRoom, sender);
         ChatSendResponseDto chatSendResponseDto = ChatSendResponseDto.builder()
                 .chatId(chat.getId())
@@ -157,11 +169,37 @@ public class ChatService {
 
         chatRoom.setModifiedDate(chat.getCreatedDate());
         chatRoomRepository.save(chatRoom);
-        //TodoSm 소켓 추후 연결해주기.
+
+        //소켓 메시지 발송.
+        String message = ChatSocketMessage.getMessage(chatLogRequestDto.getChatMsg(), chat.getId());
+        webSocketService.sendUser(chatRoom.getChatMemberA().getId(), message);
+        webSocketService.sendUser(chatRoom.getChatMemberB().getId(), message);
 
         return responseService.getSingleResponse(chatSendResponseDto);
     }
 
+
+    public SingleResponse<ChatRoomResponseDto> getChatRoom(long memberId, long otherMemberId) {
+        ChatRoomResponseDto chatRoomResponseDto = new ChatRoomResponseDto();
+        Optional<ChatRoom> chatRoomByMemberId = chatRoomRepository.findByChatMemberAIdAndChatMemberBId(memberId, otherMemberId);
+        if (chatRoomByMemberId.isPresent()) {
+            chatRoomResponseDto = ChatRoomResponseDto.builder()
+                    .chatRoomId(chatRoomByMemberId.get().getId())
+                    .chatRoomName(chatRoomByMemberId.get().getChatRoomAName())
+                    .build();
+            return responseService.getSingleResponse(chatRoomResponseDto);
+        }
+
+        Optional<ChatRoom> chatRoomByOtherMemberId = chatRoomRepository.findByChatMemberAIdAndChatMemberBId(otherMemberId,memberId );
+        if (chatRoomByOtherMemberId.isPresent()) {
+            chatRoomResponseDto = ChatRoomResponseDto.builder()
+                    .chatRoomId(chatRoomByOtherMemberId.get().getId())
+                    .chatRoomName(chatRoomByOtherMemberId.get().getChatRoomAName())
+                    .build();
+        }
+
+        return responseService.getSingleResponse(chatRoomResponseDto);
+    }
 
     //--------------- 부 기능 함수
     private Chat saveChat(String chatMsg, ChatRoom chatRoom, Member sender) {

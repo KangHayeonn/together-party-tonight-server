@@ -6,8 +6,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.messaging.handler.annotation.support.MethodArgumentTypeMismatchException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import webProject.togetherPartyTonight.domain.club.exception.ClubException;
@@ -17,6 +19,7 @@ import webProject.togetherPartyTonight.global.common.ErrorResponse;
 import webProject.togetherPartyTonight.global.common.response.FailureResponse;
 import webProject.togetherPartyTonight.global.common.service.ResponseService;
 
+import javax.validation.ConstraintViolationException;
 import java.time.format.DateTimeParseException;
 
 /**
@@ -51,6 +54,10 @@ public class GlobalExceptionHandler {
         return responseService.getFailureResponse(e.getErrorInterface().getStatusCode(), e.getErrorInterface().getErrorMessage());
     }
 
+    /**
+     *
+     * request body에서 valid에 걸리는 경우
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public FailureResponse fieldValueException (MethodArgumentNotValidException e) {
         e.printStackTrace();
@@ -61,6 +68,9 @@ public class GlobalExceptionHandler {
         return responseService.getFailureResponse(400, sb.toString());
     }
 
+    /**
+     * request body json 파싱시 데이터 타입이 맞지 않는 경우
+     */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public FailureResponse httpMessageNotReadableException (HttpMessageNotReadableException e) {
         e.printStackTrace();
@@ -69,6 +79,37 @@ public class GlobalExceptionHandler {
         //잘못된 형식의 파라미터 이름을 얻기 위한 파싱
         return responseService.getFailureResponse(400, parameter+"의 형식이 잘못되었습니다.");
     }
+
+    /**
+     * NotNull 조건에 걸리는 경우
+     */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public FailureResponse missingServletRequestParameterException (MissingServletRequestParameterException e) {
+        e.printStackTrace();
+        String[] split = e.getMessage().split("'");
+        return responseService.getFailureResponse(400, split[1]+"은 null이 될 수 없습니다.");
+    }
+
+    /**
+     * query parameter의 data type이 맞지않는 경우
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public FailureResponse methodArgumentTypeMismatchException (MethodArgumentTypeMismatchException e) {
+        e.printStackTrace();
+        return responseService.getFailureResponse(400, "쿼리 파라미터의 데이터 타입이 올바르지 않습니다.");
+    }
+
+    /**
+     * query parameter에서 valid에 걸리는 경우
+     */
+    @ExceptionHandler(ConstraintViolationException.class)
+    public FailureResponse constraintViolationException (ConstraintViolationException e) {
+        e.printStackTrace();
+        String[] split = e.getMessage().split(":");
+        return responseService.getFailureResponse(400, split[1].substring(1));
+    }
+
+
 
 
 

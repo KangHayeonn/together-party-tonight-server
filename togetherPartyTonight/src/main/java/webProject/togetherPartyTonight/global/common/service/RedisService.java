@@ -32,13 +32,13 @@ public class RedisService {
     }
 
     // redis key 에 맵 형식으로 데이터를 넣는 것.
-    public void addStringKeyWithMapKey(String key, String mapKey, Object mapValue) {
+    public void addStringKeyWithMap(String key, Object mapKey, Object mapValue) {
         HashOperations<String, Object, Object> hashOperations = redisTemplate.opsForHash();
         hashOperations.put(key, mapKey, mapValue);
     }
 
     // redis key 에 맵 형식으로 데이터를 삭제하는것.
-    public void removeStringKeyWithMapKey(String key, String mapKey) {
+    public void removeStringKeyWithMapKey(String key, Object mapKey) {
         HashOperations<String, Object, Object> hashOperations = redisTemplate.opsForHash();
         hashOperations.delete(key, mapKey);
     }
@@ -47,5 +47,10 @@ public class RedisService {
     public Object get(String key) {
         ValueOperations<String, Object> stringObjectValueOperations = redisTemplate.opsForValue();
         return stringObjectValueOperations.get(key);
+    }
+
+    public Object getStringKeyWithMap(String key, Object mapKey) {
+        HashOperations<String, Object, Object> hashOperations = redisTemplate.opsForHash();
+        return hashOperations.get(key, mapKey);
     }
 }
