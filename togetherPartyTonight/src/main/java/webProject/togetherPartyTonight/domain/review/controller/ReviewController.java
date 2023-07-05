@@ -13,6 +13,8 @@ import webProject.togetherPartyTonight.domain.review.dto.response.GetReviewDetai
 import webProject.togetherPartyTonight.domain.review.service.ReviewService;
 import webProject.togetherPartyTonight.global.common.response.CommonResponse;
 import webProject.togetherPartyTonight.global.common.ResponseWithData;
+import webProject.togetherPartyTonight.global.common.response.SingleResponse;
+import webProject.togetherPartyTonight.global.common.service.ResponseService;
 import webProject.togetherPartyTonight.infra.S3.S3Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,48 +26,43 @@ import javax.validation.Valid;
 @Slf4j
 public class ReviewController {
     private final ReviewService reviewService;
-    private final String SUCCESS = "true";
+    private final ResponseService responseService;
 
-    private final S3Service s3Service;
     @PostMapping("")
     @ApiOperation(value = "리뷰 만들기")
-    public ResponseEntity<CommonResponse> addReview (@RequestPart(name = "data") @Valid CreateReviewRequestDto createReviewRequestDto,
+    public CommonResponse addReview (@RequestPart(name = "data") @Valid CreateReviewRequestDto createReviewRequestDto,
                                                      @RequestPart(required = false)MultipartFile image, HttpServletRequest request) {
         log.info("[{}] {}",request.getMethod(),request.getRequestURI());
 
         reviewService.addReview(createReviewRequestDto, image);
-        CommonResponse response = new CommonResponse(SUCCESS, HttpStatus.OK.value());
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return responseService.getCommonResponse();
     }
 
     @GetMapping("/{reviewId}")
     @ApiOperation(value = "리뷰 상세 조회")
-    public ResponseEntity<ResponseWithData> getReviewDetail (@PathVariable Long reviewId, HttpServletRequest request) {
+    public SingleResponse<GetReviewDetailResponseDto> getReviewDetail (@PathVariable Long reviewId, HttpServletRequest request) {
         log.info("[{}] {}",request.getMethod(),request.getRequestURI());
 
         GetReviewDetailResponseDto reviewDetail = reviewService.getReviewDetail(reviewId);
-        ResponseWithData response = new ResponseWithData(SUCCESS, HttpStatus.OK.value(), reviewDetail);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return responseService.getSingleResponse(reviewDetail);
     }
 
     @PutMapping("")
     @ApiOperation(value = "리뷰 수정하기")
-    public ResponseEntity<CommonResponse> modifyReview (@RequestPart(name = "data") @Valid UpdateReviewRequestDto updateReviewRequestDto, HttpServletRequest request,
+    public CommonResponse modifyReview (@RequestPart(name = "data") @Valid UpdateReviewRequestDto updateReviewRequestDto, HttpServletRequest request,
                                                         @RequestPart(required = false) MultipartFile image) {
         log.info("[{}] {}",request.getMethod(),request.getRequestURI());
 
         reviewService.modifyReview(updateReviewRequestDto, image);
-        CommonResponse response = new CommonResponse(SUCCESS, HttpStatus.OK.value());
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return responseService.getCommonResponse();
     }
 
     @DeleteMapping("/{reviewId}")
     @ApiOperation(value = "리뷰 삭제하기")
-    public ResponseEntity<CommonResponse> deleteReview (@PathVariable Long reviewId, HttpServletRequest request) {
+    public CommonResponse deleteReview (@PathVariable Long reviewId, HttpServletRequest request) {
         log.info("[{}] {}",request.getMethod(),request.getRequestURI());
 
         reviewService.deleteReview(reviewId);
-        CommonResponse response = new CommonResponse(SUCCESS, HttpStatus.OK.value());
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return responseService.getCommonResponse();
     }
 }
