@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class GetClubResponseDto {
     private String nickName;
-    private Long userId;
+    private Long memberId;
     private String clubName;
     private ClubCategory clubCategory;
     private Integer clubMaximum;
@@ -22,7 +22,7 @@ public class GetClubResponseDto {
     private String address;
     private Float latitude;
     private Float longitude;
-    private String meetingDate;
+    private LocalDateTime meetingDate;
     private String image;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
@@ -37,12 +37,12 @@ public class GetClubResponseDto {
         this.clubCategory=club.getClubCategory();
         this.clubContent= club.getClubContent();
         this.clubMaximum = club.getClubMaximum();
-        this.userId = club.getMaster().getId();
+        this.memberId = club.getMaster().getId();
         this.latitude= (float) club.getClubPoint().getX();
         this.longitude= (float) club.getClubPoint().getY();
         this.clubTags = club.getClubTags();
         this.address=club.getAddress();
-        this.meetingDate= String.valueOf(club.getMeetingDate());
+        this.meetingDate= club.getMeetingDate();
         this.image=club.getImage();
         this.createdDate=club.getCreatedDate();
         this.modifiedDate=club.getModifiedDate();

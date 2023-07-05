@@ -30,7 +30,7 @@ public class SearchService {
         return makeResponseDto(clubList);
     }
 
-    public SearchListDto searchByConditions(Float lat, Float lng, Integer distance, String category, String state, Integer userNum, String tags, String sortFilter, Pageable pageable) {
+    public SearchListDto searchByConditions(Float lat, Float lng, Integer distance, String category, String state, Integer memberNum, String tags, String sortFilter, Pageable pageable) {
         String pointWKT = makePointWKT(lat, lng);
         String regexpTag = makeRegexp(tags);
         if (category.equals("전체")) category = convertCategory();
@@ -38,10 +38,10 @@ public class SearchService {
         Optional<Page<Club>> clubList = null;
 
         if (sortFilter.equals("latest")) {
-            clubList = searchRepository.findByConditionsOrderByDate(pointWKT, distance * 1000, state, category, userNum, regexpTag, pageable);
+            clubList = searchRepository.findByConditionsOrderByDate(pointWKT, distance * 1000, state, category, memberNum, regexpTag, pageable);
         }
         else if (sortFilter.equals("popular")) {
-            clubList = searchRepository.findByConditionsOrderByReviewScore(pointWKT,distance*1000, state, category,userNum,regexpTag, pageable);
+            clubList = searchRepository.findByConditionsOrderByReviewScore(pointWKT,distance*1000, state, category,memberNum,regexpTag, pageable);
         }
        return makeResponseDto(clubList);
 

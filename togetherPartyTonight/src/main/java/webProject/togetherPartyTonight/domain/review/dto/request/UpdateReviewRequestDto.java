@@ -17,8 +17,8 @@ public class UpdateReviewRequestDto {
     @NotNull(message = "reviewId는 필수 입력 값입니다.")
     Long reviewId;
 
-    @NotNull(message = "userId는 필수 입력 값입니다.")
-    Long userId;
+    @NotNull(message = "memberId는 필수 입력 값입니다.")
+    Long memberId;
 
     @NotNull(message = "rating은 필수 입력 값입니다.")
     Integer rating;

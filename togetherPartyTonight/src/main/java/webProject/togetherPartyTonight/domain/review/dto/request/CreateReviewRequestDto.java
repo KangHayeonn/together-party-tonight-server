@@ -15,8 +15,8 @@ public class CreateReviewRequestDto {
     @NotNull(message = "clubId는 필수 입력 값입니다.")
     Long clubId;
 
-    @NotNull(message = "userId는 필수 입력 값입니다.")
-    Long userId;
+    @NotNull(message = "memberId는 필수 입력 값입니다.")
+    Long memberId;
     @NotNull(message = "rating은 필수 입력 값입니다.")
     Integer rating;
 

@@ -16,8 +16,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class DeleteClubAndSignupRequestDto {
 
-    @NotNull (message = "userId는 필수 입력 값입니다.")
-    private Long userId ;
+    @NotNull (message = "memberId는 필수 입력 값입니다.")
+    private Long memberId ;
 
     @NotNull (message = "clubId는 필수 입력 값입니다.")
     private Long clubId ;

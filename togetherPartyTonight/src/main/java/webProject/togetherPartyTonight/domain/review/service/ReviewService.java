@@ -37,16 +37,16 @@ public class ReviewService {
     @Transactional
     public void addReview(CreateReviewRequestDto request, MultipartFile image) {
         Long clubId = request.getClubId();
-        Long userId = request.getUserId();
+        Long memberId = request.getMemberId();
 
-        if(reviewRepository.findByClubClubIdAndMemberId(clubId, userId).isPresent())
+        if(reviewRepository.findByClubClubIdAndMemberId(clubId, memberId).isPresent())
             throw new ReviewException(ReviewErrorCode.IS_ALREADY_WRITTEN);
 
         Club club = clubRepository.findById(clubId).orElseThrow(
                 () -> new ReviewException(ClubErrorCode.INVALID_CLUB_ID)
         );
 
-        ClubMember clubMember = clubMemberRepository.findByClubClubIdAndMemberId(clubId, userId).orElseThrow(
+        ClubMember clubMember = clubMemberRepository.findByClubClubIdAndMemberId(clubId, memberId).orElseThrow(
                 () -> new ReviewException(ErrorCode.INVALID_MEMBER_ID)
         );
 
@@ -57,7 +57,7 @@ public class ReviewService {
                 imageUrl = s3Service.getImage("review_default.jpg");
             }
             else {
-                imageUrl = s3Service.uploadImage(image, directory, request.getUserId());
+                imageUrl = s3Service.uploadImage(image, directory, request.getMemberId());
             }
             Review review = request.toEntity(club, clubMember.getMember(),imageUrl);
             reviewRepository.save(review);
@@ -82,7 +82,7 @@ public class ReviewService {
 
         String imageUrl="";
         if(image!=null){ //수정할 새로운 이미지가 있으면
-            imageUrl = s3Service.uploadImage(image, directory, request.getUserId()); //s3에 업로드하고 url받아옴
+            imageUrl = s3Service.uploadImage(image, directory, request.getMemberId()); //s3에 업로드하고 url받아옴
             if(!review.getImageUrl().contains("default")) { //기존 이미지가 default 이미지가 아니라면
                 s3Service.deleteImage(review.getImageUrl()); //s3에서 삭제
             }

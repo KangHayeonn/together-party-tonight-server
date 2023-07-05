@@ -25,8 +25,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class CreateClubRequestDto {
 
-    @NotNull(message = "userId는 필수 입력 값입니다.")
-    private Long userId;
+    @NotNull(message = "memberId는 필수 입력 값입니다.")
+    private Long memberId;
 
     @NotEmpty(message = "clubName은 필수 입력 값입니다.")
     private String clubName;

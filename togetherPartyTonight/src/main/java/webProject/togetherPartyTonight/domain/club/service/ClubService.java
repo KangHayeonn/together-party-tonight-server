@@ -46,14 +46,14 @@ public class ClubService {
 
     @Transactional
     public void addClub (CreateClubRequestDto clubRequest, MultipartFile image) {
-        Member master = memberRepository.getReferenceById(clubRequest.getUserId());
+        Member master = memberRepository.getReferenceById(clubRequest.getMemberId());
         // TODO: 2023/06/17 JWT 내부 유저정보와 requestBody의 userId가 다르면 '권한 없음' exception
 
         Point point = makePoint(clubRequest.getLatitude(), clubRequest.getLongitude());
 
         String url="";
         if (image != null) {
-            url = s3Service.uploadImage(image, directory, clubRequest.getUserId());
+            url = s3Service.uploadImage(image, directory, clubRequest.getMemberId());
         }
         else {
             url = getDefaultImage(clubRequest.getClubCategory());
@@ -74,7 +74,7 @@ public class ClubService {
     @Transactional
     public void deleteClub (DeleteClubAndSignupRequestDto requestDto) {
         Long clubId = requestDto.getClubId();
-        Long userId = requestDto.getUserId();
+        Long userId = requestDto.getMemberId();
         // TODO: 2023/06/17 JWT 내부 유저정보와 requestBody의 userId가 다르면 '권한 없음' exception
         Club club = clubRepository.findById(requestDto.getClubId()).orElseThrow(
                 ()-> new ClubException(ClubErrorCode.INVALID_CLUB_ID)
@@ -91,7 +91,7 @@ public class ClubService {
     @Transactional
     public void modifyClub(UpdateClubRequestDto clubRequest, MultipartFile image) {
         Long clubId = clubRequest.getClubId();
-        Long userId = clubRequest.getUserId();
+        Long userId = clubRequest.getMemberId();
         // TODO: 2023/06/17 JWT 내부 유저정보와 requestBody의 userId가 다르면 '권한 없음' exception
         Club club = clubRepository.findByClubIdAndMasterId(clubId, userId)
                 .orElseThrow(()-> new ClubException(ClubErrorCode.INVALID_CLUB_ID));
@@ -110,7 +110,7 @@ public class ClubService {
 
         String imageUrl;
         if(image!=null){
-            imageUrl = s3Service.uploadImage(image, directory, clubDto.getUserId());
+            imageUrl = s3Service.uploadImage(image, directory, clubDto.getMemberId());
             if(!clubEntity.getImage().contains("default")) {
                 s3Service.deleteImage(clubEntity.getImage());
             }

@@ -10,8 +10,8 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DeleteMyAppliedRequestDto {
-    @NotNull (message = "userId는 필수 입력 값입니다.")
-    private Long userId;
+    @NotNull (message = "memberId는 필수 입력 값입니다.")
+    private Long memberId;
 
     @NotNull (message = "clubSignupId는 필수 입력 값입니다.")
     private Long clubSignupId;

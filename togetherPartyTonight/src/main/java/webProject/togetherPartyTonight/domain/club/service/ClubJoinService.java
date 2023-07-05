@@ -41,13 +41,13 @@ public class ClubJoinService {
 
 
     public void signup (DeleteClubAndSignupRequestDto requestDto) {
-        Member member = memberRepository.getReferenceById(requestDto.getUserId());
+        Member member = memberRepository.getReferenceById(requestDto.getMemberId());
         if (member == null) throw new MemberException(MemberErrorCode.MEMBER_NOT_FOUND);
         Club club = clubRepository.getReferenceById(requestDto.getClubId());
         if (club==null) throw new ClubException(ClubErrorCode.INVALID_CLUB_ID);
         // TODO: 2023/06/17 JWT 내부 유저정보와 requestBody의 userId가 다르면 '권한 없음' exception
 
-        Optional<ClubSignup> alreadySignup = clubSignupRepository.findByClubClubIdAndClubMemberId(requestDto.getClubId(), requestDto.getUserId());
+        Optional<ClubSignup> alreadySignup = clubSignupRepository.findByClubClubIdAndClubMemberId(requestDto.getClubId(), requestDto.getMemberId());
         if(alreadySignup.isEmpty()) {
             ClubSignup clubSignup = requestDto.toClubSignup(club, member, club.getMaster());
             clubSignupRepository.save(clubSignup);
@@ -61,7 +61,7 @@ public class ClubJoinService {
     @Transactional
     public void deleteAppliedClub (DeleteMyAppliedRequestDto requestDto) {
         Long clubSignupId = requestDto.getClubSignupId();
-        Long userId = requestDto.getUserId();
+        Long userId = requestDto.getMemberId();
 
         memberRepository.findById(userId).orElseThrow(
                 () -> new MemberException(ErrorCode.INVALID_MEMBER_ID)
@@ -77,7 +77,7 @@ public class ClubJoinService {
             clubSignupRepository.deleteById(clubSignupId);
         }
         else if (clubSignup.getClubSignupApprovalState().equals(ApprovalState.APPROVE)){
-            clubMemberRepository.deleteByClubClubIdAndMemberId(clubSignup.getClub().getClubId(), requestDto.getUserId());
+            clubMemberRepository.deleteByClubClubIdAndMemberId(clubSignup.getClub().getClubId(), requestDto.getMemberId());
             clubSignupRepository.deleteById(clubSignupId);
             checkIfRecruitComplete(clubSignup);
         }
@@ -179,7 +179,7 @@ public class ClubJoinService {
 
     public void kickout (DeleteMyAppliedRequestDto request) {
         Long clubSignupId = request.getClubSignupId();
-        Long userId = request.getUserId(); //모임장 아이디
+        Long userId = request.getMemberId(); //모임장 아이디
         ClubSignup signup = clubSignupRepository.findById(clubSignupId).orElseThrow(
                 () -> new ClubException(ClubErrorCode.INVALID_CLUB_SIGNUP_ID)
         );
