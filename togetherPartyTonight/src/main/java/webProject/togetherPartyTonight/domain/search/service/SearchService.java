@@ -77,7 +77,7 @@ public class SearchService {
 
     public SearchListDto makeResponseDto (Optional<Page<Club>> clubList) {
         SearchListDto searchListDto = new SearchListDto();
-        searchListDto.setCount(clubList.get().getNumberOfElements());ㄴ
+        searchListDto.setCount(clubList.get().getNumberOfElements());
         searchListDto.setTotalCount(clubList.get().getTotalElements());
 
         if (clubList.isPresent()) searchListDto.setClubList(makeSearchResponseDto(clubList.get()));
