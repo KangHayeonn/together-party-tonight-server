@@ -33,7 +33,7 @@ public class SwaggerConfig {
 
 
 
-    private static final String[] PUBLIC = {"/reviews/**","/clubs/**","/members/reviews/**", "/search/**","/members/emailCheck", "/members/login", "/members/reissue", "/members/oauth/**", "/members/signup/**", "/members/password/**"};
+    private static final String[] PUBLIC = {"/reviews/{reviewId}","/members/reviews/**", "/search/**","/members/emailCheck", "/members/login", "/members/reissue", "/members/oauth/**", "/members/signup/**", "/members/password/**"};
 
 
     @Bean

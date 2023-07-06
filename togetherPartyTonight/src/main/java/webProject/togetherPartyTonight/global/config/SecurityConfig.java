@@ -32,7 +32,7 @@ public class SecurityConfig {
 
     private final JwtAuthenticationEntryPoint authenticationEntryPoint;
 
-    private static final String[] PUBLIC_GET = {"/reviews/**","/clubs/**","/members/reviews/**","/search/**"};
+    private static final String[] PUBLIC_GET = {"/reviews/{reviewId:^[0-9]*$}","/clubs/{clubId:^[0-9]*$}","/members/reviews/**","/search/**"};
 
     private static final String[] PUBLIC_POST = {"/members/emailCheck","/members/login","/members/reissue","/members/oauth/**","/members/signup/**","/members/password/**"};
 
