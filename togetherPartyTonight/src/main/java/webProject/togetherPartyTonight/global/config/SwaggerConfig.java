@@ -31,11 +31,6 @@ public class SwaggerConfig {
 
     TypeResolver typeResolver = new TypeResolver();
 
-
-
-    private static final String[] PUBLIC = {"/reviews/{reviewId}","/members/reviews/**", "/search/**","/members/emailCheck", "/members/login", "/members/reissue", "/members/oauth/**", "/members/signup/**", "/members/password/**"};
-
-
     @Bean
     public Docket restAPI() {
 
@@ -67,9 +62,6 @@ public class SwaggerConfig {
     private SecurityContext securityContext() {
         return SecurityContext.builder()
                 .securityReferences(defaultAuth())
-                .forPaths(Predicates.and(Arrays.stream(PUBLIC)
-                        .map(s -> Predicates.not(PathSelectors.ant(s)))
-                        .collect(Collectors.toList())))
                 .build();
     }
     List<SecurityReference> defaultAuth() {
