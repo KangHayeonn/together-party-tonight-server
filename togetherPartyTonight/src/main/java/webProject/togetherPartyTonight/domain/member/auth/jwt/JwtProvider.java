@@ -9,7 +9,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import webProject.togetherPartyTonight.domain.member.auth.MemberDetails;
 import webProject.togetherPartyTonight.domain.member.dto.request.ReissueRequestDto;
+import webProject.togetherPartyTonight.domain.member.entity.Member;
+import webProject.togetherPartyTonight.domain.member.exception.MemberException;
+import webProject.togetherPartyTonight.domain.member.exception.errorCode.MemberErrorCode;
 import webProject.togetherPartyTonight.domain.member.repository.MemberRepository;
 import webProject.togetherPartyTonight.domain.member.service.MemberDetailsService;
 
@@ -81,8 +85,9 @@ public class JwtProvider {
                 .parseClaimsJws(token)
                 .getBody().getSubject();
 
-        UserDetails principal = new User(sub,"",List.of());
-        return new UsernamePasswordAuthenticationToken(principal, "",null);
+        Member member = memberRepository.findById(Long.parseLong(sub)).orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
+        MemberDetails memberDetails = new MemberDetails(member);
+        return new UsernamePasswordAuthenticationToken(memberDetails, "",null);
     }
 
     /**
