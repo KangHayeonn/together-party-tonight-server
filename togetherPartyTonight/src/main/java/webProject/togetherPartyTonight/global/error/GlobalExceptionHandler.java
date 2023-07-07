@@ -42,7 +42,6 @@ import static org.springframework.web.client.HttpClientErrorException.*;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
-    private final ReviewRepository reviewRepository;
     /**
      * @param e 예외 종류
      * @return 정형화된 ErrorResponse
@@ -52,10 +51,8 @@ public class GlobalExceptionHandler {
     private ResponseService responseService;
 
     @Autowired
-    public GlobalExceptionHandler(ResponseService responseService,
-                                  ReviewRepository reviewRepository) {
+    public GlobalExceptionHandler(ResponseService responseService) {
         this.responseService = responseService;
-        this.reviewRepository = reviewRepository;
     }
 
     /**

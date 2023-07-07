@@ -30,7 +30,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
             response.setCharacterEncoding("UTF-8");
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             ObjectMapper objectMapper = new ObjectMapper();
-            ErrorResponse errorResponse = new ErrorResponse("false", ErrorCode.FORBIDDEN.getHttpStatus().value(), "잘못된 요청입니다.");
+            ErrorResponse errorResponse = new ErrorResponse("false", ErrorCode.FORBIDDEN.getHttpStatus().value(), ErrorCode.FORBIDDEN.getMessage());
 
             String result = objectMapper.writeValueAsString(errorResponse);
             response.getWriter().write(result);
