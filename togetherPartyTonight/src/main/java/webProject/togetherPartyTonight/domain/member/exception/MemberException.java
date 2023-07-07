@@ -8,9 +8,8 @@ import webProject.togetherPartyTonight.global.error.ErrorInterface;
 @Getter
 public class MemberException extends CommonException {
 
-    private ErrorInterface errorInterface;
-
     public MemberException(ErrorInterface errorCode) {
         super(errorCode);
     }
+    
 }

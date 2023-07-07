@@ -3,13 +3,22 @@ package webProject.togetherPartyTonight.domain.member.controller;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import webProject.togetherPartyTonight.domain.member.dto.request.LoginRequestDto;
 import webProject.togetherPartyTonight.domain.member.dto.request.ReissueRequestDto;
+import webProject.togetherPartyTonight.domain.member.dto.request.SignupRequestDto;
 import webProject.togetherPartyTonight.domain.member.dto.response.LoginResponseDto;
 import webProject.togetherPartyTonight.domain.member.dto.response.ReissueResponseDto;
 import webProject.togetherPartyTonight.domain.member.service.AuthService;
 import webProject.togetherPartyTonight.global.common.ResponseWithData;
+import webProject.togetherPartyTonight.global.common.response.CommonResponse;
+import webProject.togetherPartyTonight.global.common.response.SingleResponse;
+import webProject.togetherPartyTonight.global.common.service.ResponseService;
+
+import javax.validation.Valid;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,6 +28,17 @@ import webProject.togetherPartyTonight.global.common.ResponseWithData;
 public class AuthController {
 
     private final AuthService authService;
+
+    private final ResponseService responseService;
+
+    @PostMapping("/signup")
+    @ApiOperation(value = "회원가입", notes = "회원가입 API 입니다.")
+    public CommonResponse requestSignup(@RequestBody @Valid SignupRequestDto signupRequestDto){
+
+        authService.signup(signupRequestDto);
+
+        return responseService.getCommonResponse();
+    }
 
     @PostMapping("/login")
     @ApiOperation(value = "로그인", notes = "로그인 API 입니다.")

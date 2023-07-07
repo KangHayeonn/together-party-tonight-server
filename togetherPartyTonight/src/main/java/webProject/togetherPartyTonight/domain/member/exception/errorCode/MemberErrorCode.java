@@ -12,7 +12,9 @@ public enum MemberErrorCode implements ErrorInterface {
 
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "일치하는 이메일이 없습니다."),
 
-    INVALID_PASSWORD(HttpStatus.FORBIDDEN,"비밀번호가 틀립니다.");
+    INVALID_PASSWORD(HttpStatus.FORBIDDEN,"비밀번호가 틀립니다."),
+
+    MEMBER_ALREADY_EXIST(HttpStatus.CONFLICT,"이미 존재하는 이메일입니다.");
 
     /**
      * 필요한 에러코드 작성
