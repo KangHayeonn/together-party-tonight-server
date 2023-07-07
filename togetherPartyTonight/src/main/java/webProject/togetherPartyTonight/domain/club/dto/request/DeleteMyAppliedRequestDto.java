@@ -14,11 +14,7 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @ApiModel("가입 신청 취소")
 public class DeleteMyAppliedRequestDto {
-    @NotNull (message = "memberId는 필수 입력 값입니다.")
-    @ApiModelProperty(value = "신청자 id", example = "1")
-    private Long memberId;
-
     @NotNull (message = "clubSignupId는 필수 입력 값입니다.")
-    @ApiModelProperty(value = "가입신청 id", example = "1")
+    @ApiModelProperty(value = "가입신청 id", example = "1", required = true)
     private Long clubSignupId;
 }

@@ -19,9 +19,6 @@ public class UpdateReviewRequestDto {
     @NotNull(message = "reviewId는 필수 입력 값입니다.")
     Long reviewId;
 
-    @NotNull(message = "memberId는 필수 입력 값입니다.")
-    Long memberId;
-
     @NotNull(message = "rating은 필수 입력 값입니다.")
     @Min(value = 0, message = "최소 0점이상 평점을 매겨야 합니다.")
     @Max(value = 5, message = "최대 5점까지 평점을 줄 수 있습니다.")

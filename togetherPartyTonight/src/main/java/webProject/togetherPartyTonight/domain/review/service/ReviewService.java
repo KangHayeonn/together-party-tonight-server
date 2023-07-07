@@ -6,8 +6,10 @@ import org.springframework.web.multipart.MultipartFile;
 import webProject.togetherPartyTonight.domain.club.entity.Club;
 import webProject.togetherPartyTonight.domain.club.entity.ClubMember;
 import webProject.togetherPartyTonight.domain.club.exception.ClubErrorCode;
+import webProject.togetherPartyTonight.domain.club.exception.ClubException;
 import webProject.togetherPartyTonight.domain.club.repository.ClubMemberRepository;
 import webProject.togetherPartyTonight.domain.club.repository.ClubRepository;
+import webProject.togetherPartyTonight.domain.member.entity.Member;
 import webProject.togetherPartyTonight.domain.review.dto.request.CreateReviewRequestDto;
 import webProject.togetherPartyTonight.domain.review.dto.request.UpdateReviewRequestDto;
 import webProject.togetherPartyTonight.domain.review.dto.response.GetReviewDetailResponseDto;
@@ -35,18 +37,17 @@ public class ReviewService {
     private final String directory = "review/";
 
     @Transactional
-    public void addReview(CreateReviewRequestDto request, MultipartFile image) {
+    public void addReview(CreateReviewRequestDto request, MultipartFile image, Member member) {
         Long clubId = request.getClubId();
-        Long memberId = request.getMemberId();
-
-        if(reviewRepository.findByClubClubIdAndMemberId(clubId, memberId).isPresent())
-            throw new ReviewException(ReviewErrorCode.IS_ALREADY_WRITTEN);
 
         Club club = clubRepository.findById(clubId).orElseThrow(
                 () -> new ReviewException(ClubErrorCode.INVALID_CLUB_ID)
         );
 
-        ClubMember clubMember = clubMemberRepository.findByClubClubIdAndMemberId(clubId, memberId).orElseThrow(
+        if(reviewRepository.findByClubClubIdAndMemberId(clubId, member.getId()).isPresent())
+            throw new ReviewException(ReviewErrorCode.IS_ALREADY_WRITTEN);
+
+        ClubMember clubMember = clubMemberRepository.findByClubClubIdAndMemberId(clubId, member.getId()).orElseThrow(
                 () -> new ReviewException(ReviewErrorCode.NOT_A_MEMBER)
         );
 
@@ -57,7 +58,7 @@ public class ReviewService {
                 imageUrl = s3Service.getImage("review_default.jpg");
             }
             else {
-                imageUrl = s3Service.uploadImage(image, directory, request.getMemberId());
+                imageUrl = s3Service.uploadImage(image, directory, member.getId());
             }
             Review review = request.toEntity(club, clubMember.getMember(),imageUrl);
             reviewRepository.save(review);
@@ -74,15 +75,17 @@ public class ReviewService {
     }
 
     @Transactional
-    public void modifyReview(UpdateReviewRequestDto request, MultipartFile image) {
+    public void modifyReview(UpdateReviewRequestDto request, MultipartFile image, Member member) {
         Long reviewId = request.getReviewId();
         Review review = reviewRepository.findById(reviewId).orElseThrow(
                 () -> new ReviewException(ReviewErrorCode.INVALID_REVIEW_ID)
         );
 
+        checkAuthority(review.getMember().getId(), member);
+
         String imageUrl="";
         if(image!=null){ //수정할 새로운 이미지가 있으면
-            imageUrl = s3Service.uploadImage(image, directory, request.getMemberId()); //s3에 업로드하고 url받아옴
+            imageUrl = s3Service.uploadImage(image, directory, member.getId()); //s3에 업로드하고 url받아옴
             if(!review.getImageUrl().contains("default")) { //기존 이미지가 default 이미지가 아니라면
                 s3Service.deleteImage(review.getImageUrl()); //s3에서 삭제
             }
@@ -92,14 +95,20 @@ public class ReviewService {
     }
 
     @Transactional
-    public void deleteReview(Long reviewId) {
-        // TODO: 2023/06/21 권한없음 exception
+    public void deleteReview(Long reviewId, Member member) {
         Review review = reviewRepository.findById(reviewId).orElseThrow(
                 ()-> new ReviewException(ReviewErrorCode.INVALID_REVIEW_ID)
         );
+
+        checkAuthority(review.getMember().getId(), member);
+
         if (!review.getImageUrl().contains("default"))
             s3Service.deleteImage(review.getImageUrl());
         reviewRepository.deleteById(reviewId);
 
+    }
+
+    public void checkAuthority(Long memberId, Member member) {
+        if(memberId != member.getId()) throw new ClubException(ErrorCode.FORBIDDEN);
     }
 }
