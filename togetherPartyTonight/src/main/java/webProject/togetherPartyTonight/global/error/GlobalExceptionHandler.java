@@ -16,12 +16,14 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import webProject.togetherPartyTonight.domain.club.exception.ClubException;
 import webProject.togetherPartyTonight.domain.member.exception.MemberException;
 import webProject.togetherPartyTonight.domain.review.exception.ReviewException;
+import webProject.togetherPartyTonight.domain.review.repository.ReviewRepository;
 import webProject.togetherPartyTonight.global.common.ErrorResponse;
 import webProject.togetherPartyTonight.global.common.response.FailureResponse;
 import webProject.togetherPartyTonight.global.common.service.ResponseService;
@@ -30,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 
 import static org.springframework.data.crossstore.ChangeSetPersister.*;
+import static org.springframework.web.client.HttpClientErrorException.*;
 
 
 /**
@@ -39,6 +42,7 @@ import static org.springframework.data.crossstore.ChangeSetPersister.*;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+    private final ReviewRepository reviewRepository;
     /**
      * @param e 예외 종류
      * @return 정형화된 ErrorResponse
@@ -48,8 +52,10 @@ public class GlobalExceptionHandler {
     private ResponseService responseService;
 
     @Autowired
-    public GlobalExceptionHandler(ResponseService responseService) {
+    public GlobalExceptionHandler(ResponseService responseService,
+                                  ReviewRepository reviewRepository) {
         this.responseService = responseService;
+        this.reviewRepository = reviewRepository;
     }
 
     /**
@@ -123,5 +129,10 @@ public class GlobalExceptionHandler {
     public FailureResponse handle404(NoHandlerFoundException ex) {
 
         return responseService.getFailureResponse(404,"잘못된 경로입니다.");
+    }
+
+    @ExceptionHandler(BadRequest.class)
+    public FailureResponse badRequest(BadRequest e){
+        return responseService.getFailureResponse(400,"잘못된 요청입니다.");
     }
 }
