@@ -1,9 +1,12 @@
 package webProject.togetherPartyTonight.domain.review.dto.response;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.tomcat.jni.Local;
 import webProject.togetherPartyTonight.domain.club.entity.Club;
 import webProject.togetherPartyTonight.domain.review.entity.Review;
 
@@ -14,28 +17,41 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ApiModel(value = "리뷰 상세 조회")
 public class GetReviewDetailResponseDto {
-    Long userId; //작성자 아이디
-    String nickname; //작성자 닉네임
+    @ApiModelProperty(name = "작성자 id")
+    Long memberId;
+    @ApiModelProperty(name = "작성자 닉네임")
+    String nickname;
+    @ApiModelProperty(name = "리뷰 내용")
     String reviewContent;
+    @ApiModelProperty(name = "별점")
     Integer rating;
+    @ApiModelProperty(name = "리뷰 대상 모임의 제목")
     String clubName;
+    @ApiModelProperty(name = "모임 주소")
     String address;
-    String meetingDate;
+    @ApiModelProperty(name = "모임 날짜")
+    LocalDateTime meetingDate;
+    @ApiModelProperty(name = "리뷰 최초 작성 시각")
     LocalDateTime createdDate;
+    @ApiModelProperty(name = "리뷰 수정 시각")
+    LocalDateTime modifiedDate;
+    @ApiModelProperty(name = "리뷰 이미지")
     String image;
 
     public GetReviewDetailResponseDto toDto(Review review) {
         Club club = review.getClub();
         return GetReviewDetailResponseDto.builder()
-                .userId(review.getMember().getId())
+                .memberId(review.getMember().getId())
                 .nickname(review.getMember().getNickname())
                 .reviewContent(review.getReviewContent())
                 .rating(review.getRating())
                 .clubName(club.getClubName())
                 .address(club.getAddress())
-                .meetingDate(String.valueOf(club.getMeetingDate()))
+                .meetingDate(club.getMeetingDate())
                 .createdDate(club.getCreatedDate())
+                .modifiedDate(review.getModifiedDate())
                 .image(review.getImageUrl())
                 .build();
     }
