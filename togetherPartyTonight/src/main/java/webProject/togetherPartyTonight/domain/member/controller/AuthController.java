@@ -20,6 +20,8 @@ public class AuthController {
 
     private final AuthService authService;
 
+    /**
+     */
     @PostMapping("/login")
     @ApiOperation(value = "로그인", notes = "로그인 API 입니다.")
     public ResponseWithData requestLogin(@RequestBody LoginRequestDto loginRequestDto){
