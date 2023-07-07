@@ -11,5 +11,5 @@ public class MemberException extends CommonException {
     public MemberException(ErrorInterface errorCode) {
         super(errorCode);
     }
-    
+
 }
