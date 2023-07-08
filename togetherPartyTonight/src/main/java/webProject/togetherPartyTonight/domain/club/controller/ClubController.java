@@ -3,20 +3,27 @@ package webProject.togetherPartyTonight.domain.club.controller;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import webProject.togetherPartyTonight.domain.club.dto.request.*;
 import webProject.togetherPartyTonight.domain.club.dto.response.*;
+import webProject.togetherPartyTonight.domain.club.entity.ApprovalState;
+import webProject.togetherPartyTonight.domain.club.entity.ClubCategory;
 import webProject.togetherPartyTonight.domain.club.exception.ClubException;
 import webProject.togetherPartyTonight.domain.club.service.ClubJoinService;
 import webProject.togetherPartyTonight.domain.club.service.ClubService;
 import webProject.togetherPartyTonight.domain.member.entity.Member;
 import webProject.togetherPartyTonight.domain.member.exception.errorCode.MemberErrorCode;
 import webProject.togetherPartyTonight.domain.member.repository.MemberRepository;
+import webProject.togetherPartyTonight.global.common.Enum;
 import webProject.togetherPartyTonight.global.common.ResponseWithData;
 import webProject.togetherPartyTonight.global.common.response.CommonResponse;
 import webProject.togetherPartyTonight.global.common.response.ListResponse;
@@ -32,6 +39,7 @@ import java.util.List;
 @RequestMapping("/clubs")
 @Slf4j
 @Api(tags = {"/clubs"})
+@Validated
 public class ClubController {
     private final ClubService clubService;
     private final ClubJoinService clubJoinService;
@@ -168,10 +176,13 @@ public class ClubController {
      */
     @GetMapping("/myApplied")
     @ApiOperation(value = "사용자별 신청한 모임 조회")
-    public  SingleResponse<MyAppliedClubListDto> getMyAppliedList(HttpServletRequest request) {
+    public  SingleResponse<MyAppliedClubListDto> getMyAppliedList(HttpServletRequest request,@PageableDefault(size = 5, page = 0, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
+                                                                  @ApiParam(value = "필터 조건", allowableValues = "ALL,PENDING,APPROVE,KICKOUT,REFUSE", example = "PENDING", required = true)
+                                                                  @Enum(enumClass = ApprovalState.class, ignoreCase = true, message = "허용되지 않은 상태입니다.")
+                                                                  @RequestParam String filter) {
         log.info("[{}] {}",request.getMethod(),request.getRequestURI());
         Member member = getMemberBySecurityContextHolder();
-        MyAppliedClubListDto appliedList = clubJoinService.getAppliedList( member);
+        MyAppliedClubListDto appliedList = clubJoinService.getAppliedList( member, pageable, ApprovalState.valueOf(filter));
         return responseService.getSingleResponse(appliedList);
     }
 
@@ -180,10 +191,13 @@ public class ClubController {
      */
     @GetMapping("/myOwned")
     @ApiOperation(value = "사용자별 생성한 모임 조회")
-    public  SingleResponse<MyOwnedClubListDto> getMyOwnedClub(HttpServletRequest request) {
+    public  SingleResponse<MyOwnedClubListDto> getMyOwnedClub(HttpServletRequest request,@PageableDefault(size = 5, page = 0, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
+                                                              @ApiParam(value = "필터 조건", allowableValues = "ALL,RECRUITING,RECRUIT_FINISHED", example = "ALL", required = true)
+                                                              @Enum(enumClass = ClubStateFilterEnum.class, ignoreCase = true)
+                                                              @RequestParam String filter) {
         log.info("[{}] {}",request.getMethod(),request.getRequestURI());
         Member member = getMemberBySecurityContextHolder();
-        MyOwnedClubListDto ownedList = clubJoinService.getOwnedList( member);
+        MyOwnedClubListDto ownedList = clubJoinService.getOwnedList( member, pageable, ApprovalState.valueOf(filter));
         return responseService.getSingleResponse(ownedList);
     }
 

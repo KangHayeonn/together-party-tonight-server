@@ -12,4 +12,7 @@ public class MyPageable {
 
     @ApiModelProperty(value = "페이지 크기" , example = "20")
     private Integer size;
+
+    @ApiModelProperty(value = "정렬 조건", example = "createdDate,DESC")
+    private String[] sort;
 }

@@ -2,6 +2,8 @@ package webProject.togetherPartyTonight.domain.club.service;
 
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import webProject.togetherPartyTonight.domain.club.dto.request.ApproveRequestDto;
 import webProject.togetherPartyTonight.domain.club.dto.request.DeleteClubAndSignupRequestDto;
@@ -132,33 +134,44 @@ public class ClubJoinService {
     }
 
     //내가 신청한 모임 조회
-    public MyAppliedClubListDto getAppliedList(Member member) {
+    public MyAppliedClubListDto getAppliedList(Member member, Pageable pageable, ApprovalState filter) {
+        List<ApplicationDto> list = new ArrayList<>();
+        Optional<Page<ClubSignup>> signupMemberId;
 
-        List<ClubSignup> signupMemberId = clubSignupRepository.findAllByClubMemberId(member.getId());
+        if(filter.equals(ApprovalState.ALL)) signupMemberId = clubSignupRepository.findAllByClubMemberId(member.getId(), pageable);
+        else signupMemberId= clubSignupRepository.findAllByClubMemberIdAndClubSignupApprovalStateLike(member.getId(),filter, pageable);
 
-        List<ApplicationDto> list = signupMemberId.stream()
-                .map(c -> new ApplicationDto(c.getClubSignupId(), c.getClub().getClubId(), c.getClub().getClubName(),
-                        c.getClubMember().getId(), c.getClubMember().getNickname(), c.getClubSignupDate(), c.getClubSignupApprovalState().toString(),
-                        c.getCreatedDate(), c.getModifiedDate()))
-                .collect(Collectors.toList());
+        if(signupMemberId.isPresent()) {
+            list = signupMemberId.get().stream()
+                    .map(c -> new ApplicationDto(c.getClubSignupId(), c.getClub().getClubId(), c.getClub().getClubName(),
+                            c.getClubMember().getId(), c.getClubMember().getNickname(), c.getClubSignupDate(), c.getClubSignupApprovalState().toString(),
+                            c.getCreatedDate(), c.getModifiedDate()))
+                    .collect(Collectors.toList());
+        }
 
-        return new MyAppliedClubListDto(list);
+        return new MyAppliedClubListDto(list,pageable.getPageNumber(), pageable.getPageSize(), signupMemberId.get().getTotalElements(), signupMemberId.get().getTotalPages());
     }
 
     //내가 만든 모임 조회
-    public MyOwnedClubListDto getOwnedList(Member member) {
+    public MyOwnedClubListDto getOwnedList(Member member, Pageable pageable,ApprovalState filter) {
+        List<MyOwnedClubDto> list = new ArrayList<>();
+        Optional<Page<Club>> clubs;
 
-        List<Club> clubs = clubRepository.findClubByMasterId(member.getId());
+        if (filter.equals(ApprovalState.ALL)) clubs= clubRepository.findClubByMasterId(member.getId(), pageable);
+        else if(filter.equals("RECRUITING")) clubs= clubRepository.findClubByMasterIdAndClubState(member.getId(), true, pageable);
+        else clubs=clubRepository.findClubByMasterIdAndClubState(member.getId(), false, pageable);
 
-        List<MyOwnedClubDto> list = clubs.stream()
-                .map(c -> new MyOwnedClubDto(c.getClubName(), c.getClubCategory(), c.getClubMaximum(),
-                        c.getClubContent(), clubUtils.splitTags(c.getClubTags()), (float)c.getClubPoint().getX(), (float)c.getClubPoint().getY(),
-                        c.getAddress(),c.getMeetingDate(),c.getCreatedDate(), c.getModifiedDate()))
-                .collect(Collectors.toList());
-
-        return new MyOwnedClubListDto(list);
+        if (clubs.isPresent()) {
+            list = clubs.get().stream()
+                    .map(c -> new MyOwnedClubDto(c.getClubName(), c.getClubCategory(), c.getClubMaximum(),
+                            c.getClubContent(), clubUtils.splitTags(c.getClubTags()), (float) c.getClubPoint().getX(), (float) c.getClubPoint().getY(),
+                            c.getAddress(), c.getMeetingDate(), c.getCreatedDate(), c.getModifiedDate()))
+                    .collect(Collectors.toList());
+        }
+        return new MyOwnedClubListDto(list, pageable.getPageNumber(), pageable.getPageSize(), clubs.get().getTotalElements(), clubs.get().getTotalPages());
     }
 
+    @Transactional
     public void kickout (DeleteMyAppliedRequestDto request, Member member) {
         Long clubSignupId = request.getClubSignupId();
 
