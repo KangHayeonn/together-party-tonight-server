@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import webProject.togetherPartyTonight.domain.member.auth.MemberDetails;
+import webProject.togetherPartyTonight.domain.member.dto.request.EmailCheckRequestDto;
 import webProject.togetherPartyTonight.domain.member.dto.request.LoginRequestDto;
 import webProject.togetherPartyTonight.domain.member.dto.request.ReissueRequestDto;
 import webProject.togetherPartyTonight.domain.member.dto.request.SignupRequestDto;
@@ -126,4 +127,10 @@ public class AuthService {
         }
     }
 
+    public void checkDuplicateEmail(EmailCheckRequestDto emailCheckRequestDto) {
+        memberRepository.findMemberByEmailAndOauthProvider(emailCheckRequestDto.getEmail(), null)
+                .ifPresent((s)->{
+                    throw new MemberException(MemberErrorCode.MEMBER_ALREADY_EXIST);
+                });
+    }
 }

@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import webProject.togetherPartyTonight.domain.member.dto.request.EmailCheckRequestDto;
 import webProject.togetherPartyTonight.domain.member.dto.request.LoginRequestDto;
 import webProject.togetherPartyTonight.domain.member.dto.request.ReissueRequestDto;
 import webProject.togetherPartyTonight.domain.member.dto.request.SignupRequestDto;
@@ -58,6 +59,13 @@ public class AuthController {
         ReissueResponseDto reissueResponseDto = authService.reissue(reissueRequestDto);
 
         return new ResponseWithData("true",200,reissueResponseDto);
+    }
+
+    @PostMapping("/emailCheck")
+    @ApiOperation(value = "이메일 중복체크", notes = "이메일 중복체크 API 입니다.")
+    public CommonResponse requestCheckEmailDuplicate(@RequestBody EmailCheckRequestDto emailCheckRequestDto){
+        authService.checkDuplicateEmail(emailCheckRequestDto);
+        return responseService.getCommonResponse();
     }
 
 

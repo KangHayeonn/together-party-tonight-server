@@ -34,7 +34,6 @@ public class MemberController {
         MemberInfoResponseDto memberInfoResponseDto = memberService.findById(userId);
 
         return new ResponseEntity<>(new ResponseWithData("true",200, memberInfoResponseDto),HttpStatus.OK);
-
     }
 
 }

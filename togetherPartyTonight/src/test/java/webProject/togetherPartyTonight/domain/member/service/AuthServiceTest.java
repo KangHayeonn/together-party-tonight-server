@@ -11,8 +11,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
+import webProject.togetherPartyTonight.domain.member.dto.request.EmailCheckRequestDto;
 import webProject.togetherPartyTonight.domain.member.dto.request.SignupRequestDto;
 import webProject.togetherPartyTonight.domain.member.entity.Member;
+import webProject.togetherPartyTonight.domain.member.exception.MemberException;
+import webProject.togetherPartyTonight.domain.member.exception.errorCode.MemberErrorCode;
 import webProject.togetherPartyTonight.domain.member.repository.MemberRepository;
 
 import javax.validation.ConstraintViolation;
@@ -36,6 +39,9 @@ class AuthServiceTest {
     @Autowired
     AuthenticationManager authenticationManager;
 
+    @Autowired
+    AuthService authService;
+
     SignupRequestDto signupRequestDto;
 
     ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
@@ -47,6 +53,7 @@ class AuthServiceTest {
         signupRequestDto = new SignupRequestDto();
         signupRequestDto.setEmail("cdw5713@naver.co");
         signupRequestDto.setPassword("7788459");
+        signupRequestDto.setNickname("대웅이");
     }
 
     @Test
@@ -82,5 +89,36 @@ class AuthServiceTest {
 
         violations.forEach(System.out::println);
 
+    }
+
+    @Test
+    void validEmailCheck(){
+        EmailCheckRequestDto emailCheckRequestDto = new EmailCheckRequestDto();
+        //잘못된 이메일 제공
+        emailCheckRequestDto.setEmail("cdw5713");
+        Set<ConstraintViolation<EmailCheckRequestDto>> violations = validator.validate(emailCheckRequestDto);
+
+        //검사 결과 확인
+        assertEquals(1,violations.size());
+
+    }
+
+    @Test
+    void checkEmailDuplicate(){
+        //중복된 이메일 했을 때 에러 발생
+        Member member = Member.builder()
+                .email(signupRequestDto.getEmail())
+                .password(signupRequestDto.getPassword())
+                .nickname(signupRequestDto.getNickname())
+                .build();
+        memberRepository.save(member);
+
+        EmailCheckRequestDto emailCheckRequestDto = new EmailCheckRequestDto();
+        emailCheckRequestDto.setEmail(signupRequestDto.getEmail());
+        Assertions.assertThrows(MemberException.class,() -> authService.checkDuplicateEmail(emailCheckRequestDto));
+
+        //중복되지않은 이메일 했을 떄
+        emailCheckRequestDto.setEmail("cdw5713@hanmail.com");
+        Assertions.assertDoesNotThrow(() -> authService.checkDuplicateEmail(emailCheckRequestDto));
     }
 }
