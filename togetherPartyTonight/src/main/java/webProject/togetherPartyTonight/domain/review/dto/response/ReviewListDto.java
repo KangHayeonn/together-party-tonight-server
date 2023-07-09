@@ -1,5 +1,6 @@
 package webProject.togetherPartyTonight.domain.review.dto.response;
 
+import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
