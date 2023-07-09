@@ -63,8 +63,15 @@ public class AuthController {
 
     @PostMapping("/emailCheck")
     @ApiOperation(value = "이메일 중복체크", notes = "이메일 중복체크 API 입니다.")
-    public CommonResponse requestCheckEmailDuplicate(@RequestBody EmailCheckRequestDto emailCheckRequestDto){
+    public CommonResponse requestCheckEmailDuplicate(@RequestBody @Valid EmailCheckRequestDto emailCheckRequestDto){
         authService.checkDuplicateEmail(emailCheckRequestDto);
+        return responseService.getCommonResponse();
+    }
+
+    @GetMapping("/logout/{userId}")
+    @ApiOperation(value = "로그아웃", notes = "로그아웃 API입니다.")
+    public CommonResponse logout(@PathVariable Long userId){
+        authService.logout(userId);
         return responseService.getCommonResponse();
     }
 

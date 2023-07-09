@@ -133,4 +133,15 @@ public class AuthService {
                     throw new MemberException(MemberErrorCode.MEMBER_ALREADY_EXIST);
                 });
     }
+
+    public void logout(Long memberId){
+        memberRepository.findById(memberId).orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
+        try{
+            //로그아웃 시 리프레시 토큰 삭제
+            redisTemplate.delete(String.valueOf(memberId));
+        }catch(Exception e){
+            e.printStackTrace();
+            throw new MemberException(MemberErrorCode.FAILED_LOGOUT);
+        }
+    }
 }

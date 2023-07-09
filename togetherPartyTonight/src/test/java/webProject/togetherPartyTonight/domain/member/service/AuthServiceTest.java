@@ -2,9 +2,11 @@ package webProject.togetherPartyTonight.domain.member.service;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -41,6 +43,9 @@ class AuthServiceTest {
 
     @Autowired
     AuthService authService;
+
+    @Autowired
+    RedisTemplate<String,String> redisTemplate;
 
     SignupRequestDto signupRequestDto;
 
@@ -121,4 +126,5 @@ class AuthServiceTest {
         emailCheckRequestDto.setEmail("cdw5713@hanmail.com");
         Assertions.assertDoesNotThrow(() -> authService.checkDuplicateEmail(emailCheckRequestDto));
     }
+
 }
