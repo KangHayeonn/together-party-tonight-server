@@ -32,6 +32,10 @@ public class SecurityConfig {
 
     private final JwtAuthenticationEntryPoint authenticationEntryPoint;
 
+    private static final String[] PUBLIC_GET = {"/reviews/{reviewId:^[0-9]*$}","/clubs/{clubId:^[0-9]*$}","/members/reviews/**","/search/**"};
+
+    private static final String[] PUBLIC_POST = {"/members/emailCheck","/members/login","/members/reissue","/members/oauth/**","/members/signup/**","/members/password/**"};
+
 
 
     @Bean
@@ -50,8 +54,8 @@ public class SecurityConfig {
                     .authenticationEntryPoint(authenticationEntryPoint)
                 .and()
                     .authorizeRequests(auth->auth
-                            .mvcMatchers(HttpMethod.POST,"/members/login","/members/reissue","members/oauth/**").permitAll()
-
+                            .mvcMatchers(HttpMethod.POST,PUBLIC_POST).permitAll()
+                            .mvcMatchers(HttpMethod.GET,PUBLIC_GET).permitAll()
                         .anyRequest().authenticated()); // Authentication 필요한 주소
 
 

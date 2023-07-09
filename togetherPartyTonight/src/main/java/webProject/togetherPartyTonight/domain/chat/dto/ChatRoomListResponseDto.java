@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @Builder
 @AllArgsConstructor
-@ApiModel("채팅방 목록 응답")
+@ApiModel("채팅방")
 public class ChatRoomListResponseDto {
     @ApiModelProperty(notes = "채팅방 이름", dataType = "String")
     String chatRoomName;

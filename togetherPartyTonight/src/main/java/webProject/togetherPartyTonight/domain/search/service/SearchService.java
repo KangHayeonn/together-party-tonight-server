@@ -4,13 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import webProject.togetherPartyTonight.domain.club.entity.Club;
 import webProject.togetherPartyTonight.domain.search.dto.SearchListDto;
 import webProject.togetherPartyTonight.domain.search.dto.SearchResponseDto;
-import webProject.togetherPartyTonight.domain.search.exception.SearchException;
 import webProject.togetherPartyTonight.domain.search.repository.SearchRepository;
+import webProject.togetherPartyTonight.global.util.ClubUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,69 +24,41 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SearchService {
     private final SearchRepository searchRepository;
+    private final ClubUtils clubUtils;
 
-    public SearchListDto searchByAddress(Float lat, Float lng) {
+    public SearchListDto searchByAddress(Float lat, Float lng, Pageable pageable) {
         String pointWKT = makePointWKT(lat, lng);
-        Optional<List<Club>> clubList = searchRepository.findByAddress(pointWKT);
-
+        Optional<Page<Club>> clubList = searchRepository.findByAddress(pointWKT, pageable);
         return makeResponseDto(clubList);
     }
 
-    public SearchListDto searchByConditions(Float lat, Float lng, Integer distance, String category, String state, Integer userNum, String tags, String sortFilter) {
+    public SearchListDto searchByConditions(Float lat, Float lng, Integer distance, String category, String state, Integer memberNum, String tags, String sortFilter, Pageable pageable) {
         String pointWKT = makePointWKT(lat, lng);
         String regexpTag = makeRegexp(tags);
         if (category.equals("전체")) category = convertCategory();
 
-        Optional<List<Club>> clubList = null;
+        Optional<Page<Club>> clubList = null;
 
         if (sortFilter.equals("latest")) {
-            clubList = searchRepository.findByConditionsOrderByDate(pointWKT, distance * 1000, state, category, userNum, regexpTag);
+            clubList = searchRepository.findByConditionsOrderByDate(pointWKT, distance * 1000, state, category, memberNum, regexpTag, pageable);
         }
         else if (sortFilter.equals("popular")) {
-            clubList = searchRepository.findByConditionsOrderByReviewScore(pointWKT,distance*1000, state, category,userNum,regexpTag);
+            clubList = searchRepository.findByConditionsOrderByReviewScore(pointWKT,distance*1000, state, category,memberNum,regexpTag, pageable);
         }
        return makeResponseDto(clubList);
 
     }
 
-    public List<String> splitTags (String tags) {
-        String[] split = tags.split(",");
-        return Arrays.stream(split).collect(Collectors.toList());
-    }
+    public List<SearchResponseDto> makeSearchResponseDto(Page<Club> clubs) {
 
-    public List<SearchResponseDto> makeSearchResponseDto(List<Club> clubs) {
-        List<SearchResponseDto> res = new ArrayList<>();
-
+        List<SearchResponseDto> list = new ArrayList<>();
         for (Club c : clubs) {
-            Point clubPoint = c.getClubPoint();
-            List<String> tags = splitTags(c.getClubTags());
-            res.add(
-                    SearchResponseDto.builder()
-                            .clubId(c.getClubId())
-                            .clubName(c.getClubName())
-                            .clubCategory(String.valueOf(c.getClubCategory()))
-                            .clubTags(tags)
-                            .clubContent(c.getClubContent())
-                            .clubMaximum(c.getClubMaximum())
-                            .latitude((float) clubPoint.getX())
-                            .longitude((float) clubPoint.getY())
-                            .address(c.getAddress())
-                            //.meetingDate(c.getMeetingDate())
-                            .image(c.getImage())
-//                            .isRecruit()
-//                            .memberCount()
-                            .userId(c.getMaster().getId())
-                            .nickName(c.getMaster().getNickname())
-                            .ratingAvg(c.getMaster().getRatingAvg())
-                            .reviewCnt(c.getMaster().getReviewCount())
-                           // .totalCnt()
-                            .count(clubs.size())
-                            .createdDate(c.getCreatedDate())
-                            .modifiedDate(c.getModifiedDate())
-                            .build()
-            );
+            List<String> tags = clubUtils.splitTags(c.getClubTags());
+            Point point= c.getClubPoint();
+            list.add(new SearchResponseDto().toDto(c, tags, point));
         }
-        return res;
+
+        return list;
     }
 
     public String makeRegexp (String tags) {
@@ -100,14 +75,18 @@ public class SearchService {
         return point.toText();
     }
 
-    public SearchListDto makeResponseDto (Optional<List<Club>> clubList) {
+    public SearchListDto makeResponseDto (Optional<Page<Club>> clubList) {
         SearchListDto searchListDto = new SearchListDto();
+        searchListDto.setCount(clubList.get().getNumberOfElements());
+        searchListDto.setTotalCount(clubList.get().getTotalElements());
 
         if (clubList.isPresent()) searchListDto.setClubList(makeSearchResponseDto(clubList.get()));
         else searchListDto.setClubList(new ArrayList<>());
 
         return searchListDto;
     }
+
+
 
 
 }

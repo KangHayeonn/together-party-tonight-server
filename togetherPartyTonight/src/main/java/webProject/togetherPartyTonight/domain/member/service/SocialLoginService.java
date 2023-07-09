@@ -59,8 +59,6 @@ public class SocialLoginService {
         }catch (RestClientException e){
             throw new MemberException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
-
-
     }
 
     private Long findOrCreateMember(OAuthInfoResponse userInfo) {
