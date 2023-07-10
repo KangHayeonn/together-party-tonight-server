@@ -7,7 +7,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import webProject.togetherPartyTonight.domain.member.auth.MemberDetails;
 import webProject.togetherPartyTonight.domain.member.dto.request.MemberInfoModifyDto;
 import webProject.togetherPartyTonight.domain.member.dto.request.PasswordChangeDto;
 import webProject.togetherPartyTonight.domain.member.dto.response.MemberInfoResponseDto;
@@ -40,15 +42,15 @@ public class MemberController {
     }
 
 
-    @PutMapping("/{userId}")
+    @PutMapping("/{memberId}")
     @ApiOperation(value = "유저정보 변경", notes = "유저정보 변경 API입니다.")
-    public CommonResponse modifyMemberInfo(@PathVariable Long userId, @RequestBody MemberInfoModifyDto memberInfoDto) {
+    public CommonResponse modifyMemberInfo(@PathVariable Long memberId, @RequestBody MemberInfoModifyDto memberInfoDto) {
         // memberId와 memberInfoDto를 사용하여 회원 정보 수정 로직을 처리
-        memberService.modifyMemberInfo(userId,memberInfoDto);
+        memberService.modifyMemberInfo(memberId,memberInfoDto);
         return responseService.getCommonResponse();
     }
 
-    @PutMapping("/{memberId}")
+    @PutMapping("/password/{memberId}")
     @ApiOperation(value = "비밀번호 변경", notes = "비밀번호 변경 API입니다.")
     public CommonResponse changePassword(@PathVariable Long memberId, @RequestBody PasswordChangeDto passwordChangeDto) {
         // memberId와 passwordChangeDto를 사용하여 비밀번호 변경 로직을 처리
