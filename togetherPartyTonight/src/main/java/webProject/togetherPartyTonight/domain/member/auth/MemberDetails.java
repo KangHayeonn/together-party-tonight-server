@@ -20,7 +20,9 @@ public class MemberDetails implements UserDetails {//UserDetails를 Member에 �
         return member;
     }
 
-
+    public String getEmail() {
+        return member.getEmail();
+    }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
