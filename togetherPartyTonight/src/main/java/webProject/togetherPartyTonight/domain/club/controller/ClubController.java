@@ -56,7 +56,6 @@ public class ClubController {
     @ApiOperation(value = "모임 만들기")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "data", value = "JSON 데이터", dataType = "string", paramType = "form",required = true, example = "{\n" +
-                    "    \"memberId\": 3,\n" +
                     "\t\"clubName\": \"오늘 테니스 같이 치실 분 구해요\",\n" +
                     "\t\"clubCategory\": \"운동\",\n" +
                     "\t\"clubMaximum\" :3,\n" +
@@ -109,7 +108,6 @@ public class ClubController {
     @ApiOperation(value = "모임 변경")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "data", value = "JSON 데이터", dataType = "string", paramType = "form",required = true, example = "{\n" +
-                    "    \"memberId\": 3,\n" +
                     "\"clubId\" : 1,\n" +
                     "\t\"clubName\": \"오늘 테니스 같이 치실 분 구해요\",\n" +
                     "\t\"clubCategory\": \"운동\",\n" +

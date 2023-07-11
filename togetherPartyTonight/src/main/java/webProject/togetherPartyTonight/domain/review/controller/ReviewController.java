@@ -43,7 +43,6 @@ public class ReviewController {
     @ApiOperation(value = "리뷰 만들기")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "data", value = "JSON 데이터", dataType = "string", paramType = "form",required = true, example = "{\n" +
-                    "\"memberId\": 3,\n" +
                     "\t\"clubId\": \"5\",\n" +
                     "\t\"rating\": \"4.5\",\n" +
                     "\t\"reviewContent\": \"리뷰입니다 리뷰입니다\",\n" +
@@ -72,7 +71,6 @@ public class ReviewController {
     @ApiOperation(value = "리뷰 수정하기")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "data", value = "JSON 데이터", dataType = "string", paramType = "form",required = true, example = "{\n" +
-                    "\"memberId\": 3,\n" +
                     "\t\"clubId\": \"5\",\n" +
                     "\t\"rating\": \"4.5\",\n" +
                     "\t\"reviewContent\": \"리뷰입니다 리뷰입니다\",\n" +

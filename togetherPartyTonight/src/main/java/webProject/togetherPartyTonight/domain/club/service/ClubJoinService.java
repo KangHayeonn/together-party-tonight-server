@@ -144,7 +144,7 @@ public class ClubJoinService {
         if(signupMemberId.isPresent()) {
             list = signupMemberId.get().stream()
                     .map(c -> new ApplicationDto(c.getClubSignupId(), c.getClub().getClubId(), c.getClub().getClubName(),
-                            c.getClubMember().getId(), c.getClubMember().getNickname(), c.getClubSignupDate(), c.getClubSignupApprovalState().toString(),
+                            c.getClubMaster().getId(), c.getClubMaster().getNickname(), c.getClubSignupDate(), c.getClubSignupApprovalState().toString(),
                             c.getCreatedDate(), c.getModifiedDate()))
                     .collect(Collectors.toList());
         }
