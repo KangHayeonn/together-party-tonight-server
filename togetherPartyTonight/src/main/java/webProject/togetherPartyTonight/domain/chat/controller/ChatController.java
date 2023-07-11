@@ -4,11 +4,10 @@ import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import webProject.togetherPartyTonight.domain.chat.dto.*;
 import webProject.togetherPartyTonight.domain.chat.service.ChatService;
-import webProject.togetherPartyTonight.domain.chat.service.WebSocketService;
+import webProject.togetherPartyTonight.global.websocket.WebSocketService;
 import webProject.togetherPartyTonight.global.common.response.ListResponse;
 import webProject.togetherPartyTonight.global.common.response.SingleResponse;
 
@@ -51,11 +50,23 @@ public class ChatController {
             @ApiResponse(code = 409, message = "더 이상 채팅방이 없습니다"),
             @ApiResponse(code = 500, message = "내부 서버 오류")
     })
-    @GetMapping("/chatRoom")
-    public ListResponse<ChatRoomListResponseDto> getChatRoom(@ApiParam(value = "멤버 아이디", required = true) @RequestParam long memberId,@ApiParam(value = "페이지", required = true) @RequestParam int page,@ApiParam(value = "페이지당 수", required = true) @RequestParam int listCount, HttpServletRequest request) {
+    @GetMapping("/chatRoom/list")
+    public SingleResponse<ChatRoomListDto> getChatRoomList(@ApiParam(value = "멤버 아이디", required = true) @RequestParam long memberId,@ApiParam(value = "페이지", required = true) @RequestParam int page,@ApiParam(value = "페이지당 수", required = true) @RequestParam int perPage, HttpServletRequest request) {
         requestLog(request);
-        return chatService.getChatRoomList(memberId, page, listCount);
+        return chatService.getChatRoomList(memberId, page, perPage);
     }
+
+    @ApiOperation(value = "채팅방 확인 요청, id = 0 이라면 해당 유저들 간의 채팅방이 없음")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "성공"),
+            @ApiResponse(code = 500, message = "내부 서버 오류")
+    })
+    @GetMapping("/chatRoom")
+    public SingleResponse<ChatRoomResponseDto> getChatRoom(@ApiParam(value = "멤버 아이디", required = true) @RequestParam long memberId,@ApiParam(value = "상대 멤버 아이디", required = true) @RequestParam long otherMemberId, HttpServletRequest request) {
+        requestLog(request);
+        return chatService.getChatRoom(memberId, otherMemberId);
+    }
+
 
     @ApiOperation(value = "채팅 목록 요청")
     @ApiResponses(value = {
@@ -64,7 +75,7 @@ public class ChatController {
             @ApiResponse(code = 500, message = "내부 서버 오류")
     })
     @PostMapping("/chatLog")
-    public ListResponse<ChatDto> getChatLog(@RequestBody ChatLogRequestDto chatLogRequestDto, HttpServletRequest request) {
+    public SingleResponse<ChatListDto> getChatLog(@RequestBody ChatLogRequestDto chatLogRequestDto, HttpServletRequest request) {
         requestLog(request);
         return chatService.getChatLogList(chatLogRequestDto);
     }
