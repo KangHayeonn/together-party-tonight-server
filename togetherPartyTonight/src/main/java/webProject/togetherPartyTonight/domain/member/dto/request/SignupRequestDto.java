@@ -24,4 +24,7 @@ public class SignupRequestDto {
     @NotNull(message = "닉네임을 입력하세요")
     private String nickname;
 
+    @NotNull(message = "인증번호를 입력하세요")
+    private String authCode;
+
 }

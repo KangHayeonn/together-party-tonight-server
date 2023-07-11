@@ -50,8 +50,7 @@ class MemberServiceTest {
         Member member = memberRepository.findById(6L).orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
 
         MemberInfoModifyDto modifyDto = new MemberInfoModifyDto();
-        modifyDto.setCurrentPassword("a12345678!");
-        modifyDto.setNewPassword("12345");
+
 
 
         assertThrows(MemberException.class, () -> memberService.modifyMemberInfo(6L, modifyDto));

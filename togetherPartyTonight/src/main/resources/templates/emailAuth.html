@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<div style="border-radius: 10px; margin: auto; width: 500px;">
+<div style="background-color: #ECF2FF; height: 500px; width: 500px; border-radius: 10px">
+<div>
+  <h2 style="color: #0D3471; padding: 20px 0 0 30px; display:flex;">
+      <img style="width:40px; height: 30px;" src="https://topato-github-actions-s3-bucket.s3.ap-northeast-2.amazonaws.com/logo.png">
+      <span>투바투</span>
+  </h2>
+  <div>
+  <p style="padding: 20px 0 0 30px">
+    안녕하세요 투바투입니다. <br>
+    아래에 있는 인증번호를 입력해주세요
+  </p>
+  </div>
+  </div>
+  <div style="padding: 0 0 0 30px; text-align: center">
+    <h2 th:text="${code}"> </h2>
+  </div>
+  <div style="text-align: center">
+  <img style="border-radius: 10px; width:400px; height: 200px;" src="https://topato-github-actions-s3-bucket.s3.ap-northeast-2.amazonaws.com/%EC%8A%A4%ED%84%B0%EB%94%94_default.jpg">
+  <hr style="background: #BDBCBC; height: 1px; border: 0; width:400px;">
+    <p style="color: #BDBCBC">
+
+    Copyright ⓒ 2023 TOGETHER PARTY TONIGHT
+    <br>
+    Made by TOGETHER PARTY TONIGHT
+  </p>
+  </div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

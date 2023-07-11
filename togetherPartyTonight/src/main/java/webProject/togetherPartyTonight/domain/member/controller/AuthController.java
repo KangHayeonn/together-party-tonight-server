@@ -7,10 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import webProject.togetherPartyTonight.domain.member.dto.request.EmailCheckRequestDto;
-import webProject.togetherPartyTonight.domain.member.dto.request.LoginRequestDto;
-import webProject.togetherPartyTonight.domain.member.dto.request.ReissueRequestDto;
-import webProject.togetherPartyTonight.domain.member.dto.request.SignupRequestDto;
+import webProject.togetherPartyTonight.domain.member.auth.mail.MailService;
+import webProject.togetherPartyTonight.domain.member.auth.mail.TitleType;
+import webProject.togetherPartyTonight.domain.member.dto.request.*;
 import webProject.togetherPartyTonight.domain.member.dto.response.LoginResponseDto;
 import webProject.togetherPartyTonight.domain.member.dto.response.ReissueResponseDto;
 import webProject.togetherPartyTonight.domain.member.service.AuthService;
@@ -31,6 +30,8 @@ public class AuthController {
     private final AuthService authService;
 
     private final ResponseService responseService;
+
+    private final MailService mailService;
 
     @PostMapping("/signup")
     @ApiOperation(value = "회원가입", notes = "회원가입 API 입니다.")
@@ -59,6 +60,14 @@ public class AuthController {
         ReissueResponseDto reissueResponseDto = authService.reissue(reissueRequestDto);
 
         return new ResponseWithData("true",200,reissueResponseDto);
+    }
+
+    @PostMapping("/signup/email")
+    @ApiOperation(value = "회원가입 이메일 인증번호 받기", notes = "인증번호 메일링 API입니다.")
+    public CommonResponse authEmailForSignup(@RequestBody EmailAuthRequestDto authRequestDto){
+        mailService.sendEmailForEmailAuth(authRequestDto.getEmail(), TitleType.SIGN_UP.getType());
+
+        return responseService.getCommonResponse();
     }
 
     @PostMapping("/emailCheck")

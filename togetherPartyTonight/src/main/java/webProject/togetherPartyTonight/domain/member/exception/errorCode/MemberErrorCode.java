@@ -22,6 +22,8 @@ public enum MemberErrorCode implements ErrorInterface {
 
     FAILED_LOGOUT(HttpStatus.INTERNAL_SERVER_ERROR, "내부 서버의 문제로 로그아웃에 실패했습니다.");
 
+
+
     /**
      * 필요한 에러코드 작성
      */
