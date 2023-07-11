@@ -64,7 +64,7 @@ public class AuthController {
 
     @PostMapping("/signup/email")
     @ApiOperation(value = "회원가입 이메일 인증번호 메일링", notes = "회원가입 시 인증번호 메일링 API입니다.")
-    public CommonResponse authEmailForSignup(@RequestBody EmailAuthRequestDto authRequestDto){
+    public CommonResponse authEmailForSignup(@RequestBody @Valid EmailAuthRequestDto authRequestDto){
         mailService.sendEmailForEmailAuth(authRequestDto.getEmail(), TitleType.SIGN_UP.getType());
 
         return responseService.getCommonResponse();
@@ -74,7 +74,7 @@ public class AuthController {
 
     @PostMapping("/password/email")
     @ApiOperation(value = "비밀번호 찾기 시 인증번호 메일링", notes = "비밀번호 찾기 메일링 API입니다.")
-    public CommonResponse authEmailForFindPassword(@RequestBody EmailAuthRequestDto authRequestDto){
+    public CommonResponse authEmailForFindPassword(@RequestBody @Valid EmailAuthRequestDto authRequestDto){
 
         mailService.sendEmailForEmailAuth(authRequestDto.getEmail(), TitleType.FOR_FIND_PASSWORD.getType());
 
@@ -83,7 +83,7 @@ public class AuthController {
 
     @PostMapping("/password/reset")
     @ApiOperation(value = "비밀번호 찾기 시 인증번호 인증과 비밀번호 변경", notes = "비밀번호 찾기 시 인증번호 인증과 비밀번호 변경 API입니다.")
-    public CommonResponse resetPassword(@RequestBody PasswordResetRequestDto resetRequestDto){
+    public CommonResponse resetPassword(@RequestBody @Valid PasswordResetRequestDto resetRequestDto){
 
         authService.resetPassword(resetRequestDto);
 
