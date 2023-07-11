@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import webProject.togetherPartyTonight.domain.member.entity.Member;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 public class MemberInfoResponseDto {
@@ -16,8 +18,10 @@ public class MemberInfoResponseDto {
 
     private int reviewCount;
 
+    private LocalDateTime createTime;
 
+    private LocalDateTime modifiedTime;
     public static MemberInfoResponseDto from(Member member){
-        return new MemberInfoResponseDto(member.getEmail(),member.getNickname(),member.getRatingAvg(),member.getReviewCount());
+        return new MemberInfoResponseDto(member.getEmail(),member.getNickname(),member.getRatingAvg(),member.getReviewCount(),member.getCreatedDate(),member.getModifiedDate());
     }
 }

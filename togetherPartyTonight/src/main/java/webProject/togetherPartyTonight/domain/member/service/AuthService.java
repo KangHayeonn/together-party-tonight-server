@@ -14,21 +14,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import webProject.togetherPartyTonight.domain.member.auth.MemberDetails;
-import webProject.togetherPartyTonight.domain.member.dto.request.EmailCheckRequestDto;
-import webProject.togetherPartyTonight.domain.member.dto.request.LoginRequestDto;
-import webProject.togetherPartyTonight.domain.member.dto.request.ReissueRequestDto;
-import webProject.togetherPartyTonight.domain.member.dto.request.SignupRequestDto;
+import webProject.togetherPartyTonight.domain.member.auth.jwt.JwtProvider;
+import webProject.togetherPartyTonight.domain.member.dto.request.*;
 import webProject.togetherPartyTonight.domain.member.dto.response.LoginResponseDto;
 import webProject.togetherPartyTonight.domain.member.dto.response.ReissueResponseDto;
 import webProject.togetherPartyTonight.domain.member.entity.Member;
 import webProject.togetherPartyTonight.domain.member.exception.MemberException;
-import webProject.togetherPartyTonight.domain.member.auth.jwt.JwtProvider;
 import webProject.togetherPartyTonight.domain.member.exception.errorCode.AuthErrorCode;
 import webProject.togetherPartyTonight.domain.member.exception.errorCode.MemberErrorCode;
 import webProject.togetherPartyTonight.domain.member.exception.errorCode.TokenErrorCode;
 import webProject.togetherPartyTonight.domain.member.repository.MemberRepository;
-import webProject.togetherPartyTonight.domain.search.repository.SearchRepository;
-import webProject.togetherPartyTonight.global.common.response.CommonResponse;
 import webProject.togetherPartyTonight.global.error.ErrorCode;
 
 import java.util.concurrent.TimeUnit;
@@ -38,8 +33,6 @@ import java.util.concurrent.TimeUnit;
 @Transactional
 @RequiredArgsConstructor
 public class AuthService {
-    private final SearchRepository searchRepository;
-
 
     private final AuthenticationManager authenticationManager;
 
@@ -61,11 +54,12 @@ public class AuthService {
         String encodedPassword = passwordEncoder.encode(signupRequestDto.getPassword());
         String nickname = signupRequestDto.getNickname();
 
-
+        //인증번호 틀릴 시 오류 반환
         String authCode = redisTemplate.opsForValue().get(email);
         if(!authCode.equals(signupRequestDto.getAuthCode())){
             throw new MemberException(AuthErrorCode.NOT_EQUAL_AUTH_CODE);
         }
+        
         memberRepository.findMemberByEmailAndOauthProvider(email,null)
                 .ifPresent((s)-> {
                    throw new MemberException(MemberErrorCode.MEMBER_ALREADY_EXIST);
@@ -78,6 +72,8 @@ public class AuthService {
                         .nickname(nickname)
                         .build()
         );
+        //인증번호 레디스 삭제
+        redisTemplate.delete(email);
     }
 
     public LoginResponseDto login(LoginRequestDto userLoginReqDto){
@@ -116,6 +112,21 @@ public class AuthService {
         );
 
         return loginResponseDto;
+    }
+
+    public void resetPassword(PasswordResetRequestDto resetRequestDto){
+        Member member = memberRepository.findMemberByEmailAndOauthProvider(resetRequestDto.getEmail(), null).orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        //인증번호 같지않을 시
+        if(!resetRequestDto.getAuthCode().equals(redisTemplate.opsForValue().get(resetRequestDto.getEmail()))){
+            throw new MemberException(AuthErrorCode.NOT_EQUAL_AUTH_CODE);
+        }
+
+
+        member.setPassword(passwordEncoder.encode(resetRequestDto.getNewPassword()));
+
+        //레디스 인증번호 삭제
+        redisTemplate.delete(resetRequestDto.getEmail());
     }
 
     public ReissueResponseDto reissue(ReissueRequestDto reissueRequestDto){

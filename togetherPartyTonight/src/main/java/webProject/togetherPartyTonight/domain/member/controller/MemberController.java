@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import webProject.togetherPartyTonight.domain.member.auth.MemberDetails;
 import webProject.togetherPartyTonight.domain.member.dto.request.MemberInfoModifyDto;
 import webProject.togetherPartyTonight.domain.member.dto.request.PasswordChangeDto;
+import webProject.togetherPartyTonight.domain.member.dto.request.PasswordResetRequestDto;
 import webProject.togetherPartyTonight.domain.member.dto.response.MemberInfoResponseDto;
 import webProject.togetherPartyTonight.domain.member.service.MemberService;
 import webProject.togetherPartyTonight.global.common.ResponseWithData;
@@ -50,11 +51,21 @@ public class MemberController {
         return responseService.getCommonResponse();
     }
 
+
     @PutMapping("/password/{memberId}")
     @ApiOperation(value = "비밀번호 변경", notes = "비밀번호 변경 API입니다.")
     public CommonResponse changePassword(@PathVariable Long memberId, @RequestBody PasswordChangeDto passwordChangeDto) {
         // memberId와 passwordChangeDto를 사용하여 비밀번호 변경 로직을 처리
         memberService.changePassword(memberId, passwordChangeDto);
+        return responseService.getCommonResponse();
+    }
+
+    @DeleteMapping("{/memberId}")
+    @ApiOperation(value = "회원탈퇴", notes = "회원탈퇴 API입니다.")
+    public CommonResponse deleteMember(@PathVariable Long memberId){
+
+        memberService.deleteMember(memberId);
+
         return responseService.getCommonResponse();
     }
 

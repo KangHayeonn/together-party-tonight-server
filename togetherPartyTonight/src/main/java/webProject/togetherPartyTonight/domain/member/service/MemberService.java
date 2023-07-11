@@ -7,11 +7,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import webProject.togetherPartyTonight.domain.member.dto.request.MemberInfoModifyDto;
 import webProject.togetherPartyTonight.domain.member.dto.request.PasswordChangeDto;
+import webProject.togetherPartyTonight.domain.member.dto.request.PasswordResetRequestDto;
 import webProject.togetherPartyTonight.domain.member.dto.response.MemberInfoResponseDto;
 import webProject.togetherPartyTonight.domain.member.entity.Member;
 import webProject.togetherPartyTonight.domain.member.exception.MemberException;
 import webProject.togetherPartyTonight.domain.member.exception.errorCode.MemberErrorCode;
 import webProject.togetherPartyTonight.domain.member.repository.MemberRepository;
+
+import java.time.LocalDateTime;
 
 
 @Service
@@ -22,6 +25,8 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     private final PasswordEncoder passwordEncoder;
+
+    private final RedisTemplate<String,String> redisTemplate;
 
     @Transactional(readOnly = true)
     public MemberInfoResponseDto findById(Long userId){
@@ -38,8 +43,6 @@ public class MemberService {
         member.setNickname(modifyDto.getNickname());
         member.setDetails(modifyDto.getMemberDetails());
         member.setProfileImage(modifyDto.getProfileImage());
-
-        memberRepository.save(member);
     }
 
     public void changePassword(Long userId, PasswordChangeDto passwordChangeDto) {
@@ -55,8 +58,20 @@ public class MemberService {
         }
 
         memberRepository.save(member);
-
     }
+
+    public void deleteMember(Long memberId) {
+
+        Member member = getMember(memberId);
+        
+        //회원 삭제
+        memberRepository.delete(member);
+        
+        //리프레시 토큰 삭제
+        redisTemplate.delete(String.valueOf(memberId));
+    }
+
+
 
     private Member getMember(Long userId) {
         return memberRepository.findById(userId).orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
