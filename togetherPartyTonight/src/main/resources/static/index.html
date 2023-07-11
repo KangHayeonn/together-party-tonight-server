@@ -6,6 +6,11 @@
     <script>
         var socket = new WebSocket("ws://localhost:8080/chatting"); // WebSocket 연결
 
+        // WebSocket 연결 이벤트 핸들러
+        socket.onopen = function(event) {
+            onSocketOpen();
+        };
+
         // 메시지 수신 이벤트 핸들러
         socket.onmessage = function(event) {
             var receivedMessage = event.data;
@@ -17,8 +22,17 @@
         function sendMessage() {
             var message = $('#messageInput').val();
             // 입력한 메시지를 서버로 전송
+             var message = "{\"command\":\"chat\",\"data\":{\"userId\": \"1\"}}";
             socket.send(message);
             $('#messageInput').val(''); // 입력 필드 초기화
+        }
+
+        // WebSocket 연결 성공 시 동작하는 함수
+        function onSocketOpen() {
+            var message = "{\"command\":\"login\",\"data\":{\"userId\": 1}}";
+            socket.send(message);
+            console.log("Connected to WebSocket");
+            // 추가적인 동작을 수행하거나 초기화 등의 작업을 수행할 수 있습니다.
         }
     </script>
 </head>

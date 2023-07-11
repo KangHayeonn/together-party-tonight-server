@@ -24,10 +24,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateClubRequestDto {
-
-    @NotNull(message = "userId는 필수 입력 값입니다.")
-    private Long userId;
-
     @NotEmpty(message = "clubName은 필수 입력 값입니다.")
     private String clubName;
 
@@ -37,9 +33,8 @@ public class CreateClubRequestDto {
     private String clubCategory;
 
     @NotNull (message = "clubMaximum은 필수 입력 값입니다.")
-    @Min(value = 1, message = "최소 1 이상 이여야 합니다.")
-    @Max(value = Integer.MAX_VALUE, message = "최대 "+Integer.MAX_VALUE+ "를 넘을 수 없습니다.")
-    //clubMinimum 이상이여야하는 조건
+    @Min(value = 1, message = "최소 1명 이상 이여야 합니다.")
+    @Max(value = 20, message = "최대 20명을 넘을 수 없습니다.")
     private Integer clubMaximum;
 
     @NotEmpty (message = "clubContent는 필수 입력 값입니다.")
