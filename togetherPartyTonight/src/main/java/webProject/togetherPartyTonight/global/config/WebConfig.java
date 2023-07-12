@@ -16,11 +16,14 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        //swagger 리소스에 대한 매핑을 위해 추가
         registry
-                .addResourceHandler("/swagger-ui.html");
+                .addResourceHandler("/swagger-ui.html")
+                .addResourceLocations("classpath:/META-INF/resources/");
 
         registry
-                .addResourceHandler("/webjars/**");
+                .addResourceHandler("/webjars/**")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/");
 
     }
 }

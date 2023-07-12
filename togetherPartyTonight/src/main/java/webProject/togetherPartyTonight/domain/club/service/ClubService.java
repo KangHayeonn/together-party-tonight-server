@@ -19,8 +19,10 @@ import webProject.togetherPartyTonight.domain.club.repository.ClubRepository;
 import webProject.togetherPartyTonight.domain.club.repository.ClubSignupRepository;
 import webProject.togetherPartyTonight.domain.member.entity.Member;
 import webProject.togetherPartyTonight.domain.member.exception.MemberException;
+import webProject.togetherPartyTonight.domain.member.exception.errorCode.MemberErrorCode;
 import webProject.togetherPartyTonight.domain.member.repository.MemberRepository;
 import webProject.togetherPartyTonight.global.error.ErrorCode;
+import webProject.togetherPartyTonight.global.util.ClubUtils;
 import webProject.togetherPartyTonight.infra.S3.S3Service;
 
 import javax.transaction.Transactional;
@@ -42,24 +44,23 @@ public class ClubService {
     private final S3Service s3Service;
 
     private final String directory = "club/";
+    private final ClubUtils clubUtils;
 
 
     @Transactional
-    public void addClub (CreateClubRequestDto clubRequest, MultipartFile image) {
-        Member master = memberRepository.getReferenceById(clubRequest.getUserId());
-        // TODO: 2023/06/17 JWT 내부 유저정보와 requestBody의 userId가 다르면 '권한 없음' exception
+    public void addClub (CreateClubRequestDto clubRequest, MultipartFile image, Member member) {
 
         Point point = makePoint(clubRequest.getLatitude(), clubRequest.getLongitude());
 
         String url="";
         if (image != null) {
-            url = s3Service.uploadImage(image, directory, clubRequest.getUserId());
+            url = s3Service.uploadImage(image, directory,member.getId());
         }
         else {
             url = getDefaultImage(clubRequest.getClubCategory());
         }
 
-        Club club = clubRequest.toClub(master, point, url);
+        Club club = clubRequest.toClub(member, point, url);
 
         clubRepository.save(club);
 
@@ -68,17 +69,18 @@ public class ClubService {
     public GetClubResponseDto getClub(Long id) {
         Club club = clubRepository.findById(id)
                 .orElseThrow(() -> new ClubException(ClubErrorCode.INVALID_CLUB_ID));
-        return new GetClubResponseDto().toDto(club);
+        List<String> tags = clubUtils.splitTags(club.getClubTags());
+        return new GetClubResponseDto().toDto(club, tags);
     }
 
     @Transactional
-    public void deleteClub (DeleteClubAndSignupRequestDto requestDto) {
+    public void deleteClub (DeleteClubAndSignupRequestDto requestDto, Member member) {
         Long clubId = requestDto.getClubId();
-        Long userId = requestDto.getUserId();
-        // TODO: 2023/06/17 JWT 내부 유저정보와 requestBody의 userId가 다르면 '권한 없음' exception
         Club club = clubRepository.findById(requestDto.getClubId()).orElseThrow(
                 ()-> new ClubException(ClubErrorCode.INVALID_CLUB_ID)
         );
+
+       checkAuthority(club, member);
 
         if (!club.getImage().contains("default"))
             s3Service.deleteImage(club.getImage());
@@ -89,18 +91,17 @@ public class ClubService {
         }
 
     @Transactional
-    public void modifyClub(UpdateClubRequestDto clubRequest, MultipartFile image) {
+    public void modifyClub(UpdateClubRequestDto clubRequest, MultipartFile image, Member member) {
         Long clubId = clubRequest.getClubId();
-        Long userId = clubRequest.getUserId();
-        // TODO: 2023/06/17 JWT 내부 유저정보와 requestBody의 userId가 다르면 '권한 없음' exception
-        Club club = clubRepository.findByClubIdAndMasterId(clubId, userId)
+        Club club = clubRepository.findByClubIdAndMasterId(clubId, member.getId())
                 .orElseThrow(()-> new ClubException(ClubErrorCode.INVALID_CLUB_ID));
-        compareChange(clubRequest, club, image);
+       checkAuthority(club, member);
+        compareChange(clubRequest, club, image, member);
 
     }
 
     @Transactional
-    public void compareChange (UpdateClubRequestDto clubDto, Club clubEntity, MultipartFile image) {
+    public void compareChange (UpdateClubRequestDto clubDto, Club clubEntity, MultipartFile image, Member member) {
         Point point = makePoint(clubDto.getLatitude(), clubDto.getLongitude());
         Integer flag ;
 
@@ -110,7 +111,7 @@ public class ClubService {
 
         String imageUrl;
         if(image!=null){
-            imageUrl = s3Service.uploadImage(image, directory, clubDto.getUserId());
+            imageUrl = s3Service.uploadImage(image, directory, member.getId());
             if(!clubEntity.getImage().contains("default")) {
                 s3Service.deleteImage(clubEntity.getImage());
             }
@@ -141,6 +142,10 @@ public class ClubService {
 
     public String  getDefaultImage (String category) {
         return s3Service.getImage(category+"_default.jpg");
+    }
+
+    public void checkAuthority(Club club, Member member) {
+        if(club.getMaster().getId() != member.getId()) throw new ClubException(ErrorCode.FORBIDDEN);
     }
 
 }
