@@ -1,5 +1,6 @@
 package webProject.togetherPartyTonight.domain.member.dto.request;
 
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;

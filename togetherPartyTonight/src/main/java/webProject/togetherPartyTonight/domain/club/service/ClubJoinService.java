@@ -21,6 +21,7 @@ import webProject.togetherPartyTonight.domain.member.exception.MemberException;
 import webProject.togetherPartyTonight.domain.member.exception.errorCode.MemberErrorCode;
 import webProject.togetherPartyTonight.domain.member.repository.MemberRepository;
 import webProject.togetherPartyTonight.global.error.ErrorCode;
+import webProject.togetherPartyTonight.global.util.ClubUtils;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
@@ -38,16 +39,17 @@ public class ClubJoinService {
     private final ClubRepository clubRepository;
     private final ClubSignupRepository clubSignupRepository;
     private final ClubMemberRepository clubMemberRepository;
+    private final ClubUtils clubUtils;
 
 
-    public void signup (DeleteClubAndSignupRequestDto requestDto) {
-        Member member = memberRepository.getReferenceById(requestDto.getUserId());
-        if (member == null) throw new MemberException(MemberErrorCode.MEMBER_NOT_FOUND);
+    public void signup (DeleteClubAndSignupRequestDto requestDto, Member member) {
+
         Club club = clubRepository.getReferenceById(requestDto.getClubId());
         if (club==null) throw new ClubException(ClubErrorCode.INVALID_CLUB_ID);
-        // TODO: 2023/06/17 JWT 내부 유저정보와 requestBody의 userId가 다르면 '권한 없음' exception
 
-        Optional<ClubSignup> alreadySignup = clubSignupRepository.findByClubClubIdAndClubMemberId(requestDto.getClubId(), requestDto.getUserId());
+        if(club.getMaster().getId() == member.getId()) throw new ClubException(ClubErrorCode.CANNOT_SIGNUP_TO_MY_CLUB);
+
+        Optional<ClubSignup> alreadySignup = clubSignupRepository.findByClubClubIdAndClubMemberId(requestDto.getClubId(), member.getId());
         if(alreadySignup.isEmpty()) {
             ClubSignup clubSignup = requestDto.toClubSignup(club, member, club.getMaster());
             clubSignupRepository.save(clubSignup);
@@ -59,43 +61,39 @@ public class ClubJoinService {
 
 
     @Transactional
-    public void deleteAppliedClub (DeleteMyAppliedRequestDto requestDto) {
+    public void deleteAppliedClub (DeleteMyAppliedRequestDto requestDto, Member member) {
         Long clubSignupId = requestDto.getClubSignupId();
-        Long userId = requestDto.getUserId();
-
-        memberRepository.findById(userId).orElseThrow(
-                () -> new MemberException(ErrorCode.INVALID_MEMBER_ID)
-        );
-
-        // TODO: 2023/06/17 JWT 내부 유저정보와 userId가 다르면 '권한 없음' exception
 
         ClubSignup clubSignup = clubSignupRepository.findById(clubSignupId).orElseThrow(
                 () -> new ClubException(ClubErrorCode.INVALID_CLUB_SIGNUP_ID)
         );
+
+        checkAuthority(clubSignup.getClubMember().getId(), member);
 
         if (clubSignup.getClubSignupApprovalState().equals(ApprovalState.PENDING)) {
             clubSignupRepository.deleteById(clubSignupId);
         }
         else if (clubSignup.getClubSignupApprovalState().equals(ApprovalState.APPROVE)){
-            clubMemberRepository.deleteByClubClubIdAndMemberId(clubSignup.getClub().getClubId(), requestDto.getUserId());
+            clubMemberRepository.deleteByClubClubIdAndMemberId(clubSignup.getClub().getClubId(), member.getId());
             clubSignupRepository.deleteById(clubSignupId);
             checkIfRecruitComplete(clubSignup);
         }
         else {
-            //
+            throw new ClubException(ClubErrorCode.CANNOT_WITHDRAW);
         }
     }
 
 
     @Transactional
-    public void approve (ApproveRequestDto requestDto) {
+    public void approve (ApproveRequestDto requestDto, Member member) {
 
         Long clubSignupId = requestDto.getClubSignupId();
-        // TODO: 2023/06/17 JWT 내부 유저정보와 masterId가 다르면 '권한 없음' exception
 
         ClubSignup clubSignup = clubSignupRepository.findById(clubSignupId).orElseThrow(
                 () -> new ClubException(ClubErrorCode.INVALID_CLUB_SIGNUP_ID)
         );
+        checkAuthority(clubSignup.getClubMaster().getId() ,member);
+
         if (clubSignup.getClubSignupApprovalState().equals(ApprovalState.PENDING)) {
             if (requestDto.getApprove()) {
                 clubSignup.setClubSignupApprovalState(ApprovalState.APPROVE);
@@ -115,17 +113,12 @@ public class ClubJoinService {
     }
 
     //모임별 신청한 사람 조회
-    // TODO: 2023/06/21  pending, refuse, approve, kicked 모두 보내고 있음 -> pending, approve 만?
-    public ReceivedApplicationListDto getRequestListPerClub (Long userId, Long clubId) {
+    public ReceivedApplicationListDto getRequestListPerClub (Long clubId, Member member) {
         Club club = clubRepository.findById(clubId).orElseThrow(
                 () -> new ClubException(ClubErrorCode.INVALID_CLUB_ID)
         );
 
-        memberRepository.findById(userId).orElseThrow(
-                () -> new MemberException(ErrorCode.INVALID_MEMBER_ID)
-        );
-
-        if (club.getMaster().getId() != userId) throw new ClubException(ErrorCode.FORBIDDEN);
+        checkAuthority(club.getMaster().getId(), member);
 
         List<ClubSignup> clubSignups = clubSignupRepository.findAllByClubClubId(clubId);
 
@@ -139,15 +132,9 @@ public class ClubJoinService {
     }
 
     //내가 신청한 모임 조회
-    //승인된거랑 거절된거 모두 보냄
-    public MyAppliedClubListDto getAppliedList(Long userId) {
-        memberRepository.findById(userId).orElseThrow(
-                () -> new MemberException(ErrorCode.INVALID_MEMBER_ID)
-        );
+    public MyAppliedClubListDto getAppliedList(Member member) {
 
-        // TODO: 2023/06/17 JWT 내부 유저정보와 userId가 다르면 '권한 없음' exception
-
-        List<ClubSignup> signupMemberId = clubSignupRepository.findAllByClubMemberId(userId);
+        List<ClubSignup> signupMemberId = clubSignupRepository.findAllByClubMemberId(member.getId());
 
         List<ApplicationDto> list = signupMemberId.stream()
                 .map(c -> new ApplicationDto(c.getClubSignupId(), c.getClub().getClubId(), c.getClub().getClubName(),
@@ -159,41 +146,33 @@ public class ClubJoinService {
     }
 
     //내가 만든 모임 조회
-    public MyOwnedClubListDto getOwnedList(Long userId) {
-        memberRepository.findById(userId).orElseThrow(
-                () -> new MemberException(ErrorCode.INVALID_MEMBER_ID)
-        );
+    public MyOwnedClubListDto getOwnedList(Member member) {
 
-        // TODO: 2023/06/17 JWT 내부 유저정보와 userId가 다르면 '권한 없음' exception
-
-        List<Club> clubs = clubRepository.findClubByMasterId(userId);
+        List<Club> clubs = clubRepository.findClubByMasterId(member.getId());
 
         List<MyOwnedClubDto> list = clubs.stream()
                 .map(c -> new MyOwnedClubDto(c.getClubName(), c.getClubCategory(), c.getClubMaximum(),
-                        c.getClubContent(), splitTags(c.getClubTags()), (float)c.getClubPoint().getX(), (float)c.getClubPoint().getY(),
+                        c.getClubContent(), clubUtils.splitTags(c.getClubTags()), (float)c.getClubPoint().getX(), (float)c.getClubPoint().getY(),
                         c.getAddress(),c.getMeetingDate(),c.getCreatedDate(), c.getModifiedDate()))
                 .collect(Collectors.toList());
 
         return new MyOwnedClubListDto(list);
     }
 
-    public void kickout (DeleteMyAppliedRequestDto request) {
+    public void kickout (DeleteMyAppliedRequestDto request, Member member) {
         Long clubSignupId = request.getClubSignupId();
-        Long userId = request.getUserId(); //모임장 아이디
+
         ClubSignup signup = clubSignupRepository.findById(clubSignupId).orElseThrow(
                 () -> new ClubException(ClubErrorCode.INVALID_CLUB_SIGNUP_ID)
         );
-        if (signup.getClubMaster().getId() != userId) throw new ClubException(ErrorCode.INVALID_MEMBER_ID);
+        checkAuthority(signup.getClubMaster().getId() , member);
 
         signup.setClubSignupApprovalState(ApprovalState.KICKOUT);
         clubMemberRepository.deleteByMemberId(signup.getClubMember().getId());
 
     }
 
-    public List<String> splitTags (String tags) {
-        String[] split = tags.split(",");
-        return Arrays.stream(split).collect(Collectors.toList());
-    }
+
 
     public void checkIfRecruitComplete(ClubSignup clubSignup) {
         //현재 승인된 모임 인원이 모집 최대 인원에 도달했는지 여부 반환
@@ -202,5 +181,9 @@ public class ClubJoinService {
         Integer maximum = club.getClubMaximum();
         if (memberCnt==maximum) club.setClubState(false);
         else club.setClubState(true);
+    }
+
+    public void checkAuthority(Long memberId, Member member) {
+        if(memberId != member.getId()) throw new ClubException(ErrorCode.FORBIDDEN);
     }
 }

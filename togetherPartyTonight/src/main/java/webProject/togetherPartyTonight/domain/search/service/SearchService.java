@@ -11,6 +11,7 @@ import webProject.togetherPartyTonight.domain.club.entity.Club;
 import webProject.togetherPartyTonight.domain.search.dto.SearchListDto;
 import webProject.togetherPartyTonight.domain.search.dto.SearchResponseDto;
 import webProject.togetherPartyTonight.domain.search.repository.SearchRepository;
+import webProject.togetherPartyTonight.global.util.ClubUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SearchService {
     private final SearchRepository searchRepository;
+    private final ClubUtils clubUtils;
 
     public SearchListDto searchByAddress(Float lat, Float lng, Pageable pageable) {
         String pointWKT = makePointWKT(lat, lng);
@@ -30,7 +32,7 @@ public class SearchService {
         return makeResponseDto(clubList);
     }
 
-    public SearchListDto searchByConditions(Float lat, Float lng, Integer distance, String category, String state, Integer userNum, String tags, String sortFilter, Pageable pageable) {
+    public SearchListDto searchByConditions(Float lat, Float lng, Integer distance, String category, String state, Integer memberNum, String tags, String sortFilter, Pageable pageable) {
         String pointWKT = makePointWKT(lat, lng);
         String regexpTag = makeRegexp(tags);
         if (category.equals("전체")) category = convertCategory();
@@ -38,25 +40,20 @@ public class SearchService {
         Optional<Page<Club>> clubList = null;
 
         if (sortFilter.equals("latest")) {
-            clubList = searchRepository.findByConditionsOrderByDate(pointWKT, distance * 1000, state, category, userNum, regexpTag, pageable);
+            clubList = searchRepository.findByConditionsOrderByDate(pointWKT, distance * 1000, state, category, memberNum, regexpTag, pageable);
         }
         else if (sortFilter.equals("popular")) {
-            clubList = searchRepository.findByConditionsOrderByReviewScore(pointWKT,distance*1000, state, category,userNum,regexpTag, pageable);
+            clubList = searchRepository.findByConditionsOrderByReviewScore(pointWKT,distance*1000, state, category,memberNum,regexpTag, pageable);
         }
        return makeResponseDto(clubList);
 
-    }
-
-    public List<String> splitTags (String tags) {
-        String[] split = tags.split(",");
-        return Arrays.stream(split).collect(Collectors.toList());
     }
 
     public List<SearchResponseDto> makeSearchResponseDto(Page<Club> clubs) {
 
         List<SearchResponseDto> list = new ArrayList<>();
         for (Club c : clubs) {
-            List<String> tags = splitTags(c.getClubTags());
+            List<String> tags = clubUtils.splitTags(c.getClubTags());
             Point point= c.getClubPoint();
             list.add(new SearchResponseDto().toDto(c, tags, point));
         }

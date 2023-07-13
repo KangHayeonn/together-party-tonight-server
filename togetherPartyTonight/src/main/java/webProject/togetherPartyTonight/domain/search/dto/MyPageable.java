@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 @ApiModel
 public class MyPageable {
-    @ApiModelProperty(value = "페이지 번호", required = true, example = "0", allowableValues = "[0,infinity]")
+    @ApiModelProperty(value = "페이지 번호", required = true, example = "0", allowableValues = "range[0,infinity]")
     private Integer page;
 
     @ApiModelProperty(value = "페이지 크기" , example = "20")
