@@ -1,6 +1,7 @@
 package webProject.togetherPartyTonight.domain.member.oauth.kakao;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,7 @@ import webProject.togetherPartyTonight.domain.member.oauth.OAuthLoginParam;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class KakaoApiClient implements OAuthApiClient {
 
     private static final String GRANT_TYPE = "authorization_code";
@@ -63,6 +65,8 @@ public class KakaoApiClient implements OAuthApiClient {
         httpHeaders.set("Authorization", "Bearer " + accessToken);
         HttpEntity<?> request = new HttpEntity<>(httpHeaders);
         ResponseEntity<KakaoInfoResponse> response= restTemplate.exchange(url, HttpMethod.GET, request, KakaoInfoResponse.class);
+
+        log.info("회원의 이메일 - {}",response.getBody().getEmail());
 
         return restTemplate.postForObject(url, request, KakaoInfoResponse.class);
     }
