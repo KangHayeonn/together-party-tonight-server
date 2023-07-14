@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public enum ApprovalState {
+    ALL("all"),
     APPROVE("approve"),
     PENDING ("pending"),
     REFUSE ("refuse"),

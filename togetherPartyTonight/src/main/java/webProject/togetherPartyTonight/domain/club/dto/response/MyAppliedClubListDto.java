@@ -9,4 +9,8 @@ import java.util.List;
 @AllArgsConstructor
 public class MyAppliedClubListDto {
     private List<ApplicationDto> myAppliedList ;
+    private Integer page;
+    private Integer size;
+    private Long totalElements;
+    private Integer totalPages;
 }
