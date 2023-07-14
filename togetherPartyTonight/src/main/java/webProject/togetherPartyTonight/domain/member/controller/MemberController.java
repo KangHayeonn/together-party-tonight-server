@@ -3,11 +3,17 @@ package webProject.togetherPartyTonight.domain.member.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import webProject.togetherPartyTonight.domain.member.auth.MemberDetails;
+import webProject.togetherPartyTonight.domain.member.dto.request.MemberDetailsModifyDto;
+import webProject.togetherPartyTonight.domain.member.dto.request.MemberModifyProfileImageDto;
 import webProject.togetherPartyTonight.domain.member.dto.request.MemberNicknameModifyDto;
 import webProject.togetherPartyTonight.domain.member.dto.request.PasswordChangeDto;
 import webProject.togetherPartyTonight.domain.member.dto.response.MemberInfoResponseDto;
@@ -15,6 +21,8 @@ import webProject.togetherPartyTonight.domain.member.service.MemberService;
 import webProject.togetherPartyTonight.global.common.ResponseWithData;
 import webProject.togetherPartyTonight.global.common.response.CommonResponse;
 import webProject.togetherPartyTonight.global.common.service.ResponseService;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequiredArgsConstructor
@@ -43,6 +51,24 @@ public class MemberController {
     public CommonResponse modifyMemberInfo(@PathVariable Long memberId, @RequestBody MemberNicknameModifyDto memberInfoDto) {
         
         memberService.modifyMemberInfo(memberId,memberInfoDto);
+        return responseService.getCommonResponse();
+    }
+    
+    @PutMapping("/memberDetail/{memberId}")
+    @ApiOperation(value = "자기소개 변경", notes = "자기소개 변경 API입니다.")
+    public CommonResponse modifyMemberDetails(@PathVariable Long memberId, @RequestBody MemberDetailsModifyDto memberInfoDto) {
+
+        memberService.modifyMemberDetails(memberId,memberInfoDto);
+        return responseService.getCommonResponse();
+    }
+
+    @PutMapping("profileImages/{memberId}")
+    @ApiOperation(value = "프로필 사진 변경", notes = "프로필 사진 변경 API입니다.")
+    public CommonResponse modifyMemberProfileImage(@PathVariable Long memberId,
+                                                   @RequestPart(value = "profileImage",required = false) @ApiParam("프로필이미지") MultipartFile profileImage,
+                                                   HttpServletRequest request) {
+
+        memberService.modifyMemberProfileImage(memberId,profileImage);
         return responseService.getCommonResponse();
     }
 
