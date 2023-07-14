@@ -32,7 +32,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@Api("/comment")
+@Api(tags = {"/comment"})
 @RequestMapping("/comment")
 public class CommentController {
 
@@ -53,7 +53,7 @@ public class CommentController {
 
     @ApiOperation(value = "댓글 작성하기")
     @PostMapping(value = "")
-    public SingleResponse writeComment (@ApiParam(required = true) @RequestBody CreateCommentRequestDto requestDto, HttpServletRequest request) {
+    public SingleResponse<CreateCommentResponseDto> writeComment (@ApiParam(required = true) @RequestBody CreateCommentRequestDto requestDto, HttpServletRequest request) {
         log.info("[{}] {}",request.getMethod(),request.getRequestURI());
         Member member = getMemberBySecurityContextHolder();
 
@@ -64,7 +64,7 @@ public class CommentController {
 
     @ApiOperation(value = "댓글 수정하기")
     @PutMapping(value = "")
-    public SingleResponse updateComment (@ApiParam(required = true) @RequestBody UpdateCommentRequestDto requestDto, HttpServletRequest request) {
+    public SingleResponse<UpdateCommentResponseDto> updateComment (@ApiParam(required = true) @RequestBody UpdateCommentRequestDto requestDto, HttpServletRequest request) {
         log.info("[{}] {}",request.getMethod(),request.getRequestURI());
         Member member = getMemberBySecurityContextHolder();
         UpdateCommentResponseDto res = commentService.updateComment(member, requestDto);
@@ -73,11 +73,11 @@ public class CommentController {
 
     @ApiOperation(value = "댓글 삭제하기")
     @DeleteMapping(value = "")
-    public CommonResponse deleteComment (@ApiParam(required = true) @RequestBody DeleteCommentRequestDto requestDto, HttpServletRequest request) {
+    public SingleResponse<DeleteCommentResponseDto> deleteComment (@ApiParam(required = true) @RequestBody DeleteCommentRequestDto requestDto, HttpServletRequest request) {
         log.info("[{}] {}",request.getMethod(),request.getRequestURI());
         Member member = getMemberBySecurityContextHolder();
         DeleteCommentResponseDto res = commentService.deleteComment(member, requestDto);
-        return responseService.getCommonResponse();
+        return responseService.getSingleResponse(res);
     }
 
     @ApiOperation(value="퇴장하기")
