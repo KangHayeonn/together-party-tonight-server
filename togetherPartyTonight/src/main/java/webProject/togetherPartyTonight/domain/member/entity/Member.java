@@ -18,6 +18,7 @@ import static javax.persistence.FetchType.LAZY;
 @Entity
 @Getter
 @Setter
+@DynamicInsert
 @NoArgsConstructor
 public class Member extends BaseEntity {
     @Id
