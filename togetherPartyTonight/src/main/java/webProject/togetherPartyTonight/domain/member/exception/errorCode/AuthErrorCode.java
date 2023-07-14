@@ -9,7 +9,8 @@ import webProject.togetherPartyTonight.global.error.ErrorInterface;
 @RequiredArgsConstructor
 public enum AuthErrorCode implements ErrorInterface {
     NOT_EMAIL_SEND(HttpStatus.INTERNAL_SERVER_ERROR,"이메일을 보내지 못했습니다."),
-    NOT_EQUAL_AUTH_CODE(HttpStatus.FORBIDDEN, "인증번호가 틀립니다.");
+    NOT_EQUAL_AUTH_CODE(HttpStatus.FORBIDDEN, "인증번호가 틀립니다."),
+    AUTH_TIME_OUT(HttpStatus.UNAUTHORIZED, "인증시간이 끝났습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

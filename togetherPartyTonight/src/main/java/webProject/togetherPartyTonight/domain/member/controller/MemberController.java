@@ -11,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import webProject.togetherPartyTonight.domain.member.auth.MemberDetails;
 import webProject.togetherPartyTonight.domain.member.dto.request.MemberInfoModifyDto;
+import webProject.togetherPartyTonight.domain.member.dto.request.MemberNicknameModifyDto;
 import webProject.togetherPartyTonight.domain.member.dto.request.PasswordChangeDto;
 import webProject.togetherPartyTonight.domain.member.dto.request.PasswordResetRequestDto;
 import webProject.togetherPartyTonight.domain.member.dto.response.MemberInfoResponseDto;
@@ -45,7 +46,7 @@ public class MemberController {
 
     @PutMapping("/{memberId}")
     @ApiOperation(value = "유저정보 변경", notes = "유저정보 변경 API입니다.")
-    public CommonResponse modifyMemberInfo(@PathVariable Long memberId, @RequestBody MemberInfoModifyDto memberInfoDto) {
+    public CommonResponse modifyMemberInfo(@PathVariable Long memberId, @RequestBody MemberNicknameModifyDto memberInfoDto) {
         // memberId와 memberInfoDto를 사용하여 회원 정보 수정 로직을 처리
         memberService.modifyMemberInfo(memberId,memberInfoDto);
         return responseService.getCommonResponse();

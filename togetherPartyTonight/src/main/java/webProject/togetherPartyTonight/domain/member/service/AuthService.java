@@ -54,8 +54,13 @@ public class AuthService {
         String encodedPassword = passwordEncoder.encode(signupRequestDto.getPassword());
         String nickname = signupRequestDto.getNickname();
 
-        //인증번호 틀릴 시 오류 반환
+
         String authCode = redisTemplate.opsForValue().get(email);
+
+        if(authCode == null){
+            throw new MemberException(AuthErrorCode.AUTH_TIME_OUT);
+        }
+        //인증번호 틀릴 시 오류 반환
         if(!authCode.equals(signupRequestDto.getAuthCode())){
             throw new MemberException(AuthErrorCode.NOT_EQUAL_AUTH_CODE);
         }

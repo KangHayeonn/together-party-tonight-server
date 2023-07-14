@@ -18,6 +18,7 @@ import static javax.persistence.FetchType.LAZY;
 @Entity
 @Getter
 @Setter
+@DynamicInsert
 @NoArgsConstructor
 public class Member extends BaseEntity {
     @Id
@@ -37,7 +38,7 @@ public class Member extends BaseEntity {
     @Column(name = "member_review_count",columnDefinition = "int(11) default 0")
     private Integer reviewCount;
 
-    @Column(name = "member_rating_avg", columnDefinition = "decimal(2,1) default 0.0")
+    @Column(name = "member_rating_avg",columnDefinition = "decimal(2,1) default 0.0")
     private Float ratingAvg;
 
     @Column(name = "member_details")

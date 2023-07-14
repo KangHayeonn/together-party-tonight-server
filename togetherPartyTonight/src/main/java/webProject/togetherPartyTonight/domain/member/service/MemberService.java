@@ -6,6 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import webProject.togetherPartyTonight.domain.member.dto.request.MemberInfoModifyDto;
+import webProject.togetherPartyTonight.domain.member.dto.request.MemberNicknameModifyDto;
 import webProject.togetherPartyTonight.domain.member.dto.request.PasswordChangeDto;
 import webProject.togetherPartyTonight.domain.member.dto.request.PasswordResetRequestDto;
 import webProject.togetherPartyTonight.domain.member.dto.response.MemberInfoResponseDto;
@@ -37,12 +38,11 @@ public class MemberService {
 
     }
 
-    public void modifyMemberInfo(Long userId, MemberInfoModifyDto modifyDto){
+    public void modifyMemberInfo(Long userId, MemberNicknameModifyDto modifyDto){
         Member member = getMember(userId);
 
         member.setNickname(modifyDto.getNickname());
-        member.setDetails(modifyDto.getMemberDetails());
-        member.setProfileImage(modifyDto.getProfileImage());
+
     }
 
     public void changePassword(Long userId, PasswordChangeDto passwordChangeDto) {
