@@ -5,17 +5,13 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import webProject.togetherPartyTonight.domain.member.dto.request.MemberInfoModifyDto;
 import webProject.togetherPartyTonight.domain.member.dto.request.MemberNicknameModifyDto;
 import webProject.togetherPartyTonight.domain.member.dto.request.PasswordChangeDto;
-import webProject.togetherPartyTonight.domain.member.dto.request.PasswordResetRequestDto;
 import webProject.togetherPartyTonight.domain.member.dto.response.MemberInfoResponseDto;
 import webProject.togetherPartyTonight.domain.member.entity.Member;
 import webProject.togetherPartyTonight.domain.member.exception.MemberException;
 import webProject.togetherPartyTonight.domain.member.exception.errorCode.MemberErrorCode;
 import webProject.togetherPartyTonight.domain.member.repository.MemberRepository;
-
-import java.time.LocalDateTime;
 
 
 @Service
