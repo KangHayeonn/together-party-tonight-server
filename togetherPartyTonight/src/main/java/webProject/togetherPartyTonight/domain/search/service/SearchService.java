@@ -34,7 +34,11 @@ public class SearchService {
 
     public SearchListDto searchByConditions(Float lat, Float lng, Integer distance, String category, String state, Integer memberNum, String tags, String sortFilter, Pageable pageable) {
         String pointWKT = makePointWKT(lat, lng);
-        String regexpTag = makeRegexp(tags);
+        String regexpTag;
+        if(tags!=null)
+            regexpTag = makeRegexp(tags);
+        else regexpTag ="";
+        
         if (category.equals("전체")) category = convertCategory();
 
         Optional<Page<Club>> clubList = null;
