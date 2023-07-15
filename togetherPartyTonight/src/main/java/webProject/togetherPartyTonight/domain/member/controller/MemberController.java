@@ -20,9 +20,11 @@ import webProject.togetherPartyTonight.domain.member.dto.response.MemberInfoResp
 import webProject.togetherPartyTonight.domain.member.service.MemberService;
 import webProject.togetherPartyTonight.global.common.ResponseWithData;
 import webProject.togetherPartyTonight.global.common.response.CommonResponse;
+import webProject.togetherPartyTonight.global.common.response.SingleResponse;
 import webProject.togetherPartyTonight.global.common.service.ResponseService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -48,28 +50,29 @@ public class MemberController {
 
     @PutMapping("/nickname/{memberId}")
     @ApiOperation(value = "닉네임 변경", notes = "닉네임 변경 API입니다.")
-    public CommonResponse modifyMemberInfo(@PathVariable Long memberId, @RequestBody MemberNicknameModifyDto memberInfoDto) {
-        
-        memberService.modifyMemberInfo(memberId,memberInfoDto);
-        return responseService.getCommonResponse();
+    public SingleResponse<MemberNicknameModifyDto> modifyMemberInfo(@PathVariable Long memberId, @RequestBody MemberNicknameModifyDto memberInfoDto) {
+
+        MemberNicknameModifyDto memberNicknameModifyDto = memberService.modifyMemberInfo(memberId, memberInfoDto);
+        return responseService.getSingleResponse(memberNicknameModifyDto);
     }
     
     @PutMapping("/memberDetail/{memberId}")
     @ApiOperation(value = "자기소개 변경", notes = "자기소개 변경 API입니다.")
-    public CommonResponse modifyMemberDetails(@PathVariable Long memberId, @RequestBody MemberDetailsModifyDto memberInfoDto) {
+    public SingleResponse<MemberDetailsModifyDto> modifyMemberDetails(@PathVariable Long memberId, @RequestBody MemberDetailsModifyDto memberInfoDto) {
 
-        memberService.modifyMemberDetails(memberId,memberInfoDto);
-        return responseService.getCommonResponse();
+        MemberDetailsModifyDto memberDetailsModifyDto = memberService.modifyMemberDetails(memberId, memberInfoDto);
+        return responseService.getSingleResponse(memberDetailsModifyDto);
     }
 
     @PutMapping("profileImages/{memberId}")
     @ApiOperation(value = "프로필 사진 변경", notes = "프로필 사진 변경 API입니다.")
-    public CommonResponse modifyMemberProfileImage(@PathVariable Long memberId,
+    public SingleResponse<MemberModifyProfileImageDto> modifyMemberProfileImage(@PathVariable Long memberId,
                                                    @RequestPart(value = "profileImage",required = false) @ApiParam("프로필이미지") MultipartFile profileImage,
-                                                   HttpServletRequest request) {
+                                                   HttpServletRequest request) throws IOException {
 
-        memberService.modifyMemberProfileImage(memberId,profileImage);
-        return responseService.getCommonResponse();
+        MemberModifyProfileImageDto memberModifyProfileImageDto = memberService.modifyMemberProfileImage(memberId, profileImage);
+
+        return responseService.getSingleResponse(memberModifyProfileImageDto);
     }
 
 
@@ -80,6 +83,8 @@ public class MemberController {
         memberService.changePassword(memberId, passwordChangeDto);
         return responseService.getCommonResponse();
     }
+
+
 
     @DeleteMapping("{/memberId}")
     @ApiOperation(value = "회원탈퇴", notes = "회원탈퇴 API입니다.")

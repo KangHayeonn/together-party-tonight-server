@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import webProject.togetherPartyTonight.domain.member.dto.request.MemberDetailsModifyDto;
+import webProject.togetherPartyTonight.domain.member.dto.request.MemberModifyProfileImageDto;
 import webProject.togetherPartyTonight.domain.member.dto.request.MemberNicknameModifyDto;
 import webProject.togetherPartyTonight.domain.member.dto.request.PasswordChangeDto;
 import webProject.togetherPartyTonight.domain.member.dto.response.MemberInfoResponseDto;
@@ -16,6 +17,8 @@ import webProject.togetherPartyTonight.domain.member.exception.MemberException;
 import webProject.togetherPartyTonight.domain.member.exception.errorCode.MemberErrorCode;
 import webProject.togetherPartyTonight.domain.member.repository.MemberRepository;
 import webProject.togetherPartyTonight.infra.S3.S3Service;
+
+import java.io.IOException;
 
 
 @Service
@@ -43,32 +46,42 @@ public class MemberService {
 
     }
 
-    public void modifyMemberInfo(Long userId, MemberNicknameModifyDto modifyDto){
+    public MemberNicknameModifyDto modifyMemberInfo(Long userId, MemberNicknameModifyDto modifyDto){
         Member member = getMember(userId);
 
         member.setNickname(modifyDto.getNickname());
 
+        log.info("변경닉네임 - {}",member.getNickname());
+
+        return new MemberNicknameModifyDto(member.getNickname());
     }
 
-    public void modifyMemberDetails(Long userId, MemberDetailsModifyDto memberInfoDto) {
+    public MemberDetailsModifyDto modifyMemberDetails(Long userId, MemberDetailsModifyDto memberInfoDto) {
         Member member = getMember(userId);
 
         member.setDetails(memberInfoDto.getDetails());
+
+        log.info("변경 자기소개 - {}",member.getDetails());
+
+        return new MemberDetailsModifyDto(member.getDetails());
     }
 
-    public void modifyMemberProfileImage(Long userId, MultipartFile profileImage) {
+    public MemberModifyProfileImageDto modifyMemberProfileImage(Long userId, MultipartFile profileImage) throws IOException {
         Member member = getMember(userId);
         String url = null;
 
+        log.info("프로필 이미지 - {}",profileImage.getBytes());
         if(member.getProfileImage() != null){
             s3Service.deleteImage(member.getProfileImage());
         }
-
-        if (profileImage != null) {
+        //파일의 크기가 0이 아니면 s3업로드
+        if (profileImage.getBytes().length != 0) {
             url = s3Service.uploadImage(profileImage, directory,member.getId());
         }
         log.info("받아온 url - {}",url);
         member.setProfileImage(url);
+
+        return new MemberModifyProfileImageDto(url);
     }
 
     public void changePassword(Long userId, PasswordChangeDto passwordChangeDto) {
