@@ -58,13 +58,15 @@ public class AuthService {
         String authCode = redisTemplate.opsForValue().get(email);
 
         if(authCode == null){
-            throw new MemberException(AuthErrorCode.AUTH_TIME_OUT);
+            throw new MemberException(AuthErrorCode.AUTH_CODE_TIME_OUT);
         }
+
         //인증번호 틀릴 시 오류 반환
         if(!authCode.equals(signupRequestDto.getAuthCode())){
             throw new MemberException(AuthErrorCode.NOT_EQUAL_AUTH_CODE);
         }
-        
+
+
         memberRepository.findMemberByEmailAndOauthProvider(email,null)
                 .ifPresent((s)-> {
                    throw new MemberException(MemberErrorCode.MEMBER_ALREADY_EXIST);
