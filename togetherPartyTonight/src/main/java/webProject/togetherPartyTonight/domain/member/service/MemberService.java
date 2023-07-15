@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import webProject.togetherPartyTonight.domain.member.dto.request.MemberDetailsModifyDto;
-import webProject.togetherPartyTonight.domain.member.dto.request.MemberModifyProfileImageDto;
+import webProject.togetherPartyTonight.domain.member.dto.response.MemberModifyProfileImageDto;
 import webProject.togetherPartyTonight.domain.member.dto.request.MemberNicknameModifyDto;
 import webProject.togetherPartyTonight.domain.member.dto.request.PasswordChangeDto;
 import webProject.togetherPartyTonight.domain.member.dto.response.MemberInfoResponseDto;

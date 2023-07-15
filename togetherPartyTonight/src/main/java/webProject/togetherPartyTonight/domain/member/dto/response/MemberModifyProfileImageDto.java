@@ -1,4 +1,4 @@
-package webProject.togetherPartyTonight.domain.member.dto.request;
+package webProject.togetherPartyTonight.domain.member.dto.response;
 
 import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
