@@ -10,7 +10,7 @@ import webProject.togetherPartyTonight.global.error.ErrorInterface;
 public enum TokenErrorCode implements ErrorInterface {
 
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "만료된 토큰입니다."),
-    INVALID_TOKEN(HttpStatus.FORBIDDEN, "잘못된 토큰입니다.");
+    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "잘못된 토큰입니다.");
 
     /**
      * 필요한 에러코드 작성

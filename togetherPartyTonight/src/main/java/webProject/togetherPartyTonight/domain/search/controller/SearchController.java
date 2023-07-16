@@ -72,10 +72,9 @@ public class SearchController {
 
     @GetMapping("/tags")
     @ApiOperation(value = "태그 검색", notes = "기존에 있는 태그 목록들을 검색한다.")
-    public void findTags (@RequestParam(name = "word") @ApiParam(value = "태그로 검색할 글자", example = "강") String partial) {
-         List<String> list = new ArrayList<>(searchService.findTags(partial));
-//        //정확도 순으로 정렬하는 함수 작성하기
+    public ListResponse<String> findTags (@RequestParam(name = "word") @ApiParam(value = "태그로 검색할 글자", example = "강") String partial) {
+        List<String> list = new ArrayList<>(searchService.findTags(partial));
         List<String> res = searchService.sortBySimilarity(partial, list);
-        responseService.getListResponse(res);
+        return responseService.getListResponse(res);
     }
 }
