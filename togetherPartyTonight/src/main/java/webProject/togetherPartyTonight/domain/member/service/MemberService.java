@@ -51,6 +51,8 @@ public class MemberService {
 
         member.setNickname(modifyDto.getNickname());
 
+        log.info("바꾸는 유저 - {}", member.getEmail());
+
         log.info("변경닉네임 - {}",member.getNickname());
 
         return new MemberNicknameModifyDto(member.getNickname());
@@ -61,6 +63,8 @@ public class MemberService {
 
         member.setDetails(memberInfoDto.getDetails());
 
+        log.info("바꾸는 유저 - {}", member.getEmail());
+
         log.info("변경 자기소개 - {}",member.getDetails());
 
         return new MemberDetailsModifyDto(member.getDetails());
@@ -69,6 +73,8 @@ public class MemberService {
     public MemberModifyProfileImageDto modifyMemberProfileImage(Long userId, MultipartFile profileImage) throws IOException {
         Member member = getMember(userId);
         String url = null;
+
+        log.info("바꾸는 유저 - {}", member.getEmail());
 
         log.info("프로필 이미지 - {}",profileImage.getBytes());
         if(member.getProfileImage() != null){

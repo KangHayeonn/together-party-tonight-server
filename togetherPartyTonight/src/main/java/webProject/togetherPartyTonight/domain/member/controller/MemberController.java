@@ -22,6 +22,7 @@ import webProject.togetherPartyTonight.global.common.response.SingleResponse;
 import webProject.togetherPartyTonight.global.common.service.ResponseService;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.io.IOException;
 
 @RestController
@@ -56,7 +57,7 @@ public class MemberController {
     
     @PutMapping("/memberDetail/{memberId}")
     @ApiOperation(value = "자기소개 변경", notes = "자기소개 변경 API입니다.")
-    public SingleResponse<MemberDetailsModifyDto> modifyMemberDetails(@PathVariable Long memberId, @RequestBody MemberDetailsModifyDto memberInfoDto) {
+    public SingleResponse<MemberDetailsModifyDto> modifyMemberDetails(@PathVariable Long memberId, @RequestBody @Valid MemberDetailsModifyDto memberInfoDto) {
 
         MemberDetailsModifyDto memberDetailsModifyDto = memberService.modifyMemberDetails(memberId, memberInfoDto);
         return responseService.getSingleResponse(memberDetailsModifyDto);
