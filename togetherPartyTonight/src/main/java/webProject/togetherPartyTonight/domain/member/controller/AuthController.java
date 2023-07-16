@@ -1,29 +1,18 @@
 package webProject.togetherPartyTonight.domain.member.controller;
 
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import webProject.togetherPartyTonight.domain.member.auth.mail.MailService;
 import webProject.togetherPartyTonight.domain.member.auth.mail.TitleType;
 import webProject.togetherPartyTonight.domain.member.dto.request.*;
-
-import org.springframework.web.bind.annotation.*;
-import webProject.togetherPartyTonight.domain.member.dto.request.LoginRequestDto;
-import webProject.togetherPartyTonight.domain.member.dto.request.ReissueRequestDto;
-import webProject.togetherPartyTonight.domain.member.dto.request.SignupRequestDto;
-
 import webProject.togetherPartyTonight.domain.member.dto.response.LoginResponseDto;
 import webProject.togetherPartyTonight.domain.member.dto.response.ReissueResponseDto;
 import webProject.togetherPartyTonight.domain.member.service.AuthService;
 import webProject.togetherPartyTonight.global.common.ResponseWithData;
 import webProject.togetherPartyTonight.global.common.response.CommonResponse;
-
-import webProject.togetherPartyTonight.global.common.response.SingleResponse;
 import webProject.togetherPartyTonight.global.common.service.ResponseService;
 
 import javax.validation.Valid;
