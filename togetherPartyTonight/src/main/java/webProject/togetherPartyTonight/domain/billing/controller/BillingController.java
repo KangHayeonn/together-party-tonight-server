@@ -1,5 +1,6 @@
 package webProject.togetherPartyTonight.domain.billing.controller;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -13,6 +14,7 @@ import webProject.togetherPartyTonight.global.common.response.SingleResponse;
 
 import javax.servlet.http.HttpServletRequest;
 
+@Api(tags = {"/billing"})
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/billing")

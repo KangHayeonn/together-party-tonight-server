@@ -76,19 +76,16 @@ public class BillingService {
         int totalMember = clubMembers.size();
         int divPrice = getDivPrice(saveBilling, totalMember);
 
-        clubMembers.forEach(clubMember ->{
-            //모임장은 정산내역 x
-            if (isClubMemberMaster(member, clubMember)) {
-                return;
-            }
-            webProject.togetherPartyTonight.domain.billing.entity.BillingHistory billinghistory = webProject.togetherPartyTonight.domain.billing.entity.BillingHistory.builder()
-                    .billing(saveBilling)
-                    .billingState(wait)
-                    .clubMember(clubMember)
-                    .price(divPrice)
-                    .build();
-            billingHistoryRepository.save(billinghistory);
-        });
+        clubMembers.stream().filter(clubMember->!isClubMemberMaster(member, clubMember))
+                        .forEach(clubMember ->{
+                            webProject.togetherPartyTonight.domain.billing.entity.BillingHistory billinghistory = webProject.togetherPartyTonight.domain.billing.entity.BillingHistory.builder()
+                                    .billing(saveBilling)
+                                    .billingState(wait)
+                                    .clubMember(clubMember)
+                                    .price(divPrice)
+                                    .build();
+                            billingHistoryRepository.save(billinghistory);
+                        });
 
         CreateBillingResponseDto createBillingResponseDto = CreateBillingResponseDto.builder()
                 .BillingId(saveBilling.getId())
@@ -115,19 +112,19 @@ public class BillingService {
                     throw new BillingException(MEMBER_NOT_CLUB_MEMBER);
                 });
 
+        List<BillingHistoryDto> clubBillingHistoryList = new ArrayList<>();
         Optional<Billing> billingOptional = billingRepository.findByClubClubId(club.getClubId());
         if (billingOptional.isEmpty()) {
-            return responseService.getSingleResponse(new ClubBillingHistoryResponseDto(new ArrayList<>()));
+            return responseService.getSingleResponse(new ClubBillingHistoryResponseDto(clubBillingHistoryList));
         }
 
         Billing billing = billingOptional.get();
-        List<webProject.togetherPartyTonight.domain.billing.entity.BillingHistory> billingHistoryList = billingHistoryRepository.findByBillingId(billing.getId())
+        List<BillingHistory> billingHistoryList = billingHistoryRepository.findByBillingId(billing.getId())
                 .orElseThrow(() -> {
                     log.error("[BillingService] getClubBillingDetail billing history is empty clubId: {}, memberId: {}, BillingId: {}", clubBillingHistoryRequestDto.getClubId(), member.getId(), billing.getId());
                     throw new BillingException(BILLING_HISTORY_NOT_FOUNT);
                 });
 
-        List<BillingHistoryDto> clubBillingHistoryList = new ArrayList<>();
 
         billingHistoryList.forEach(billingHistory -> {
             Member billingMember = billingHistory.getClubMember().getMember();
@@ -149,25 +146,21 @@ public class BillingService {
     public SingleResponse<MyBillingHistoryResponseDto> getMyBillingHistory() {
 
         Member member = getMemberBySecurityContextHolder();
-        Optional<ClubMember> clubMemberOptional = clubMemberRepository.findByMemberId(member.getId());
-        if (clubMemberOptional.isEmpty()) {
-            return responseService.getSingleResponse(new MyBillingHistoryResponseDto(new ArrayList<>()));
-        }
-        ClubMember clubMember = clubMemberOptional.get();
-
-        Optional<List<BillingHistory>> billingHistoryListOptional = billingHistoryRepository.findByClubMemberClubMemberId(clubMember.getClubMemberId());
-        if (billingHistoryListOptional.isEmpty()) {
-            return responseService.getSingleResponse(new MyBillingHistoryResponseDto(new ArrayList<>()));
-        }
-
-        List<BillingHistory> billingHistoryList = billingHistoryListOptional.get();
-
+        Optional<List<ClubMember>> clubMemberOptional = clubMemberRepository.findByMemberId(member.getId());
         List<BillingHistoryDto> billingHistoryDtoList = new ArrayList<>();
 
-        for (BillingHistory billingHistory : billingHistoryList) {
-            BillingHistoryDto billingHistoryDto = BillingHistoryDto.toDto(billingHistory);
-            billingHistoryDtoList.add(billingHistoryDto);
+        if (clubMemberOptional.isEmpty()) {
+            return responseService.getSingleResponse(new MyBillingHistoryResponseDto(billingHistoryDtoList));
         }
+        List<ClubMember> clubMemberList = clubMemberOptional.get();
+
+        clubMemberList.forEach(clubMember -> {
+            billingHistoryRepository.findByClubMemberClubMemberId(clubMember.getClubMemberId())
+                    .ifPresent(billingHistory->{
+                        BillingHistoryDto billingHistoryDto = BillingHistoryDto.toDto(billingHistory);
+                        billingHistoryDtoList.add(billingHistoryDto);
+                    });
+        });
 
         return responseService.getSingleResponse(new MyBillingHistoryResponseDto(billingHistoryDtoList));
     }

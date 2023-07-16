@@ -8,5 +8,5 @@ import java.util.Optional;
 
 public interface BillingHistoryRepository extends JpaRepository<BillingHistory, Long> {
     Optional<List<BillingHistory>> findByBillingId(Long billingId);
-    Optional<List<BillingHistory>> findByClubMemberClubMemberId(Long clubMemberId);
+    Optional<BillingHistory> findByClubMemberClubMemberId(Long clubMemberId);
 }

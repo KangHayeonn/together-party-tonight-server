@@ -14,8 +14,7 @@ import webProject.togetherPartyTonight.global.common.response.SingleResponse;
 import javax.servlet.http.HttpServletRequest;
 
 
-@Api(value = "/chat")
-@SwaggerDefinition(tags = {@Tag(name = "/chat", description = "채팅 컨트롤러")})
+@Api(tags = {"/chat"})
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/chat")
@@ -51,9 +50,9 @@ public class ChatController {
             @ApiResponse(code = 500, message = "내부 서버 오류")
     })
     @GetMapping("/chatRoom/list")
-    public SingleResponse<ChatRoomListDto> getChatRoomList(@ApiParam(value = "페이지", required = true) @RequestParam int page,@ApiParam(value = "페이지당 수", required = true) @RequestParam int perPage, HttpServletRequest request) {
+    public SingleResponse<ChatRoomListDto> getChatRoomList(HttpServletRequest request) {
         requestLog(request);
-        return chatService.getChatRoomList(page, perPage);
+        return chatService.getChatRoomList();
     }
 
     @ApiOperation(value = "채팅방 확인 요청, id = 0 이라면 해당 유저들 간의 채팅방이 없음")

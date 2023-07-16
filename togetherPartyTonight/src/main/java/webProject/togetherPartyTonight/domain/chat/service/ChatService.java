@@ -87,20 +87,14 @@ public class ChatService {
     }
 
     //채팅방 목록을 불러온다  혹시 한 사람이 채팅 목록이 100개가 넘어거는 경우가 있다면 페이징 처리 필요.
-    public SingleResponse<ChatRoomListDto> getChatRoomList(int page, int perPage) {
+    public SingleResponse<ChatRoomListDto> getChatRoomList() {
+
         Member member = getMemberBySecurityContextHolder();
 
         List<ChatRoom> chatRooms = member.getAChatRooms();
         chatRooms.addAll(member.getBChatRooms());
 
         chatRooms.sort(Comparator.comparing(BaseEntity::getModifiedDate));
-
-        int startIdx = (page - 1) * perPage;
-        if (chatRooms.size() <= startIdx) {
-            throw new ChatException(OVER_CHAT_ROOM_PAGE);
-        }
-
-        chatRooms = chatRooms.subList(startIdx, Math.min(chatRooms.size(), (startIdx + perPage)));
 
         List<ChatRoomListResponseDto> chatRoomList = new ArrayList<>();
 
@@ -230,15 +224,18 @@ public class ChatService {
         //가장 최근 채팅 한개만 들어온다.
         List<Chat> chats = getChats(chatRoom.getId(), defaultSeq, 1);
         String chatMessage = "";
+        String dateTimeString = "";
 
         if (chats.size() == 1) {
             chatMessage = chats.get(0).getChatMsg();
+            dateTimeString = chats.get(0).getCreatedDate().toString();
         }
 
         ChatRoomListResponseDto chatRoomListResponseDto = ChatRoomListResponseDto.builder()
                 .chatRoomName(chatRoomName)
                 .chatRoomId(chatRoom.getId())
                 .latestMessage(chatMessage)
+                .dateTime(dateTimeString)
                 .build();
         chatRoomListResponseListDto.add(chatRoomListResponseDto);
     }
