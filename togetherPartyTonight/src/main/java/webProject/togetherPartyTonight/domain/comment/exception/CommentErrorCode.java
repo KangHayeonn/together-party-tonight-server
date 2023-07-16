@@ -15,11 +15,11 @@ public enum CommentErrorCode implements ErrorInterface {
 
     @Override
     public int getStatusCode() {
-        return 0;
+        return httpStatus.value();
     }
 
     @Override
     public String getErrorMessage() {
-        return null;
+        return message;
     }
 }
