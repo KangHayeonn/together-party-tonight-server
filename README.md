@@ -107,9 +107,9 @@ SpringBoot, Spring Data JPA, JWT 를 이용해 Back-end 개발
 <br>
 
 ## ERD
-![image](https://github.com/KangHayeonn/together-party-tonight-server/assets/78534650/790e87ac-f209-451b-9a13-7e7c3d0f82bd)
+![erd](./topato_ERD.png)
 
 ---
-![topato](https://github.com/KangHayeonn/together-party-tonight-server/assets/78534650/501d26a9-6ef2-447b-8fde-55521ca32f88)
+![topato](./topato.png)
 
 🔗 [TOGETHER-PARTY-TONIGHT(투바투)](https://www.topato.site/)
