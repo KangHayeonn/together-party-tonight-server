@@ -125,6 +125,7 @@ public class ClubService {
     }
 
     @Scheduled(cron = "0 0 0/1 * * *") //1시간마다 실행
+    @Transactional
     public void checkMeetingDateIsPassed() {
         List<Club> clubList = clubRepository.findAll();
         for (Club c : clubList) {

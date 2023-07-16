@@ -20,7 +20,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(new WebSocketHandler(webSocketService), "/chatting"); //웹소켓 핸들러 등록
-
         // registry.addHandler(new ChatWebSocketHandler(), "/notification");   // 알림용 웹 소켓 핸들러 등록 (추후 구현 예정)
     }
 }
