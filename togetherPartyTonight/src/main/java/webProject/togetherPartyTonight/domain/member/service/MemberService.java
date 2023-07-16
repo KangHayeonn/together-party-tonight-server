@@ -1,23 +1,28 @@
 package webProject.togetherPartyTonight.domain.member.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import webProject.togetherPartyTonight.domain.member.dto.request.MemberInfoModifyDto;
+import org.springframework.web.multipart.MultipartFile;
+import webProject.togetherPartyTonight.domain.member.dto.request.MemberDetailsModifyDto;
+import webProject.togetherPartyTonight.domain.member.dto.response.MemberModifyProfileImageDto;
+import webProject.togetherPartyTonight.domain.member.dto.request.MemberNicknameModifyDto;
 import webProject.togetherPartyTonight.domain.member.dto.request.PasswordChangeDto;
-import webProject.togetherPartyTonight.domain.member.dto.request.PasswordResetRequestDto;
 import webProject.togetherPartyTonight.domain.member.dto.response.MemberInfoResponseDto;
 import webProject.togetherPartyTonight.domain.member.entity.Member;
 import webProject.togetherPartyTonight.domain.member.exception.MemberException;
 import webProject.togetherPartyTonight.domain.member.exception.errorCode.MemberErrorCode;
 import webProject.togetherPartyTonight.domain.member.repository.MemberRepository;
+import webProject.togetherPartyTonight.infra.S3.S3Service;
 
-import java.time.LocalDateTime;
+import java.io.IOException;
 
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @Transactional
 public class MemberService {
@@ -28,6 +33,10 @@ public class MemberService {
 
     private final RedisTemplate<String,String> redisTemplate;
 
+    private final String directory = "member/";
+
+    private final S3Service s3Service;
+
     @Transactional(readOnly = true)
     public MemberInfoResponseDto findById(Long userId){
 
@@ -37,12 +46,48 @@ public class MemberService {
 
     }
 
-    public void modifyMemberInfo(Long userId, MemberInfoModifyDto modifyDto){
+    public MemberNicknameModifyDto modifyMemberInfo(Long userId, MemberNicknameModifyDto modifyDto){
         Member member = getMember(userId);
 
         member.setNickname(modifyDto.getNickname());
-        member.setDetails(modifyDto.getMemberDetails());
-        member.setProfileImage(modifyDto.getProfileImage());
+
+        log.info("바꾸는 유저 - {}", member.getEmail());
+
+        log.info("변경닉네임 - {}",member.getNickname());
+
+        return new MemberNicknameModifyDto(member.getNickname());
+    }
+
+    public MemberDetailsModifyDto modifyMemberDetails(Long userId, MemberDetailsModifyDto memberInfoDto) {
+        Member member = getMember(userId);
+
+        member.setDetails(memberInfoDto.getDetails());
+
+        log.info("바꾸는 유저 - {}", member.getEmail());
+
+        log.info("변경 자기소개 - {}",member.getDetails());
+
+        return new MemberDetailsModifyDto(member.getDetails());
+    }
+
+    public MemberModifyProfileImageDto modifyMemberProfileImage(Long userId, MultipartFile profileImage) throws IOException {
+        Member member = getMember(userId);
+        String url = null;
+
+        log.info("바꾸는 유저 - {}", member.getEmail());
+
+        log.info("프로필 이미지 - {}",profileImage.getBytes());
+        if(member.getProfileImage() != null){
+            s3Service.deleteImage(member.getProfileImage());
+        }
+        //파일의 크기가 0이 아니면 s3업로드
+        if (profileImage.getBytes().length != 0) {
+            url = s3Service.uploadImage(profileImage, directory,member.getId());
+        }
+        log.info("받아온 url - {}",url);
+        member.setProfileImage(url);
+
+        return new MemberModifyProfileImageDto(url);
     }
 
     public void changePassword(Long userId, PasswordChangeDto passwordChangeDto) {
@@ -76,4 +121,7 @@ public class MemberService {
     private Member getMember(Long userId) {
         return memberRepository.findById(userId).orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
     }
+
+
+
 }
