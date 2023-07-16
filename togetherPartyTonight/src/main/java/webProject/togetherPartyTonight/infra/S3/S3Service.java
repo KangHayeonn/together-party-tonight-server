@@ -75,9 +75,8 @@ public class S3Service {
     }
 
     private String  checkImageExtension(String extension) {
-        String[] image = {".jpg", ".png", ".jpeg", ".bmp", ".gif", ".tiff", ".svg", ".heic"};
+        String[] image = {".jpg", ".png", ".jpeg", ".svg"};
         boolean check = false;
-        System.out.println(extension);
         for (String ex : image) {
             if (extension.equals(ex) || extension.equals(ex.toUpperCase())) {
                 check = true;
