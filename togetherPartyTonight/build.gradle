@@ -1,0 +1,62 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '2.7.12'
+	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+}
+
+group = 'webProject'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.projectlombok:lombok:1.18.22'
+	compileOnly 'org.projectlombok:lombok'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation group: 'com.mysql', name: 'mysql-connector-j', version: '8.0.31'
+	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+	implementation group: 'com.google.code.gson', name: 'gson', version: '2.9.0'
+	//테스트용 h2 db
+	implementation 'com.h2database:h2:2.1.214'
+	implementation 'org.hibernate:hibernate-core:5.6.3.Final'
+	implementation group: 'org.locationtech.jts', name: 'jts-core', version: '1.16.1'
+	implementation group: 'org.hibernate', name: 'hibernate-spatial', version: '5.6.15.Final'
+
+
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	testImplementation 'org.springframework.security:spring-security-test'
+	//메일추가
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+	implementation "io.jsonwebtoken:jjwt:0.9.1"
+
+	implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
+	implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	implementation group: 'org.orbisgis', name: 'h2gis', version: '1.5.0'
+
+	//소켓 추가
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+  
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
