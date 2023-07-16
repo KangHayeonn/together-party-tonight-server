@@ -129,7 +129,7 @@ public class ClubService {
         List<Club> clubList = clubRepository.findAll();
         for (Club c : clubList) {
             if (c.getMeetingDate().isBefore(LocalDateTime.now()))
-                clubRepository.updateClubState();
+                clubRepository.updateClubState(c.getClubId());
         }
     }
 

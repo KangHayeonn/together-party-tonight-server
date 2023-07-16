@@ -58,7 +58,7 @@ public class SearchController {
                                             @RequestParam @ApiParam(required = true, value = "모임 카테고리", example = "취미", allowableValues = "취미,봉사,운동,스터디,맛집,여행,친목,전체") @Enum(enumClass = ClubCategory.class, ignoreCase = true) String category,
                                             @RequestParam @ApiParam(required = true, value = "모임 상태", example = "all", allowableValues = "recruit,all") @Enum(enumClass = SearchState.class, ignoreCase = true, message = "검색할 수 없는 모임 상태입니다.") String status,
                                             @RequestParam @ApiParam(required = true, value = "검색할 모임 최대 인원", example = "7" ,allowableValues = "range[1,20]") @Min(value = 1, message = "최대 1명이상의 모임만 검색할 수 있습니다.") @Max(value = 20, message = "최대 20명까지의 모임만 검색할 수 있습니다.") Integer memberNum,
-                                            @RequestParam @ApiParam(required = false, value = "모임 태그", example = "테니스,다이어트,오운완") String tags,
+                                            @RequestParam(required = false) @ApiParam(required = false, value = "모임 태그", example = "테니스,다이어트,오운완") String tags,
                                             @RequestParam @ApiParam(required = true, value = "정렬 조건", example = "popular", allowableValues = "popular,latest") @Enum(enumClass = SortFilter.class, ignoreCase = true, message = "허용되지 않은 sorting filter 입니다.") String sortFilter,
                                             Pageable pageable,
                                             HttpServletRequest request) {

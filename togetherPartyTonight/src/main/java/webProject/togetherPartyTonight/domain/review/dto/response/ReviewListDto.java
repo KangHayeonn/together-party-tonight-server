@@ -11,5 +11,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReviewListDto {
-    List<GetReviewDetailResponseDto> reviewList;
+    List<?> reviewList;
+    private Integer page;
+    private Integer size;
+    private Long totalElements;
+    private Integer totalPages;
 }
