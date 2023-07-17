@@ -31,7 +31,7 @@ public class BillingController {
     @ApiOperation(value = "정산 요청")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "성공"),
-            @ApiResponse(code = 400, message = "모임을 찾을 수 없습니다\n모임장만이 정산 요청을 할 수 있습니다"),
+            @ApiResponse(code = 400, message = "모임을 찾을 수 없습니다\n모임장만이 정산 요청을 할 수 있습니다\n모임의 멤버가 모임장 이외에 없습니다\n클럽에 해당 멤버가 없습니다"),
             @ApiResponse(code = 500, message = "내부 서버 오류")
     })
     @PostMapping("/")

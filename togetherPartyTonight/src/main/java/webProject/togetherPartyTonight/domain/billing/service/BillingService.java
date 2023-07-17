@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static webProject.togetherPartyTonight.domain.billing.entity.BillingState.completed;
-import static webProject.togetherPartyTonight.domain.billing.entity.BillingState.wait;
+import static webProject.togetherPartyTonight.domain.billing.entity.BillingState.COMPLETED;
+import static webProject.togetherPartyTonight.domain.billing.entity.BillingState.WAIT;
 import static webProject.togetherPartyTonight.domain.billing.exception.BillingErrorCode.*;
 
 @Service
@@ -64,6 +64,14 @@ public class BillingService {
         if (!isClubMaster(member, club)) {
             throw new BillingException(NOT_MASTER);
         }
+        List<ClubMember> clubMembers = club.getClubMembers();
+        int totalMember = clubMembers.size();
+
+        if (totalMember <= 1) {
+            log.error("[BillingService] createBilling club member size <= 1, totalMember: {}, clubId: {}, memberId: {}", totalMember, club.getClubId(), member.getId());
+            throw new BillingException(BILLING_MINIMUM_MEMBERS_NOT_MET_ERROR);
+        }
+
         Billing billing = Billing.builder()
                 .club(club)
                 .price(createBillingRequestDto.getPrice())
@@ -71,16 +79,19 @@ public class BillingService {
 
         Billing saveBilling = billingRepository.save(billing);
 
-        clubMemberRepository.findByClubClubIdAndMemberId(club.getClubId(), member.getId());
-        List<ClubMember> clubMembers = club.getClubMembers();
-        int totalMember = clubMembers.size();
+        ClubMember masterClubMember = clubMemberRepository.findByClubClubIdAndMemberId(club.getClubId(), member.getId())
+                .orElseThrow(() -> {
+                    log.error("[BillingService] createBilling club member doesn't exist clubId: {}, memberId: {}", club.getClubId(), member.getId());
+                    throw new BillingException(MEMBER_NOT_CLUB_MEMBER);
+                });
+
         int divPrice = getDivPrice(saveBilling, totalMember);
 
-        clubMembers.stream().filter(clubMember->!isClubMemberMaster(member, clubMember))
+        clubMembers.stream().filter(clubMember->!isClubMemberMaster(masterClubMember, clubMember))
                         .forEach(clubMember ->{
                             webProject.togetherPartyTonight.domain.billing.entity.BillingHistory billinghistory = webProject.togetherPartyTonight.domain.billing.entity.BillingHistory.builder()
                                     .billing(saveBilling)
-                                    .billingState(wait)
+                                    .billingState(WAIT)
                                     .clubMember(clubMember)
                                     .price(divPrice)
                                     .build();
@@ -183,7 +194,7 @@ public class BillingService {
             throw new BillingException(BILLING_HISTORY_ALREADY_PAYED);
         }
 
-        billingHistory.setBillingState(completed);
+        billingHistory.setBillingState(COMPLETED);
         BillingHistory saveBillingHistory = billingHistoryRepository.save(billingHistory);
 
         return responseService.getSingleResponse(BillingPaymentResponseDto.toDto(saveBillingHistory));
@@ -207,14 +218,14 @@ public class BillingService {
     private boolean isClubMaster(Member member, Club club) {
         return Objects.equals(club.getMaster().getId(), member.getId());
     }
-    private boolean isClubMemberMaster(Member member, ClubMember clubMember) {
-        return clubMember.getMember().getId().equals(member.getId());
+    private boolean isClubMemberMaster(ClubMember masterClubMember, ClubMember clubMember) {
+        return clubMember.getClubMemberId().equals(masterClubMember.getClubMemberId());
     }
 
     private boolean isBillingHistoryMemberSame(Member member, BillingHistory billingHistory) {
         return billingHistory.getClubMember().getMember().getId().equals(member.getId());
     }
     private boolean isAlreadyPayed(BillingHistory billingHistory) {
-        return billingHistory.getBillingState().getStateString().equals(completed.getStateString());
+        return billingHistory.getBillingState().getStateString().equals(COMPLETED.getStateString());
     }
 }

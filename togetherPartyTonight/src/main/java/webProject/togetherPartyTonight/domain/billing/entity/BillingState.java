@@ -7,8 +7,8 @@ import lombok.Getter;
 @Getter
 public enum BillingState {
 
-    wait ("결제대기"),
-    completed ("정산완료");
+    WAIT("결제대기"),
+    COMPLETED("정산완료");
 
     private String billingState;
 

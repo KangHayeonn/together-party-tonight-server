@@ -17,7 +17,8 @@ public enum BillingErrorCode implements ErrorInterface {
     MEMBER_NOT_CLUB_MEMBER(HttpStatus.BAD_REQUEST, "클럽에 해당 멤버가 없습니다"),
     BILLING_HISTORY_NOT_FOUNT(HttpStatus.BAD_REQUEST, "정산에 해당하는 정산내역이 없습니다"),
     BILLING_HISTORY_MEMBER_DIFFERENT(HttpStatus.BAD_REQUEST, "정산내역에 해당하는 멤버와 일치하지 않습니다"),
-    BILLING_HISTORY_ALREADY_PAYED(HttpStatus.BAD_REQUEST, "이미 결제 완료한 내역입니다");
+    BILLING_HISTORY_ALREADY_PAYED(HttpStatus.BAD_REQUEST, "이미 결제 완료한 내역입니다"),
+    BILLING_MINIMUM_MEMBERS_NOT_MET_ERROR(HttpStatus.BAD_REQUEST, "모임의 멤버가 모임장 이외에 없습니다"),
     ;
 
     private final HttpStatus httpStatus;
