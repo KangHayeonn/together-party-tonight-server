@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import webProject.togetherPartyTonight.domain.club.entity.ClubMember;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -21,4 +22,5 @@ public interface ClubMemberRepository extends JpaRepository<ClubMember, Long> {
     void deleteByClubClubIdAndMemberId(Long clubId, Long memberId);
 
     Optional<ClubMember> findByClubClubIdAndMemberId(Long clubId, Long memberId);
+    Optional<List<ClubMember>> findByMemberId(Long memberId);
 }

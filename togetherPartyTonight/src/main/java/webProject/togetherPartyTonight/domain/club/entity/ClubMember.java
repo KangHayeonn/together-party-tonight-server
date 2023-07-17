@@ -7,6 +7,8 @@ import webProject.togetherPartyTonight.global.common.BaseEntity;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+import static javax.persistence.FetchType.LAZY;
+
 @Entity
 @Setter
 @Getter
@@ -20,11 +22,11 @@ public class ClubMember extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long clubMemberId;
 
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "club_id", nullable = false)
     private Club club;
 
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
