@@ -9,22 +9,18 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import webProject.togetherPartyTonight.domain.alert.dto.AlertDto;
 import webProject.togetherPartyTonight.domain.alert.dto.AlertUnreadCountDto;
-import webProject.togetherPartyTonight.domain.alert.dto.alertContent.AlertApplyData;
+import webProject.togetherPartyTonight.domain.alert.dto.alertContent.*;
 import webProject.togetherPartyTonight.domain.alert.dto.AlertListRequestDto;
 import webProject.togetherPartyTonight.domain.alert.dto.AlertListResponseDto;
-import webProject.togetherPartyTonight.domain.alert.dto.alertContent.AlertApproveData;
-import webProject.togetherPartyTonight.domain.alert.dto.alertContent.AlertBillingData;
-import webProject.togetherPartyTonight.domain.alert.dto.alertContent.AlertBillingPayData;
-import webProject.togetherPartyTonight.domain.alert.dto.alertSocketContent.AlertApproveSocketContent;
-import webProject.togetherPartyTonight.domain.alert.dto.alertSocketContent.AlertBillingPaySocketContent;
-import webProject.togetherPartyTonight.domain.alert.dto.alertSocketContent.AlertBillingSocketContent;
+import webProject.togetherPartyTonight.domain.alert.dto.alertSocketContent.*;
 import webProject.togetherPartyTonight.domain.alert.dto.alertSocketMessage.SocketApplyData;
-import webProject.togetherPartyTonight.domain.alert.dto.alertSocketContent.AlertApplySocketContent;
 import webProject.togetherPartyTonight.domain.alert.entity.Alert;
 import webProject.togetherPartyTonight.domain.alert.exception.AlertException;
 import webProject.togetherPartyTonight.domain.alert.repository.AlertRepository;
 import webProject.togetherPartyTonight.domain.billing.entity.BillingHistory;
 import webProject.togetherPartyTonight.domain.billing.exception.BillingException;
+import webProject.togetherPartyTonight.domain.chat.entity.Chat;
+import webProject.togetherPartyTonight.domain.chat.entity.ChatRoom;
 import webProject.togetherPartyTonight.domain.club.entity.Club;
 import webProject.togetherPartyTonight.domain.member.entity.Member;
 import webProject.togetherPartyTonight.domain.member.repository.MemberRepository;
@@ -67,7 +63,6 @@ public class AlertService {
     public SingleResponse<AlertListResponseDto> getAlertList(AlertListRequestDto alertListRequestDto) {
         Member member = getMemberBySecurityContextHolder();
 
-        //Todo 읽음 여부 동기화 하기
         List<Alert> alerts = getAlerts(member.getId(), alertListRequestDto.getLastSeq(), alertListRequestDto.getListCount(), alertListRequestDto.getIsAllOrNotRead());
         List<AlertDto> alertDtoList = new ArrayList<>();
         alerts.forEach(alert -> alertDtoList.add(AlertDto.toDto(alert)));
@@ -176,7 +171,7 @@ public class AlertService {
     public void saveBillingPayAlertData(Club club, Member member, BillingHistory billingHistory) {
         AlertBillingPayData alertBillingPayData = AlertBillingPayData.toAlertBillingPayData(club, member, billingHistory);
         Alert alert = Alert.builder()
-                .member(billingHistory.getClubMember().getMember())
+                .member(club.getMaster())
                 .alertType(BILLING_PAY)
                 .alert_content(new Gson().toJson(alertBillingPayData))
                 .alert_check_state(false)
@@ -184,12 +179,30 @@ public class AlertService {
 
         Alert saveAlert = alertRepository.save(alert);
 
-
         AlertBillingPaySocketContent alertBillingSocketContent = AlertBillingPaySocketContent.toAlertBillingPaySocketContent(alertBillingPayData, saveAlert.getId());
-        String socketMessage = SocketApplyData.getMessage(alertBillingSocketContent, BILLING_REQUEST.toString());
+        String socketMessage = SocketApplyData.getMessage(alertBillingSocketContent, BILLING_PAY.toString());
 
         //소켓에도 발송
         webSocketService.sendUser(billingHistory.getClubMember().getMember().getId(), socketMessage);
+    }
+
+    //채팅 알림 발송
+    public void saveChattingAlertData(Chat chat, ChatRoom chatRoom, Member sender) {
+        AlertChatData alertChatData = AlertChatData.toAlertChatData(chat, chatRoom, sender);
+        Member otherMember = chatRoom.getOtherMember(sender);
+        Alert alert = Alert.builder()
+                .member(otherMember)
+                .alertType(CHAT)
+                .alert_content(new Gson().toJson(alertChatData))
+                .alert_check_state(false)
+                .build();
+        Alert saveAlert = alertRepository.save(alert);
+
+        AlertChatSocketContent alertChatSocketContent = AlertChatSocketContent.toAlertChatSocketContent(alertChatData, saveAlert.getId());
+        String socketMessage = SocketApplyData.getMessage(alertChatSocketContent, CHAT.toString());
+
+        //소켓에도 발송
+        webSocketService.sendUser(otherMember.getId(), socketMessage);
     }
 
 
