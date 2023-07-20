@@ -25,7 +25,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class CreateClubRequestDto {
     @NotEmpty(message = "clubName은 필수 입력 값입니다.")
-    @Size(max = 15, message = "clubName은 최대 15자를 넘을 수 없습니다.")
+    @Size(max = 11, message = "clubName은 최대 11자를 넘을 수 없습니다.")
     private String clubName;
 
     @NotEmpty (message = "clubCategory는 필수 입력 값입니다.")

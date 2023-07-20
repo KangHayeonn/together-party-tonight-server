@@ -35,7 +35,7 @@ public class Club extends BaseEntity {
     @JoinColumn(name = "club_master_id", nullable = false)
     private Member master;
 
-    @Column(name="club_name", nullable = false, length = 15)
+    @Column(name="club_name", nullable = false, length = 11)
     private String clubName;
 
     @Column(name = "club_category" , nullable = false, length = 255)
