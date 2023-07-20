@@ -4,11 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpRequest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.messaging.handler.annotation.support.MethodArgumentTypeMismatchException;
 import org.springframework.validation.FieldError;
@@ -16,20 +11,11 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import webProject.togetherPartyTonight.domain.club.exception.ClubException;
-import webProject.togetherPartyTonight.domain.member.exception.MemberException;
-import webProject.togetherPartyTonight.domain.review.exception.ReviewException;
-import webProject.togetherPartyTonight.global.common.ErrorResponse;
 import webProject.togetherPartyTonight.global.common.response.FailureResponse;
 import webProject.togetherPartyTonight.global.common.service.ResponseService;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
-
-import static org.springframework.data.crossstore.ChangeSetPersister.*;
 
 
 /**
@@ -38,7 +24,7 @@ import static org.springframework.data.crossstore.ChangeSetPersister.*;
  */
 @RestControllerAdvice
 @Slf4j
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler{
     /**
      * @param e 예외 종류
      * @return 정형화된 ErrorResponse
@@ -106,6 +92,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public FailureResponse methodArgumentTypeMismatchException (MethodArgumentTypeMismatchException e) {
         e.printStackTrace();
+
         return responseService.getFailureResponse(400, "쿼리 파라미터의 데이터 타입이 올바르지 않습니다.");
     }
 
@@ -119,9 +106,21 @@ public class GlobalExceptionHandler {
         return responseService.getFailureResponse(400, split[1].substring(1));
     }
 
+    /**
+     * 존재하지않는 경로에 들어왔을 때
+     */
     @ExceptionHandler(NoHandlerFoundException.class)
-    public FailureResponse handle404(NoHandlerFoundException ex) {
+    public FailureResponse noHandlerFoundException(NoHandlerFoundException ex) {
 
         return responseService.getFailureResponse(404,"잘못된 경로입니다.");
+    }
+
+    /**
+     * 잘못된 경로 문자가 들어왔을 때 
+     */
+    @ExceptionHandler(NumberFormatException.class)
+    public FailureResponse numberFormatException(NumberFormatException e) {
+        e.printStackTrace();
+        return responseService.getFailureResponse(400, "잘못된 형식의 경로 문자입니다.");
     }
 }

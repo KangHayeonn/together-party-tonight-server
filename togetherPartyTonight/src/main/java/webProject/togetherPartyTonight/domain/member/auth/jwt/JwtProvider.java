@@ -108,18 +108,8 @@ public class JwtProvider {
      * Access 토큰을 검증
      */
     public boolean validateToken(String token) throws ExpiredJwtException,SignatureException{
+        Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+        return true;
 
-        try {
-            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
-            return true;
-        } catch(SignatureException e){
-            log.info("잘못된 토큰입니다.");
-        } catch (ExpiredJwtException e){
-            log.info("토큰이 만료되었습니다.");
-        }
-        catch (UnsupportedJwtException e) {
-            log.info("지원되지 않는 JWT 토큰입니다.");
-        }
-        return false;
     }
 }

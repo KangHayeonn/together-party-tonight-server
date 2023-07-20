@@ -6,9 +6,9 @@ import webProject.togetherPartyTonight.global.error.ErrorCode;
 
 @Getter
 public class BillingException extends RuntimeException{
-    private ErrorCode errorCode;
+    private BillingErrorCode errorCode;
 
-    public BillingException(ErrorCode errorCode) {
+    public BillingException(BillingErrorCode errorCode) {
         super(errorCode.getMessage());
         this.errorCode= errorCode;
     }

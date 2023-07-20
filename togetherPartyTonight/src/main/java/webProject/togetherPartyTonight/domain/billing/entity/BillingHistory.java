@@ -1,16 +1,18 @@
 package webProject.togetherPartyTonight.domain.billing.entity;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import webProject.togetherPartyTonight.domain.club.entity.ClubMember;
 import webProject.togetherPartyTonight.global.common.BaseEntity;
 
 import javax.persistence.*;
 
+import static javax.persistence.FetchType.LAZY;
+
 @Entity
 @Setter
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class BillingHistory extends BaseEntity {
 
@@ -18,11 +20,11 @@ public class BillingHistory extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "billing_id")
     Billing billing;
 
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "club_member_id")
     ClubMember clubMember;
 

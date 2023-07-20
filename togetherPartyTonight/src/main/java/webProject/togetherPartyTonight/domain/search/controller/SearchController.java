@@ -22,6 +22,8 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -58,7 +60,7 @@ public class SearchController {
                                             @RequestParam @ApiParam(required = true, value = "모임 카테고리", example = "취미", allowableValues = "취미,봉사,운동,스터디,맛집,여행,친목,전체") @Enum(enumClass = ClubCategory.class, ignoreCase = true) String category,
                                             @RequestParam @ApiParam(required = true, value = "모임 상태", example = "all", allowableValues = "recruit,all") @Enum(enumClass = SearchState.class, ignoreCase = true, message = "검색할 수 없는 모임 상태입니다.") String status,
                                             @RequestParam @ApiParam(required = true, value = "검색할 모임 최대 인원", example = "7" ,allowableValues = "range[1,20]") @Min(value = 1, message = "최대 1명이상의 모임만 검색할 수 있습니다.") @Max(value = 20, message = "최대 20명까지의 모임만 검색할 수 있습니다.") Integer memberNum,
-                                            @RequestParam @ApiParam(required = false, value = "모임 태그", example = "테니스,다이어트,오운완") String tags,
+                                            @RequestParam(required = false) @ApiParam(required = false, value = "모임 태그", example = "테니스,다이어트,오운완") String tags,
                                             @RequestParam @ApiParam(required = true, value = "정렬 조건", example = "popular", allowableValues = "popular,latest") @Enum(enumClass = SortFilter.class, ignoreCase = true, message = "허용되지 않은 sorting filter 입니다.") String sortFilter,
                                             Pageable pageable,
                                             HttpServletRequest request) {
@@ -66,5 +68,13 @@ public class SearchController {
         SearchListDto searchListDto = searchService.searchByConditions(lat, lng, distance, category, status, memberNum, tags, sortFilter, pageable);
 
         return responseService.getSingleResponse(searchListDto);
+    }
+
+    @GetMapping("/tags")
+    @ApiOperation(value = "태그 검색", notes = "기존에 있는 태그 목록들을 검색한다.")
+    public ListResponse<String> findTags (@RequestParam(name = "word") @ApiParam(value = "태그로 검색할 글자", example = "강") String partial) {
+        List<String> list = new ArrayList<>(searchService.findTags(partial));
+        List<String> res = searchService.sortBySimilarity(partial, list);
+        return responseService.getListResponse(res);
     }
 }

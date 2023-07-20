@@ -10,10 +10,6 @@ import lombok.Setter;
 @ApiModel("방 생성 요청")
 public class CreateChatRoomRequest {
 
-    //내 멤버 아이디
-    @ApiModelProperty(dataType = "long", required = true, notes = "내 멤버 아이디")
-    Long memberId;
-
     //상대방 맴버 아이디
     @ApiModelProperty(dataType = "long", required = true, notes = "상대방 맴버 아이디")
     Long otherMemberId;
