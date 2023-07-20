@@ -33,6 +33,8 @@ public class MyOwnedClubDto {
     private String address;
     @ApiModelProperty(value = "모임 날짜와 시간", example = "2023-07-05:12:30")
     private LocalDateTime meetingDate;
+    @ApiModelProperty(value = "첨부 이미지")
+    private String image;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 }
