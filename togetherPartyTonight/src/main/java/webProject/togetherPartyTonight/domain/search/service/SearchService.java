@@ -162,6 +162,30 @@ public class SearchService {
         return searchListDto;
     }
 
+    public List<String> getRandomTags () {
+        List<String> tagList = searchRepository.getRandomTags();
+        Set<String> set = new HashSet<>();
+        for (String t : tagList) {
+            List<String> splitTags = clubUtils.splitTags(t);
+            for (String st : splitTags) {
+                set.add(st);
+            }
+        }
+
+        List<String> listFromSet = new ArrayList<>(set);
+        List<String> res = new ArrayList<>();
+        Random random = new Random();
+
+        for (int i = 0; i < 12; i++) {
+            int randomIndex = random.nextInt(listFromSet.size());
+            String randomElement = listFromSet.remove(randomIndex);
+            res.add(randomElement);
+        }
+
+        return res;
+
+    }
+
 
 
 

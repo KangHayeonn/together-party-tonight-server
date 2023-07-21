@@ -72,9 +72,18 @@ public class SearchController {
 
     @GetMapping("/tags")
     @ApiOperation(value = "태그 검색", notes = "기존에 있는 태그 목록들을 검색한다.")
-    public ListResponse<String> findTags (@RequestParam(name = "word") @ApiParam(value = "태그로 검색할 글자", example = "강") String partial) {
+    public ListResponse<String> findTags (@RequestParam(name = "word") @ApiParam(value = "태그로 검색할 글자", example = "강") String partial, HttpServletRequest request) {
+        log.info("[{}] {}",request.getMethod(),request.getRequestURI());
         List<String> list = new ArrayList<>(searchService.findTags(partial));
         List<String> res = searchService.sortBySimilarity(partial, list);
         return responseService.getListResponse(res);
     }
+
+    @GetMapping("/tags/random")
+    @ApiOperation(value = "태그 랜덤 반환", notes = "기존에 있는 태그 중 12개 반환")
+    public ListResponse<String> randomTags (HttpServletRequest request) {
+        log.info("[{}] {}",request.getMethod(),request.getRequestURI());
+        return responseService.getListResponse(searchService.getRandomTags());
+    }
+
 }

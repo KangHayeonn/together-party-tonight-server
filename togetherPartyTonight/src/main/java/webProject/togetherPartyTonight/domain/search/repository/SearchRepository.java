@@ -52,4 +52,8 @@ public interface SearchRepository extends JpaRepository<Club,Long> {
 
     Optional<List<Club>> findByClubTagsLike (String partial) ;
 
+
+    @Query(nativeQuery = true, value = "SELECT club_tags from club ORDER BY rand() limit 30")
+    List<String> getRandomTags ();
+
 }
