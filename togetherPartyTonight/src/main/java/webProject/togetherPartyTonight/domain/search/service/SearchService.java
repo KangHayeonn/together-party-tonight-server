@@ -36,7 +36,7 @@ public class SearchService {
             regexpTag = makeRegexp(tags);
         else regexpTag ="";
         
-        if (category.equals("전체")) category = convertCategory();
+        if (category.equals("모두")) category = convertCategory();
 
         Optional<Page<Club>> clubList = null;
 
@@ -142,7 +142,7 @@ public class SearchService {
     }
 
     public String convertCategory () {
-        return "맛집,취미,봉사,운동,스터디,찬목,여행";
+        return "맛집,취미,봉사,운동,스터디,친목,여행";
     }
 
     public String makePointWKT (Float lat, Float lng) {

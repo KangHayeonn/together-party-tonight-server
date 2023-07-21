@@ -11,7 +11,7 @@ public enum ClubCategory {
     스터디 ("스터디"),
     맛집("맛집"),
     취미("취미"),
-    전체("전체");
+    모두("모두");
 
     private String clubCategory;
 }
