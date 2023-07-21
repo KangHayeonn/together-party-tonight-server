@@ -10,8 +10,7 @@ public enum ClubCategory {
     봉사("봉사"),
     스터디 ("스터디"),
     맛집("맛집"),
-    취미("취미"),
-    모두("모두");
+    취미("취미");
 
     private String clubCategory;
 }
