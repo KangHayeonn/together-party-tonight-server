@@ -28,4 +28,12 @@ public class searchCategoryTest {
             log.info("clubId : {}", dto.getClubId());
         }
     }
+
+    @Test
+    public void totalElementTest() {
+        Pageable pageable = PageRequest.of(1,7);
+        SearchListDto conditions = searchService.searchByConditions(37.5585021972656F, 126.939506530762F, 100, "모두", "ALL", 20, null, "popular", pageable);
+        log.info("totalCount : {}",conditions.getTotalCount());
+        log.info("count : {}",conditions.getCount());
+    }
 }
