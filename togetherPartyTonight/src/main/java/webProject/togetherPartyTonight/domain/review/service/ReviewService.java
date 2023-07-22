@@ -67,6 +67,7 @@ public class ReviewService {
             }
             Review review = request.toEntity(club, clubMember.getMember(),imageUrl);
             reviewRepository.save(review);
+            addMasterReviewInfo(review);
         }
         else throw new ReviewException(ReviewErrorCode.INVALID_REVIEW_DATE);
     }
@@ -100,6 +101,7 @@ public class ReviewService {
         }
 
         request.modify(review, imageUrl); //디비에 새로운 수정사항 반영
+        updateMasterReviewInfo(review);
     }
 
     @Transactional
@@ -113,6 +115,7 @@ public class ReviewService {
         if (!review.getImageUrl().contains("default"))
             s3Service.deleteImage(review.getImageUrl());
         reviewRepository.deleteById(reviewId);
+        deleteMasterReviewInfo(review);
 
     }
 
@@ -152,5 +155,43 @@ public class ReviewService {
             }
         }
         reviewListDto.setReviewList(list);
+    }
+
+    @Transactional
+    public void addMasterReviewInfo (Review review) {
+        Member master = review.getClub().getMaster();
+        int reviewCount = master.getReviewCount();
+        float avg = master.getRatingAvg();
+
+        float total = avg * reviewCount;
+        total += review.getRating(); //새로운 합계
+        reviewCount += 1; //리뷰 갯수 증가
+        avg = total/reviewCount; //새로운 평점
+
+        master.setReviewCount(reviewCount);
+        master.setRatingAvg(avg);
+
+    }
+
+    @Transactional
+    public void deleteMasterReviewInfo (Review review) {
+        Member master = review.getClub().getMaster();
+        Integer rating = review.getRating();
+        Integer reviewCount = master.getReviewCount();
+        float avg = master.getRatingAvg();
+
+        float total = avg*reviewCount;
+        total -=rating; //평점 삭제
+        reviewCount-=1; //리뷰 갯수 감소
+        avg = total/reviewCount; //새로운 평점
+
+        master.setReviewCount(reviewCount);
+        master.setRatingAvg(avg);
+    }
+
+    @Transactional
+    public void updateMasterReviewInfo (Review review) {
+        deleteMasterReviewInfo(review);
+        addMasterReviewInfo(review);
     }
 }
