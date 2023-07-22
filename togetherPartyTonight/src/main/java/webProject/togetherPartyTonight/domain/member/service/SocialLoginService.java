@@ -1,6 +1,7 @@
 package webProject.togetherPartyTonight.domain.member.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -21,6 +22,7 @@ import webProject.togetherPartyTonight.global.error.ErrorCode;
 import java.util.concurrent.TimeUnit;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class SocialLoginService {
 
@@ -57,6 +59,8 @@ public class SocialLoginService {
 
             return responseDto;
         }catch (RestClientException e){
+            e.printStackTrace();
+            log.error("레디스 오류입니다.");
             throw new MemberException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
