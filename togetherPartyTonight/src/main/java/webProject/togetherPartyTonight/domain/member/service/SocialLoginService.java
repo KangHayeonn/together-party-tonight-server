@@ -59,8 +59,8 @@ public class SocialLoginService {
 
             return responseDto;
         }catch (RestClientException e){
-            e.printStackTrace();
-            log.error("레디스 오류입니다.");
+
+            log.error("레디스 오류입니다. - {}",e.getMessage());
             throw new MemberException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
