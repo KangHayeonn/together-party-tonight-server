@@ -10,9 +10,13 @@ import lombok.Setter;
  *      "type" : "alert",
  *      "data" : {
  *          "alertType" : "",
+ *          "alertId" : 1,
  *          "alertData" : {
  *          }
- *      }
+ *      },
+ *      "alertIsRead" : false,
+ *      "createdDate" : "2023-07-16T17:31:43.490118",
+ *      "modifiedDate" : "2023-07-16T17:31:43.490118"
  *  }
  *
  */
@@ -20,5 +24,9 @@ import lombok.Setter;
 @Setter
 public class AlertSocketContent<T> {
     String alertType;
+    Long alertId;       //알림 아이디
     T alertData;
+    Boolean alertIsRead;    //알림 읽은 여부
+    String createdDate;
+    String modifiedDate;
 }

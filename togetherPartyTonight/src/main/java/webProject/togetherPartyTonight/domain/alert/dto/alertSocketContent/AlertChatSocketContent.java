@@ -7,16 +7,14 @@ import webProject.togetherPartyTonight.domain.alert.dto.alertContent.AlertChatDa
 @Getter
 @Builder
 public class AlertChatSocketContent extends AlertDataSocketContent{
-    private Long alertId;   //알림아이디
     private Long chatId; //채팅기록 아이디
     private Long chatRoomId; // 채팅방 아이디
     private Long sendMemberId; // 채팅을 보낸 사람의 아이디
     private String nickName; // 채팅을 보낸 사람의 닉네임
     private String chatMsg; // 채팅 내용
 
-    public static AlertChatSocketContent toAlertChatSocketContent(AlertChatData alertChatData, Long alertId) {
+    public static AlertChatSocketContent toAlertChatSocketContent(AlertChatData alertChatData) {
         return AlertChatSocketContent.builder()
-                .alertId(alertId)
                 .chatId(alertChatData.getChatId())
                 .chatRoomId(alertChatData.getChatRoomId())
                 .sendMemberId(alertChatData.getSendMemberId())

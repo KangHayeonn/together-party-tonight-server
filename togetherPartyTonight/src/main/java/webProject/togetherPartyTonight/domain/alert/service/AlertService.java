@@ -79,12 +79,12 @@ public class AlertService {
                     throw new AlertException(NO_ALERT);
                 });
 
-        if (alert.isAlert_check_state()) {
+        if (alert.isAlertCheckState()) {
             log.warn("[AlertService] readAlert alert already checked, alertId: {}, memberId: {}", alertId, member.getId());
             throw new AlertException(ALREADY_READ);
         }
 
-        alert.setAlert_check_state(true);
+        alert.setAlertCheckState(true);
         alertRepository.save(alert);
         return responseService.getSingleResponse("알림 읽기에 성공하였습니다.");
     }
@@ -106,7 +106,7 @@ public class AlertService {
     //알림 수 확인 TodoSm 나중에 캐시처리 꼭 하기
     public SingleResponse<AlertUnreadCountDto> getAlertCount() {
         Member member = getMemberBySecurityContextHolder();
-        Integer unreadCount = alertRepository.countUnReadAlert(member.getId(), false);
+        Integer unreadCount = alertRepository.countByMemberIdAndAlertCheckState(member.getId(), false);
         AlertUnreadCountDto alertUnReadCountDto = AlertUnreadCountDto.builder().alertUnreadCount(unreadCount).build();
         return responseService.getSingleResponse(alertUnReadCountDto);
     }
@@ -117,14 +117,14 @@ public class AlertService {
         Alert alert = Alert.builder()
                 .member(club.getMaster())
                 .alertType(APPLY)
-                .alert_content(new Gson().toJson(alertApplyData))
-                .alert_check_state(false)
+                .alertContent(new Gson().toJson(alertApplyData))
+                .alertCheckState(false)
                 .build();
 
         Alert saveAlert = alertRepository.save(alert);
 
-        AlertApplySocketContent alertApplySocketContent = AlertApplySocketContent.toAlertApplySocketContent(alertApplyData, saveAlert.getId());
-        String socketMessage = SocketApplyData.getMessage(alertApplySocketContent, APPLY.toString());
+        AlertApplySocketContent alertApplySocketContent = AlertApplySocketContent.toAlertApplySocketContent(alertApplyData);
+        String socketMessage = SocketApplyData.getMessage(alertApplySocketContent, APPLY.toString(), saveAlert);
 
         //소켓에도 발송
         webSocketService.sendUser(club.getMaster().getId(), socketMessage);
@@ -136,14 +136,14 @@ public class AlertService {
         Alert alert = Alert.builder()
                 .member(club.getMaster())
                 .alertType(APPROVE)
-                .alert_content(new Gson().toJson(alertApproveData))
-                .alert_check_state(false)
+                .alertContent(new Gson().toJson(alertApproveData))
+                .alertCheckState(false)
                 .build();
 
         Alert saveAlert = alertRepository.save(alert);
 
-        AlertApproveSocketContent alertApplySocketContent = AlertApproveSocketContent.toAlertApproveSocketContent(alertApproveData, saveAlert.getId());
-        String socketMessage = SocketApplyData.getMessage(alertApplySocketContent, APPROVE.toString());
+        AlertApproveSocketContent alertApplySocketContent = AlertApproveSocketContent.toAlertApproveSocketContent(alertApproveData);
+        String socketMessage = SocketApplyData.getMessage(alertApplySocketContent, APPROVE.toString(), saveAlert);
 
         //소켓에도 발송
         webSocketService.sendUser(receiver.getId(), socketMessage);
@@ -155,13 +155,13 @@ public class AlertService {
         Alert alert = Alert.builder()
                 .member(billingHistory.getClubMember().getMember())
                 .alertType(BILLING_REQUEST)
-                .alert_content(new Gson().toJson(alertBillingData))
-                .alert_check_state(false)
+                .alertContent(new Gson().toJson(alertBillingData))
+                .alertCheckState(false)
                 .build();
 
         Alert saveAlert = alertRepository.save(alert);
         AlertBillingSocketContent alertBillingSocketContent = AlertBillingSocketContent.toAlertSocketBillingData(alertBillingData, saveAlert.getId());
-        String socketMessage = SocketApplyData.getMessage(alertBillingSocketContent, BILLING_REQUEST.toString());
+        String socketMessage = SocketApplyData.getMessage(alertBillingSocketContent, BILLING_REQUEST.toString(), saveAlert);
 
         //소켓에도 발송
         webSocketService.sendUser(billingHistory.getClubMember().getMember().getId(), socketMessage);
@@ -173,14 +173,14 @@ public class AlertService {
         Alert alert = Alert.builder()
                 .member(club.getMaster())
                 .alertType(BILLING_PAY)
-                .alert_content(new Gson().toJson(alertBillingPayData))
-                .alert_check_state(false)
+                .alertContent(new Gson().toJson(alertBillingPayData))
+                .alertCheckState(false)
                 .build();
 
         Alert saveAlert = alertRepository.save(alert);
 
-        AlertBillingPaySocketContent alertBillingSocketContent = AlertBillingPaySocketContent.toAlertBillingPaySocketContent(alertBillingPayData, saveAlert.getId());
-        String socketMessage = SocketApplyData.getMessage(alertBillingSocketContent, BILLING_PAY.toString());
+        AlertBillingPaySocketContent alertBillingSocketContent = AlertBillingPaySocketContent.toAlertBillingPaySocketContent(alertBillingPayData);
+        String socketMessage = SocketApplyData.getMessage(alertBillingSocketContent, BILLING_PAY.toString(), saveAlert);
 
         //소켓에도 발송
         webSocketService.sendUser(billingHistory.getClubMember().getMember().getId(), socketMessage);
@@ -193,13 +193,13 @@ public class AlertService {
         Alert alert = Alert.builder()
                 .member(otherMember)
                 .alertType(CHAT)
-                .alert_content(new Gson().toJson(alertChatData))
-                .alert_check_state(false)
+                .alertContent(new Gson().toJson(alertChatData))
+                .alertCheckState(false)
                 .build();
         Alert saveAlert = alertRepository.save(alert);
 
-        AlertChatSocketContent alertChatSocketContent = AlertChatSocketContent.toAlertChatSocketContent(alertChatData, saveAlert.getId());
-        String socketMessage = SocketApplyData.getMessage(alertChatSocketContent, CHAT.toString());
+        AlertChatSocketContent alertChatSocketContent = AlertChatSocketContent.toAlertChatSocketContent(alertChatData);
+        String socketMessage = SocketApplyData.getMessage(alertChatSocketContent, CHAT.toString(), saveAlert);
 
         //소켓에도 발송
         webSocketService.sendUser(otherMember.getId(), socketMessage);
@@ -214,15 +214,15 @@ public class AlertService {
 
         if (isFirstPage(lastSeq)) {
             if (isAllOrNotRead) {
-                alerts = alertRepository.findAlertByMember(memberId, pageable);
+                alerts = alertRepository.findByMemberIdOrderByIdDesc(memberId, pageable);
             } else {
-                alerts = alertRepository.findAlertByMemberNotRead(memberId, pageable, false);
+                alerts = alertRepository.findByMemberIdAndAlertCheckStateOrderByIdDesc(memberId, false, pageable);
             }
         } else {
             if (isAllOrNotRead) {
-                alerts = alertRepository.findAlertByMemberAndSeq(memberId, lastSeq, pageable);
+                alerts = alertRepository.findByMemberIdAndIdLessThanOrderByIdDesc(memberId, lastSeq, pageable);
             } else {
-                alerts = alertRepository.findAlertByMemberAndSeqNotRead(memberId, lastSeq, pageable, false);
+                alerts = alertRepository.findByMemberIdAndIdLessThanAndAlertCheckStateOrderByIdDesc(memberId, lastSeq, false, pageable);
             }
         }
         return alerts.orElse(new ArrayList<>());

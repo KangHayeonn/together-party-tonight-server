@@ -31,8 +31,8 @@ public class AlertDto {
         return AlertDto.builder()
                 .alertId(alert.getId())
                 .alertType(alert.getAlertType().toString())
-                .alertContent(alert.getAlert_content())
-                .checkStatus(alert.isAlert_check_state())
+                .alertContent(alert.getAlertContent())
+                .checkStatus(alert.isAlertCheckState())
                 .alertCreateDateTime(alert.getCreatedDate().toString())
                 .alertReadDateTime(alert.getModifiedDate().toString())
                 .build();

@@ -25,13 +25,13 @@ public class Alert extends BaseEntity {
     @JoinColumn(name = "member_id", referencedColumnName = "member_id")
     private Member member;
 
-    @Column(name = "alert_type", nullable = false, length = 255)
+    @Column(name = "alert_type", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     private AlertType alertType;
 
     @Column(name = "alert_content", length = 1000, nullable = false)
-    private String alert_content;
+    private String alertContent;
 
     @Column(name = "alert_check_state", nullable = false)
-    private boolean alert_check_state;
+    private boolean alertCheckState;
 }

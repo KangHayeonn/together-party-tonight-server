@@ -7,15 +7,13 @@ import webProject.togetherPartyTonight.domain.alert.dto.alertContent.AlertApplyD
 @Getter
 @Builder
 public class AlertApplySocketContent extends AlertDataSocketContent{
-    private Long alertId; //알림 아이디
     private Long clubId; // 내 모임 아이디
     private String clubName; // 내 모임방 이름
     private Long memberId; // 신청한 사람 아이디
     private String nickName; // 신청한 사람 닉네임
 
-    public static AlertApplySocketContent toAlertApplySocketContent(AlertApplyData alertApplyData, Long alertId){
+    public static AlertApplySocketContent toAlertApplySocketContent(AlertApplyData alertApplyData){
         return AlertApplySocketContent.builder()
-                .alertId(alertId)
                 .clubId(alertApplyData.getClubId())
                 .clubName(alertApplyData.getClubName())
                 .memberId(alertApplyData.getMemberId())

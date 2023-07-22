@@ -12,23 +12,13 @@ import java.util.Optional;
 @Repository
 public interface AlertRepository extends JpaRepository<Alert,Long> {
 
+    Optional<List<Alert>> findByMemberIdAndIdLessThanOrderByIdDesc(Long memberId, Long lastSeq, Pageable pageable);
 
-    // @Query("SELECT c FROM Chat c WHERE c.chatRoom.id = :roomId AND c.id <= :maxChatId ORDER BY c.id DESC")
+    Optional<List<Alert>> findByMemberIdAndIdLessThanAndAlertCheckStateOrderByIdDesc(Long memberId, Long lastSeq, boolean isRead, Pageable pageable);
 
-    @Query("SELECT a FROM Alert a WHERE a.member.id = :memberId AND a.id <= :lastSeq ORDER BY a.id DESC")
-    Optional<List<Alert>> findAlertByMemberAndSeq(Long memberId, Long lastSeq, Pageable pageable);
+    Optional<List<Alert>> findByMemberIdOrderByIdDesc(Long memberId, Pageable pageable);
 
-    @Query("SELECT a FROM Alert a WHERE a.member.id = :memberId AND a.id <= :lastSeq AND a.alert_check_state = :isRead ORDER BY a.id DESC")
-    Optional<List<Alert>> findAlertByMemberAndSeqNotRead(Long memberId, Long lastSeq, Pageable pageable, boolean isRead);
+    Optional<List<Alert>> findByMemberIdAndAlertCheckStateOrderByIdDesc(Long memberId, boolean isRead, Pageable pageable);
 
-    @Query("SELECT a FROM Alert a WHERE a.member.id = :memberId ORDER BY a.id DESC")
-    Optional<List<Alert>> findAlertByMember(Long memberId, Pageable pageable);
-
-    @Query("SELECT a FROM Alert a WHERE a.member.id = :memberId AND a.alert_check_state = :isRead ORDER BY a.id DESC")
-    Optional<List<Alert>> findAlertByMemberNotRead(Long memberId, Pageable pageable, boolean isRead);
-
-
-
-    @Query("SELECT COUNT(a) FROM Alert a WHERE a.member.id = :memberId AND a.alert_check_state = :falseValue ORDER BY a.id DESC")
-    Integer countUnReadAlert(Long memberId, boolean falseValue);
+    Integer countByMemberIdAndAlertCheckState(Long memberId, boolean isRead);
 }
