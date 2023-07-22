@@ -51,7 +51,7 @@ public class Club extends BaseEntity {
     @Column(name = "club_tags", nullable = false)
     private String clubTags;
 
-    @Column(name = "club_point", columnDefinition = "GEOMETRY")
+    @Column(name = "club_point", columnDefinition = "GEOMETRY", nullable = false)
     @ColumnTransformer(read = "ST_AsText(club_point)",write = "ST_GeomFromText(?, 4326)")
     @Convert(converter = PointConverter.class)
     private Point clubPoint;

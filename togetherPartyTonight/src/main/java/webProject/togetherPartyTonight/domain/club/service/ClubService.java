@@ -51,7 +51,6 @@ public class ClubService {
 
     @Transactional
     public void addClub (CreateClubRequestDto clubRequest, MultipartFile image, Member member) {
-        log.info("[ClubService]: image name : {}, content-type : {}",image.getOriginalFilename(), image.getContentType());
         Point point = makePoint(clubRequest.getLatitude(), clubRequest.getLongitude());
 
         String url="";
@@ -145,7 +144,8 @@ public class ClubService {
     }
 
     public String  getDefaultImage (String category) {
-        return s3Service.getImage(category+"_default.jpg");
+        ClubCategory categoryImage = ClubCategory.valueOf(category);
+        return s3Service.getImage(categoryImage+"_default.svg");
     }
 
     public void checkAuthority(Club club, Member member) {
