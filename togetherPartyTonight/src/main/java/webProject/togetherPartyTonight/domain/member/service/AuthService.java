@@ -147,7 +147,7 @@ public class AuthService {
         }catch (IllegalArgumentException e){
             throw new MemberException(ErrorCode.FORBIDDEN);
         }catch (ExpiredJwtException e){
-            throw new MemberException(TokenErrorCode.EXPIRED_TOKEN);
+            throw new MemberException(TokenErrorCode.EXPIRED_REFRESH_TOKEN);
         }
     }
 
