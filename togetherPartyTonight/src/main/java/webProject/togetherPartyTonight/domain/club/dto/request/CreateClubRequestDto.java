@@ -30,7 +30,6 @@ public class CreateClubRequestDto {
 
     @NotEmpty (message = "clubCategory는 필수 입력 값입니다.")
     @Size(max = 255 )
-    @Enum(enumClass = ClubCategory.class, ignoreCase = true)
     private String clubCategory;
 
     @NotNull (message = "clubMaximum은 필수 입력 값입니다.")
