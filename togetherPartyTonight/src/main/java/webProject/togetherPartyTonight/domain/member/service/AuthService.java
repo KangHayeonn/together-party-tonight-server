@@ -54,12 +54,14 @@ public class AuthService {
         String encodedPassword = passwordEncoder.encode(signupRequestDto.getPassword());
         String nickname = signupRequestDto.getNickname();
 
-        //인증번호 틀릴 시 오류 반환
+
         String authCode = redisTemplate.opsForValue().get(email);
-        if(!authCode.equals(signupRequestDto.getAuthCode())){
+
+        //인증번호 틀릴 시 오류 반환
+        if(!signupRequestDto.getAuthCode().equals(authCode)) {
             throw new MemberException(AuthErrorCode.NOT_EQUAL_AUTH_CODE);
         }
-        
+
         memberRepository.findMemberByEmailAndOauthProvider(email,null)
                 .ifPresent((s)-> {
                    throw new MemberException(MemberErrorCode.MEMBER_ALREADY_EXIST);
@@ -145,7 +147,7 @@ public class AuthService {
         }catch (IllegalArgumentException e){
             throw new MemberException(ErrorCode.FORBIDDEN);
         }catch (ExpiredJwtException e){
-            throw new MemberException(TokenErrorCode.EXPIRED_TOKEN);
+            throw new MemberException(TokenErrorCode.EXPIRED_REFRESH_TOKEN);
         }
     }
 

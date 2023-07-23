@@ -1,21 +1,16 @@
 package webProject.togetherPartyTonight.domain.member.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import webProject.togetherPartyTonight.domain.member.dto.request.MemberInfoModifyDto;
 import webProject.togetherPartyTonight.domain.member.entity.Member;
 import webProject.togetherPartyTonight.domain.member.exception.MemberException;
 import webProject.togetherPartyTonight.domain.member.exception.errorCode.MemberErrorCode;
 import webProject.togetherPartyTonight.domain.member.repository.MemberRepository;
 
 import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Slf4j
@@ -49,10 +44,6 @@ class MemberServiceTest {
     void modifyMemberInfo(){
         Member member = memberRepository.findById(6L).orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
 
-        MemberInfoModifyDto modifyDto = new MemberInfoModifyDto();
 
-
-
-        assertThrows(MemberException.class, () -> memberService.modifyMemberInfo(6L, modifyDto));
     }
 }

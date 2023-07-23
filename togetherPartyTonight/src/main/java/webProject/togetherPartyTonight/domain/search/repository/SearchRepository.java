@@ -50,5 +50,6 @@ public interface SearchRepository extends JpaRepository<Club,Long> {
                                                       @Param("state")String state, @Param("category")String category, @Param("memberNum")Integer memberNum,
                                                       @Param("tags")String tags, Pageable pageable);
 
+    Optional<List<Club>> findByClubTagsLike (String partial) ;
 
 }

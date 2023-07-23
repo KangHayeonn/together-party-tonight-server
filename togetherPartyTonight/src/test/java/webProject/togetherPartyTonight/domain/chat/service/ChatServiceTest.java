@@ -7,6 +7,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import webProject.togetherPartyTonight.domain.chat.repository.ChatRepository;
 
+import java.time.LocalDateTime;
+
 
 @ExtendWith(MockitoExtension.class)
 class ChatServiceTest {
