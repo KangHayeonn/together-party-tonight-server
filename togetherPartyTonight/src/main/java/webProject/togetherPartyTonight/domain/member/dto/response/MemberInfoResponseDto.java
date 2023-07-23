@@ -14,6 +14,8 @@ public class MemberInfoResponseDto {
 
     private String nickname;
 
+    private String detail;
+
     private Float rateAvg;
 
     private int reviewCount;
@@ -24,6 +26,6 @@ public class MemberInfoResponseDto {
 
     private LocalDateTime modifiedTime;
     public static MemberInfoResponseDto from(Member member){
-        return new MemberInfoResponseDto(member.getEmail(),member.getNickname(),member.getRatingAvg(),member.getReviewCount(),member.getProfileImage(),member.getCreatedDate(),member.getModifiedDate());
+        return new MemberInfoResponseDto(member.getEmail(),member.getNickname(),member.getDetails(),member.getRatingAvg(),member.getReviewCount(),member.getProfileImage(),member.getCreatedDate(),member.getModifiedDate());
     }
 }
