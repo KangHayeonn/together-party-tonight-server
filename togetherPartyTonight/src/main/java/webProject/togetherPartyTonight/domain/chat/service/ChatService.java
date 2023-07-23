@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import webProject.togetherPartyTonight.domain.alert.service.AlertService;
 import webProject.togetherPartyTonight.domain.billing.exception.BillingException;
 import webProject.togetherPartyTonight.domain.chat.dto.*;
 import webProject.togetherPartyTonight.domain.chat.entity.Chat;
@@ -39,14 +40,16 @@ public class ChatService {
     private ResponseService responseService;
     private ChatRepository chatRepository;
     private WebSocketService webSocketService;
+    private AlertService alertService;
 
     @Autowired
-    public ChatService(ChatRoomRepository chatRoomRepository, MemberRepository memberRepository, ResponseService responseService, ChatRepository chatRepository, WebSocketService webSocketService) {
+    public ChatService(ChatRoomRepository chatRoomRepository, MemberRepository memberRepository, ResponseService responseService, ChatRepository chatRepository, WebSocketService webSocketService, AlertService alertService) {
         this.chatRoomRepository = chatRoomRepository;
         this.memberRepository = memberRepository;
         this.responseService = responseService;
         this.chatRepository = chatRepository;
         this.webSocketService = webSocketService;
+        this.alertService = alertService;
     }
 
     private static final int maxCount = 100;        //채팅 기록 최대 요청 수
@@ -152,12 +155,14 @@ public class ChatService {
                 .build();
 
         chatRoom.setModifiedDate(chat.getCreatedDate());
-        chatRoomRepository.save(chatRoom);
+        ChatRoom saveChatRoom = chatRoomRepository.save(chatRoom);
 
         //소켓 메시지 발송.
         String message = ChatSocketMessage.getMessage(chatLogRequestDto.getChatMsg(), chat.getId());
         webSocketService.sendUser(chatRoom.getChatMemberA().getId(), message);
         webSocketService.sendUser(chatRoom.getChatMemberB().getId(), message);
+
+        alertService.saveChattingAlertData(chat, saveChatRoom, sender);
 
         return responseService.getSingleResponse(chatSendResponseDto);
     }

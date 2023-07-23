@@ -56,7 +56,7 @@ public class JwtFilter extends OncePerRequestFilter {
             inValidTokenResponse(invalidTokenError,request,response,filterChain);
         }catch (ExpiredJwtException e){
             log.info("토큰이 만료되었습니다.");
-            TokenErrorCode invalidTokenError = TokenErrorCode.EXPIRED_TOKEN;
+            TokenErrorCode invalidTokenError = TokenErrorCode.EXPIRED_ACCESS_TOKEN;
             inValidTokenResponse(invalidTokenError,request,response,filterChain);
         }
 
