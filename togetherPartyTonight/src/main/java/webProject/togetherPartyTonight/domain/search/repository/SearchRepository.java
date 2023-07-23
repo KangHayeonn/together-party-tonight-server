@@ -18,7 +18,7 @@ import java.util.Optional;
 public interface SearchRepository extends JpaRepository<Club,Long> {
 
     String searchDefaultQuery = "SELECT club_id, c.created_date, c.modified_date, address," +
-            "club_category, club_content, club_maximum, club_minimum, club_name,club_state," +
+            "club_category, club_content, club_maximum, club_name,club_state," +
             "club_tags, club_image, club_meeting_date, club_master_id, ST_AsText(club_point) AS club_point " +
             "FROM club c ";
     String OptionWhere = "WHERE ST_DISTANCE_SPHERE(ST_GEOMFROMTEXT(:standard_point,4326), club_point) <= :distance " +
@@ -36,17 +36,20 @@ public interface SearchRepository extends JpaRepository<Club,Long> {
     @Query(nativeQuery = true, value = searchDefaultQuery+
             "JOIN member m ON c.club_master_id = m.member_id "
             +OptionWhere +
-            "ORDER BY m.member_rating_avg DESC ")
+            "ORDER BY m.member_rating_avg DESC ",
+            countQuery = "SELECT COUNT(club_id) FROM club")
     Optional<Page<Club>>  findByConditionsOrderByReviewScore (@Param("standard_point") String point, @Param("distance")Integer distance,
                                           @Param("state")String state, @Param("category")String category, @Param("memberNum")Integer memberNum,
                                           @Param("tags")String tags, Pageable pageable);
 
 
     @Query(nativeQuery = true, value = searchDefaultQuery+ OptionWhere +
-            "ORDER BY created_date DESC")
+            "ORDER BY created_date DESC",
+            countQuery = "SELECT COUNT(club_id) FROM club")
     Optional<Page<Club>> findByConditionsOrderByDate (@Param("standard_point") String point, @Param("distance")Integer distance,
                                                       @Param("state")String state, @Param("category")String category, @Param("memberNum")Integer memberNum,
                                                       @Param("tags")String tags, Pageable pageable);
 
+    Optional<List<Club>> findByClubTagsLike (String partial) ;
 
 }

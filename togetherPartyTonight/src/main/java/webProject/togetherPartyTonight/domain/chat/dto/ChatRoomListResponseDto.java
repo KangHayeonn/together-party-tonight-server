@@ -20,6 +20,8 @@ public class ChatRoomListResponseDto {
     Long chatRoomId;
     @ApiModelProperty(notes = "가장 최근 채팅", dataType = "String")
     String latestMessage;
+    @ApiModelProperty(notes = "가장 최근 채팅 시간", dataType = "String", example = "2023-07-16T17:31:43.490118")
+    String dateTime;
 }
 
 

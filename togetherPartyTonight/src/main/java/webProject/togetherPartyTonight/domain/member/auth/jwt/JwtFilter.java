@@ -28,6 +28,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
 
+
+
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
@@ -49,12 +51,12 @@ public class JwtFilter extends OncePerRequestFilter {
             }
 
         }catch (SignatureException  | MalformedJwtException | IllegalStateException e) {
-
+            log.info("잘못된 토큰입니다.");
             TokenErrorCode invalidTokenError = TokenErrorCode.INVALID_TOKEN;
             inValidTokenResponse(invalidTokenError,request,response,filterChain);
         }catch (ExpiredJwtException e){
-
-            TokenErrorCode invalidTokenError = TokenErrorCode.EXPIRED_TOKEN;
+            log.info("토큰이 만료되었습니다.");
+            TokenErrorCode invalidTokenError = TokenErrorCode.EXPIRED_ACCESS_TOKEN;
             inValidTokenResponse(invalidTokenError,request,response,filterChain);
         }
 

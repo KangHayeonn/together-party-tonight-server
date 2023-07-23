@@ -9,6 +9,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import webProject.togetherPartyTonight.domain.comment.dto.response.CreateCommentResponseDto;
+import webProject.togetherPartyTonight.domain.comment.dto.response.GetCommentResponseDto;
+import webProject.togetherPartyTonight.domain.comment.exception.CommentErrorCode;
+import webProject.togetherPartyTonight.domain.comment.exception.CommentException;
+import webProject.togetherPartyTonight.domain.member.entity.Member;
 import webProject.togetherPartyTonight.domain.member.repository.MemberRepository;
 import webProject.togetherPartyTonight.global.common.service.RedisService;
 import webProject.togetherPartyTonight.global.websocket.command.SocketLoginHandler;
@@ -40,6 +45,7 @@ public class WebSocketService {
 
     //멀티 쓰레드에서 사용 가능한 해시맵
     private Map<String, WebSocketSession> sessionMap = new ConcurrentHashMap<>();
+    private Map<Long,Map<String, WebSocketSession>> commentSessionMap = new ConcurrentHashMap<>();
 
     //command 수행 manager 해시맵
     private HashMap<String/**command*/, WebSocketHandler /** commandHandler*/> commandHandler = new HashMap<>();
@@ -126,4 +132,50 @@ public class WebSocketService {
             return false;
         }
     }
+
+        public void addMemberToCommentSession(Long clubId, Member member)  {
+
+            String sessionId = (String)redisService.getStringKeyWithMap(userSessionName, member.getId());
+            WebSocketSession webSocketSession = sessionMap.get(sessionId);
+
+            //sessionMap 에 없다면 삽입
+        if (!commentSessionMap.containsKey(clubId)) {
+            ConcurrentHashMap<String, WebSocketSession> webSocketSessionMap = new ConcurrentHashMap<>();
+            webSocketSessionMap.put(sessionId, webSocketSession);
+            commentSessionMap.put(clubId, webSocketSessionMap);
+        }
+        else {
+            Map<String, WebSocketSession> getSessionMap = commentSessionMap.get(clubId);
+            getSessionMap.put(sessionId, webSocketSession);
+        }
+    }
+
+    public void deleteMemberFromCommentSession(Long clubId, Member member) {
+        String exitSessionId = (String)redisService.getStringKeyWithMap(userSessionName, member.getId());
+        commentSessionMap.forEach((key,map)-> {
+            if (clubId == key) {
+                map.forEach((sessionId, value) -> {
+                    if (sessionId.equals(exitSessionId)) {
+                        map.remove(sessionId);
+                    }
+                });
+            }
+        });
+    }
+
+    public void broadcastComment(String message, Long clubId) {
+        // 받은 메시지를 다른 클라이언트들에게 전달
+        commentSessionMap.forEach((key,map)-> {
+            if (clubId == key) {
+                map.forEach((sessionId, value) -> {
+                    try {
+                        value.sendMessage(new TextMessage(message));
+                    } catch (IOException e) {
+                        throw new CommentException(CommentErrorCode.SOCKET_MESSAGE_PUB_FAIL);
+                    }
+                });
+            }
+        });
+    }
+
 }

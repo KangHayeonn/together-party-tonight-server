@@ -3,6 +3,7 @@ package webProject.togetherPartyTonight.domain.review.controller;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,6 +17,7 @@ import webProject.togetherPartyTonight.domain.member.repository.MemberRepository
 import webProject.togetherPartyTonight.domain.review.dto.request.CreateReviewRequestDto;
 import webProject.togetherPartyTonight.domain.review.dto.request.UpdateReviewRequestDto;
 import webProject.togetherPartyTonight.domain.review.dto.response.GetReviewDetailResponseDto;
+import webProject.togetherPartyTonight.domain.review.dto.response.ReviewListDto;
 import webProject.togetherPartyTonight.domain.review.service.ReviewService;
 import webProject.togetherPartyTonight.global.common.response.CommonResponse;
 import webProject.togetherPartyTonight.global.common.ResponseWithData;
@@ -41,7 +43,6 @@ public class ReviewController {
     @ApiOperation(value = "리뷰 만들기")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "data", value = "JSON 데이터", dataType = "string", paramType = "form",required = true, example = "{\n" +
-                    "\"memberId\": 3,\n" +
                     "\t\"clubId\": \"5\",\n" +
                     "\t\"rating\": \"4.5\",\n" +
                     "\t\"reviewContent\": \"리뷰입니다 리뷰입니다\",\n" +
@@ -70,7 +71,6 @@ public class ReviewController {
     @ApiOperation(value = "리뷰 수정하기")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "data", value = "JSON 데이터", dataType = "string", paramType = "form",required = true, example = "{\n" +
-                    "\"memberId\": 3,\n" +
                     "\t\"clubId\": \"5\",\n" +
                     "\t\"rating\": \"4.5\",\n" +
                     "\t\"reviewContent\": \"리뷰입니다 리뷰입니다\",\n" +

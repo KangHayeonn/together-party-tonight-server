@@ -1,6 +1,8 @@
 package webProject.togetherPartyTonight.domain.review.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import webProject.togetherPartyTonight.domain.club.entity.Club;
@@ -13,6 +15,8 @@ import webProject.togetherPartyTonight.domain.member.entity.Member;
 import webProject.togetherPartyTonight.domain.review.dto.request.CreateReviewRequestDto;
 import webProject.togetherPartyTonight.domain.review.dto.request.UpdateReviewRequestDto;
 import webProject.togetherPartyTonight.domain.review.dto.response.GetReviewDetailResponseDto;
+import webProject.togetherPartyTonight.domain.review.dto.response.MyPageReviewResponseDto;
+import webProject.togetherPartyTonight.domain.review.dto.response.ReviewListDto;
 import webProject.togetherPartyTonight.domain.review.entity.Review;
 import webProject.togetherPartyTonight.domain.review.exception.ReviewErrorCode;
 import webProject.togetherPartyTonight.domain.review.exception.ReviewException;
@@ -23,6 +27,7 @@ import webProject.togetherPartyTonight.infra.S3.S3Service;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -62,6 +67,7 @@ public class ReviewService {
             }
             Review review = request.toEntity(club, clubMember.getMember(),imageUrl);
             reviewRepository.save(review);
+            addMasterReviewInfo(review);
         }
         else throw new ReviewException(ReviewErrorCode.INVALID_REVIEW_DATE);
     }
@@ -90,8 +96,12 @@ public class ReviewService {
                 s3Service.deleteImage(review.getImageUrl()); //s3에서 삭제
             }
         }
+        else {
+            imageUrl= s3Service.getImage("review_default.jpg");
+        }
 
         request.modify(review, imageUrl); //디비에 새로운 수정사항 반영
+        updateMasterReviewInfo(review);
     }
 
     @Transactional
@@ -105,10 +115,83 @@ public class ReviewService {
         if (!review.getImageUrl().contains("default"))
             s3Service.deleteImage(review.getImageUrl());
         reviewRepository.deleteById(reviewId);
+        deleteMasterReviewInfo(review);
 
     }
 
+    public ReviewListDto getMyReviews (Member member, Pageable pageable) {
+        Optional<Page<Review>> optionalReviews = reviewRepository.findByMemberId(member.getId(), pageable);
+        ReviewListDto reviewListDto = new ReviewListDto();
+        setReviewList(optionalReviews, reviewListDto);
+        setPageable(reviewListDto, optionalReviews.get());
+        return reviewListDto;
+
+    }
+
+    public ReviewListDto getOthersReviews (Long memberId ) {
+        Optional<List<Review>> optionalReviews = reviewRepository.findByClubMasterId(memberId);
+        ReviewListDto reviewListDto = new ReviewListDto();
+        setReviewList(optionalReviews, reviewListDto);
+        return reviewListDto;
+    }
+
+    public void setPageable (ReviewListDto reviewListDto, Page<Review> pageable) {
+        reviewListDto.setPage(pageable.getPageable().getPageNumber());
+        reviewListDto.setSize(pageable.getPageable().getPageSize());
+        reviewListDto.setTotalPages(pageable.getTotalPages());
+        reviewListDto.setTotalElements(pageable.getTotalElements());
+    }
+
+
     public void checkAuthority(Long memberId, Member member) {
         if(memberId != member.getId()) throw new ClubException(ErrorCode.FORBIDDEN);
+    }
+
+    public void setReviewList (Optional<? extends Iterable<Review>> reviews, ReviewListDto reviewListDto) {
+        List<MyPageReviewResponseDto> list = new ArrayList<>();
+        if (reviews.isPresent()) {
+            for (Review r : reviews.get()) {
+                list.add(new MyPageReviewResponseDto().toDto(r));
+            }
+        }
+        reviewListDto.setReviewList(list);
+    }
+
+    @Transactional
+    public void addMasterReviewInfo (Review review) {
+        Member master = review.getClub().getMaster();
+        int reviewCount = master.getReviewCount();
+        float avg = master.getRatingAvg();
+
+        float total = avg * reviewCount;
+        total += review.getRating(); //새로운 합계
+        reviewCount += 1; //리뷰 갯수 증가
+        avg = total/reviewCount; //새로운 평점
+
+        master.setReviewCount(reviewCount);
+        master.setRatingAvg(avg);
+
+    }
+
+    @Transactional
+    public void deleteMasterReviewInfo (Review review) {
+        Member master = review.getClub().getMaster();
+        Integer rating = review.getRating();
+        Integer reviewCount = master.getReviewCount();
+        float avg = master.getRatingAvg();
+
+        float total = avg*reviewCount;
+        total -=rating; //평점 삭제
+        reviewCount-=1; //리뷰 갯수 감소
+        avg = total/reviewCount; //새로운 평점
+
+        master.setReviewCount(reviewCount);
+        master.setRatingAvg(avg);
+    }
+
+    @Transactional
+    public void updateMasterReviewInfo (Review review) {
+        deleteMasterReviewInfo(review);
+        addMasterReviewInfo(review);
     }
 }
