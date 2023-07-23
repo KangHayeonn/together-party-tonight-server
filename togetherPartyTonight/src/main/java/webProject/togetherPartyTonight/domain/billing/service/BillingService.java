@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import webProject.togetherPartyTonight.domain.alert.service.AlertService;
 import webProject.togetherPartyTonight.domain.billing.dto.*;
 import webProject.togetherPartyTonight.domain.billing.entity.Billing;
 import webProject.togetherPartyTonight.domain.billing.entity.BillingHistory;
@@ -41,15 +42,17 @@ public class BillingService {
     BillingHistoryRepository billingHistoryRepository;
     ClubRepository clubRepository;
     ClubMemberRepository clubMemberRepository;
+    AlertService alertService;
 
     @Autowired
-    public BillingService(ResponseService responseService, MemberRepository memberRepository, BillingRepository billingRepository, BillingHistoryRepository billingHistoryRepository, ClubRepository clubRepository, ClubMemberRepository clubMemberRepository) {
+    public BillingService(ResponseService responseService, MemberRepository memberRepository, BillingRepository billingRepository, BillingHistoryRepository billingHistoryRepository, ClubRepository clubRepository, ClubMemberRepository clubMemberRepository, AlertService alertService) {
         this.responseService = responseService;
         this.memberRepository = memberRepository;
         this.billingRepository = billingRepository;
         this.billingHistoryRepository = billingHistoryRepository;
         this.clubRepository = clubRepository;
         this.clubMemberRepository = clubMemberRepository;
+        this.alertService = alertService;
     }
 
     public SingleResponse<CreateBillingResponseDto> createBilling(CreateBillingRequestDto createBillingRequestDto) {
@@ -95,7 +98,8 @@ public class BillingService {
                                     .clubMember(clubMember)
                                     .price(divPrice)
                                     .build();
-                            billingHistoryRepository.save(billinghistory);
+                            BillingHistory billingHistory = billingHistoryRepository.save(billinghistory);
+                            alertService.savaBillingAlertData(billingHistory);
                         });
 
         CreateBillingResponseDto createBillingResponseDto = CreateBillingResponseDto.builder()
@@ -196,6 +200,8 @@ public class BillingService {
 
         billingHistory.setBillingState(COMPLETED);
         BillingHistory saveBillingHistory = billingHistoryRepository.save(billingHistory);
+
+        alertService.saveBillingPayAlertData(saveBillingHistory.getBilling().getClub(), member, saveBillingHistory);
 
         return responseService.getSingleResponse(BillingPaymentResponseDto.toDto(saveBillingHistory));
     }

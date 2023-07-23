@@ -47,6 +47,13 @@ public class ChatRoom extends BaseEntity {
         return chatMemberA.getId();
     }
 
+    public Member getOtherMember(Member sender) {
+        if (Objects.equals(chatMemberA.getId(), sender.getId())) {
+            return chatMemberB;
+        }
+        return chatMemberA;
+    }
+
     public Boolean isChatMember(Member sender) {
         if (Objects.equals(chatMemberA.getId(), sender.getId())) {
             return true;
