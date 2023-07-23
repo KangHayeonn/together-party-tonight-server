@@ -47,9 +47,10 @@ public class MyPageReviewController {
 
     @GetMapping("/reviews/{memberId}")
     @ApiOperation(value = "마이페이지에서 사용자별 받은 리뷰 조회")
-    public SingleResponse<ReviewListDto> getOthersReviews (@PathVariable @ApiParam(name = "조회할 사용자 id", example = "1", required = true) Long memberId, HttpServletRequest request) {
+    public SingleResponse<ReviewListDto> getOthersReviews (@PageableDefault(size = 5, page = 0, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
+                                                           @PathVariable @ApiParam(name = "조회할 사용자 id", example = "1", required = true) Long memberId, HttpServletRequest request) {
         log.info("[{}] {}",request.getMethod(),request.getRequestURI());
-        ReviewListDto review = reviewService.getOthersReviews(memberId);
+        ReviewListDto review = reviewService.getOthersReviews(memberId, pageable);
         return responseService.getSingleResponse(review);
     }
 
