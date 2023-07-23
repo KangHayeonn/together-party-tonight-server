@@ -171,7 +171,7 @@ public class ClubJoinService {
             list = clubs.get().stream()
                     .map(c -> new MyOwnedClubDto(c.getClubName(), c.getClubCategory(), c.getClubMaximum(),
                             c.getClubContent(), clubUtils.splitTags(c.getClubTags()), (float) c.getClubPoint().getX(), (float) c.getClubPoint().getY(),
-                            c.getAddress(), c.getMeetingDate(), c.getCreatedDate(), c.getModifiedDate()))
+                            c.getAddress(), c.getMeetingDate(), c.getImage(), c.getCreatedDate(), c.getModifiedDate()))
                     .collect(Collectors.toList());
         }
         return new MyOwnedClubListDto(list, pageable.getPageNumber(), pageable.getPageSize(), clubs.get().getTotalElements(), clubs.get().getTotalPages());
