@@ -36,7 +36,7 @@ public class SearchService {
             regexpTag = makeRegexp(tags);
         else regexpTag ="";
         
-        if (category.equals("전체")) category = convertCategory();
+        if (category.equals("모두")) category = convertCategory();
 
         Optional<Page<Club>> clubList = null;
 
@@ -142,7 +142,7 @@ public class SearchService {
     }
 
     public String convertCategory () {
-        return "맛집,취미,봉사,운동,스터디,찬목,여행";
+        return "맛집,취미,봉사,운동,스터디,친목,여행";
     }
 
     public String makePointWKT (Float lat, Float lng) {
@@ -160,6 +160,30 @@ public class SearchService {
         else searchListDto.setClubList(new ArrayList<>());
 
         return searchListDto;
+    }
+
+    public List<String> getRandomTags () {
+        List<String> tagList = searchRepository.getRandomTags();
+        Set<String> set = new HashSet<>();
+        for (String t : tagList) {
+            List<String> splitTags = clubUtils.splitTags(t);
+            for (String st : splitTags) {
+                set.add(st);
+            }
+        }
+
+        List<String> listFromSet = new ArrayList<>(set);
+        List<String> res = new ArrayList<>();
+        Random random = new Random();
+
+        for (int i = 0; i < 12; i++) {
+            int randomIndex = random.nextInt(listFromSet.size());
+            String randomElement = listFromSet.remove(randomIndex);
+            res.add(randomElement);
+        }
+
+        return res;
+
     }
 
 
