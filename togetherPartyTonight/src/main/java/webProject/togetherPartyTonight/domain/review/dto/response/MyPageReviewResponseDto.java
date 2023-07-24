@@ -18,7 +18,7 @@ public class MyPageReviewResponseDto {
     private Integer rating;
     private String reviewContent;
     private String nickName;
-
+    private String profileImage;
     private String clubName;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
@@ -32,6 +32,7 @@ public class MyPageReviewResponseDto {
                 .clubName(r.getClub().getClubName())
                 .createdDate(r.getCreatedDate())
                 .modifiedDate(r.getModifiedDate())
+                .profileImage(r.getMember().getProfileImage())
                 .build();
     }
 }
