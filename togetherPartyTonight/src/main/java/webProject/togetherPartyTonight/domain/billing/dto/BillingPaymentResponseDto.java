@@ -6,15 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import webProject.togetherPartyTonight.domain.billing.entity.Billing;
 import webProject.togetherPartyTonight.domain.billing.entity.BillingHistory;
-import webProject.togetherPartyTonight.domain.billing.entity.BillingState;
-import webProject.togetherPartyTonight.domain.club.entity.ClubMember;
-
-import javax.persistence.*;
-import java.util.List;
-
-import static javax.persistence.FetchType.LAZY;
 
 @Getter
 @Builder

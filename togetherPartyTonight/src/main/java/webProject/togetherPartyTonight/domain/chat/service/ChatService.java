@@ -12,8 +12,8 @@ import webProject.togetherPartyTonight.domain.alert.service.AlertService;
 import webProject.togetherPartyTonight.domain.billing.exception.BillingException;
 import webProject.togetherPartyTonight.domain.chat.dto.*;
 import webProject.togetherPartyTonight.domain.chat.entity.Chat;
-import webProject.togetherPartyTonight.domain.chat.exception.ChatException;
 import webProject.togetherPartyTonight.domain.chat.entity.ChatRoom;
+import webProject.togetherPartyTonight.domain.chat.exception.ChatException;
 import webProject.togetherPartyTonight.domain.chat.repository.ChatRepository;
 import webProject.togetherPartyTonight.domain.chat.repository.ChatRoomRepository;
 import webProject.togetherPartyTonight.domain.member.entity.Member;
@@ -158,7 +158,7 @@ public class ChatService {
         ChatRoom saveChatRoom = chatRoomRepository.save(chatRoom);
 
         //소켓 메시지 발송.
-        String message = ChatSocketMessage.getMessage(chatLogRequestDto.getChatMsg(), chat.getId());
+        String message = ChatSocketMessage.getMessage(chatLogRequestDto.getChatMsg(), chat.getId(), sender, chatRoom);
         webSocketService.sendUser(chatRoom.getChatMemberA().getId(), message);
         webSocketService.sendUser(chatRoom.getChatMemberB().getId(), message);
 
@@ -192,6 +192,57 @@ public class ChatService {
         return responseService.getSingleResponse(chatRoomResponseDto);
     }
 
+    public SingleResponse<ChatRoomResponseDto> renameChatRoom(ChatRoomRenameRequestDto chatRoomRenameRequestDto) {
+        Member member = getMemberBySecurityContextHolder();
+
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomRenameRequestDto.getChatRoomId())
+                .orElseThrow(() -> {
+                    log.error("[ChatService] renameChatRoom CHATROOM_NOT_FOUNT requestMemberId: {}, chatRoomId: {}", member.getId(), chatRoomRenameRequestDto.getChatRoomId());
+                    throw new ChatException(CHATROOM_NOT_FOUNT);
+                });
+
+        //채팅방 안에 존재하는 유저가 아니면 예외처리
+        if (!chatRoom.isChatMember(member)) {
+            log.error("[ChatService] renameChatRoom is not this chatRoom requestMemberId: {}, chatRoomId: {}", member.getId(), chatRoomRenameRequestDto.getChatRoomId());
+            throw new ChatException(CHAT_MEMBER_NOT_FOUND);
+        }
+
+        chatRoom.rename(member, chatRoomRenameRequestDto.getChatRoomName());
+
+        ChatRoom saveChatRoom = chatRoomRepository.save(chatRoom);
+
+        ChatRoomResponseDto chatRoomResponseDto = ChatRoomResponseDto.builder()
+                .chatRoomId(saveChatRoom.getId())
+                .chatRoomName(saveChatRoom.getChatRoomName(member))
+                .build();
+
+        return responseService.getSingleResponse(chatRoomResponseDto);
+    }
+
+    public SingleResponse<String> leaveChatRoom(ChatRoomLeaveRequest chatRoomLeaveRequest) {
+
+        Member member = getMemberBySecurityContextHolder();
+
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomLeaveRequest.getChatRoomId())
+                .orElseThrow(() -> {
+                    log.error("[ChatService] leaveChatRoom CHATROOM_NOT_FOUNT requestMemberId: {}, chatRoomId: {}", member.getId(), chatRoomLeaveRequest.getChatRoomId());
+                    throw new ChatException(CHATROOM_NOT_FOUNT);
+                });
+
+        //채팅방 안에 존재하는 유저가 아니면 예외처리
+        if (!chatRoom.isChatMember(member)) {
+            log.error("[ChatService] leaveChatRoom is not this chatRoom requestMemberId: {}, chatRoomId: {}", member.getId(), chatRoomLeaveRequest.getChatRoomId());
+            throw new ChatException(CHAT_MEMBER_NOT_FOUND);
+        }
+
+        alertService.saveLeaveChatRoomAlertDat(chatRoom, member);
+
+        chatRepository.deleteByChatRoomId(chatRoom.getId());
+        chatRoomRepository.delete(chatRoom);
+
+        return responseService.getSingleResponse("채팅방 나가기에 성공하였습니다");
+    }
+
     //--------------- 부 기능 함수
     private Chat saveChat(String chatMsg, ChatRoom chatRoom, Member sender) {
         Chat chat = Chat.builder()
@@ -207,9 +258,9 @@ public class ChatService {
         Optional<List<Chat>> chats;
         Pageable pageable = PageRequest.of(0, listCount);
         if (isFirstPage(latestSeq)) {
-            chats = chatRepository.findLatestChatsByRoomId(chatRoomId, pageable);
+            chats = chatRepository.findByChatRoomIdOrderByIdDesc(chatRoomId, pageable);
         } else {
-            chats = chatRepository.findLatestChatsByRoomIdWithMaxChatId(chatRoomId, latestSeq, pageable);
+            chats = chatRepository.findByChatRoomIdAndIdLessThanEqualOrderByIdDesc(chatRoomId, latestSeq, pageable);
         }
         return chats.orElse(new ArrayList<>());
     }
