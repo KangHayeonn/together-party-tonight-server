@@ -13,7 +13,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "club_signup")
+@Table(name = "club_signup",
+        indexes = {
+        @Index(name = "club_signup_member_filter_club_sign_up_id",columnList = "club_signup_member_id, club_signup_approval_state, club_signup_id DESC"),
+        @Index(name = "club_id_club_signup_approval_state_idx", columnList = "club_id, club_signup_approval_state"),
+        @Index(name = "club_id_member_id", columnList = "club_id, club_signup_member_id"),
+        @Index(name = "club_signup_member_id_club_signup_id_idx", columnList = "club_signup_member_id, club_signup_id"),
+        @Index(name = "club_id_idx", columnList = "club_id")})
 public class ClubSignup extends BaseEntity {
     @Id
     @Column(name = "club_signup_id")

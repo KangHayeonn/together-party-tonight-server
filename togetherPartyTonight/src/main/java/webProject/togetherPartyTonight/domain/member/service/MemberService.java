@@ -37,6 +37,8 @@ public class MemberService {
 
     private final S3Service s3Service;
 
+    private static final String BASIC_PROFILE = "https://topato-github-actions-s3-bucket.s3.ap-northeast-2.amazonaws.com/member_default.png";
+
     @Transactional(readOnly = true)
     public MemberInfoResponseDto findById(Long userId){
 
@@ -72,18 +74,23 @@ public class MemberService {
 
     public MemberModifyProfileImageDto modifyMemberProfileImage(Long userId, MultipartFile profileImage) throws IOException {
         Member member = getMember(userId);
-        String url = null;
 
+        String url = member.getProfileImage();
         log.info("바꾸는 유저 - {}", member.getEmail());
 
         log.info("프로필 이미지 - {}",profileImage.getBytes());
-        if(member.getProfileImage() != null){
-            s3Service.deleteImage(member.getProfileImage());
-        }
+
         //파일의 크기가 0이 아니면 s3업로드
-        if (profileImage.getBytes().length != 0) {
+        if (profileImage.getBytes().length != 0 && url.contains("default")) {
             url = s3Service.uploadImage(profileImage, directory,member.getId());
+        }else if(profileImage.getBytes().length != 0 && !url.contains("default")){
+            s3Service.deleteImage(url);
+            url = s3Service.uploadImage(profileImage, directory,member.getId());
+        }else if(profileImage.getBytes().length == 0 && !url.contains("default")){
+            s3Service.deleteImage(url);
+            url = BASIC_PROFILE;
         }
+
         log.info("받아온 url - {}",url);
         member.setProfileImage(url);
 
@@ -102,7 +109,8 @@ public class MemberService {
             throw new MemberException(MemberErrorCode.INVALID_PASSWORD);
         }
 
-        memberRepository.save(member);
+        member.setPassword(passwordEncoder.encode(passwordChangeDto.getNewPassword()));
+
     }
 
     public void deleteMember(Long memberId) {
