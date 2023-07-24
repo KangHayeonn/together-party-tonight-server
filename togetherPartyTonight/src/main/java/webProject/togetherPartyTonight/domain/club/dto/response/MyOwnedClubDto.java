@@ -35,6 +35,10 @@ public class MyOwnedClubDto {
     private LocalDateTime meetingDate;
     @ApiModelProperty(value = "첨부 이미지")
     private String image;
+
+    @ApiModelProperty(value = "현재 모집된 인원", example = "3")
+    private Integer appliedCount;
+
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 }

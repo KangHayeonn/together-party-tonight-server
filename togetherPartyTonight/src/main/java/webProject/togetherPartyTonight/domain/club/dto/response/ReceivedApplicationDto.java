@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@ApiModel("내가 신청한 모임 내역")
-public class ApplicationDto {
+@ApiModel("내가 만든 모임에 신청한 사람들 내역")
+public class ReceivedApplicationDto {
     @ApiModelProperty(value = "모임 신청 id", example = "1")
     private Long clubSignupId;
     @ApiModelProperty(value = "모임 id", example = "1")
@@ -29,11 +29,6 @@ public class ApplicationDto {
     private LocalDateTime signupDate;
     @ApiModelProperty(value = "승인 여부", example = "PENDING", allowableValues = "PENDING, APPROVE, REFUSE, KICKOUT")
     private String approvalStatus;
-    @ApiModelProperty(value = "현재 모집된 인원", example = "3")
-    private Integer appliedCount;
-
-    @ApiModelProperty(value = "최대 모집 인원", example = "5")
-    private Integer clubMaximum;
 
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
