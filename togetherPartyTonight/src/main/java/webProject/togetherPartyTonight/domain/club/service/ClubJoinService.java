@@ -51,8 +51,9 @@ public class ClubJoinService {
 
     public void signup (DeleteClubAndSignupRequestDto requestDto, Member member) {
 
-        Club club = clubRepository.getReferenceById(requestDto.getClubId());
-        if (club==null) throw new ClubException(ClubErrorCode.INVALID_CLUB_ID);
+        Club club = clubRepository.findById(requestDto.getClubId()).orElseThrow(
+                ()->new ClubException(ClubErrorCode.INVALID_CLUB_ID)
+        ) ;
 
         if(club.getMaster().getId() == member.getId()) throw new ClubException(ClubErrorCode.CANNOT_SIGNUP_TO_MY_CLUB);
 
@@ -104,6 +105,11 @@ public class ClubJoinService {
 
         if (clubSignup.getClubSignupApprovalState().equals(ApprovalState.PENDING)) {
             if (requestDto.getApprove()) {
+                int memberCnt = clubMemberRepository.getMemberCnt(clubSignup.getClub().getClubId());
+                int clubMaximum = clubSignup.getClub().getClubMaximum();
+                if (clubMaximum>= memberCnt) {
+                    throw new ClubException(ClubErrorCode.EXCEED_CLUB_MAXIMUM);
+                }
                 clubSignup.setClubSignupApprovalState(ApprovalState.APPROVE);
                 clubSignup.setClubSignupApprovalDate(LocalDateTime.now());
                 ClubMember clubMember = new ClubMember(clubSignup.getClub(), clubSignup.getClubMember());
@@ -153,6 +159,7 @@ public class ClubJoinService {
 
             for (ClubSignup clubSignup : signupMemberId.get()) {
                 int appliedCount = clubMemberRepository.getMemberCnt(clubSignup.getClub().getClubId());
+                List<String> splitTags = clubUtils.splitTags(clubSignup.getClub().getClubTags());
                 list.add(ApplicationDto.builder()
                         .clubSignupId(clubSignup.getClubSignupId())
                         .clubId(clubSignup.getClub().getClubId())
@@ -161,6 +168,7 @@ public class ClubJoinService {
                         .createdDate(clubSignup.getCreatedDate())
                         .modifiedDate(clubSignup.getModifiedDate())
                         .appliedCount(appliedCount)
+                        .clubTags(splitTags)
                         .clubMaximum(clubSignup.getClub().getClubMaximum())
                         .approvalStatus(String.valueOf(clubSignup.getClubSignupApprovalState()))
                         .nickName(clubSignup.getClubMember().getNickname())
@@ -191,7 +199,7 @@ public class ClubJoinService {
                 Point clubPoint = c.getClubPoint();
                 List<String> splitTags = clubUtils.splitTags(c.getClubTags());
 
-                MyOwnedClubDto.builder()
+                list.add(MyOwnedClubDto.builder()
                         .clubName(c.getClubName())
                         .clubCategory(c.getClubCategory())
                         .clubContent(c.getClubContent())
@@ -205,7 +213,7 @@ public class ClubJoinService {
                         .longitude((float) clubPoint.getY())
                         .createdDate(c.getCreatedDate())
                         .modifiedDate(c.getModifiedDate())
-                        .build();
+                        .build());
 
             }
         }

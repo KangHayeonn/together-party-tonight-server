@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -34,6 +35,9 @@ public class ApplicationDto {
 
     @ApiModelProperty(value = "최대 모집 인원", example = "5")
     private Integer clubMaximum;
+
+    @ApiModelProperty(value = "모임 태그", example = "[\"테니스\",\"다이어트\",\"오운완\"]")
+    private List<String> clubTags;
 
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
