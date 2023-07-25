@@ -128,10 +128,11 @@ public class ReviewService {
 
     }
 
-    public ReviewListDto getOthersReviews (Long memberId ) {
-        Optional<List<Review>> optionalReviews = reviewRepository.findByClubMasterId(memberId);
+    public ReviewListDto getOthersReviews (Long memberId , Pageable pageable) {
+        Optional<Page<Review>> optionalReviews = reviewRepository.findByClubMasterId(memberId, pageable);
         ReviewListDto reviewListDto = new ReviewListDto();
         setReviewList(optionalReviews, reviewListDto);
+        setPageable(reviewListDto, optionalReviews.get());
         return reviewListDto;
     }
 

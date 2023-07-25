@@ -11,5 +11,5 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class ListResponse<T> extends CommonResponse {
-    List<T> dataList;
+    List<T> data;
 }
