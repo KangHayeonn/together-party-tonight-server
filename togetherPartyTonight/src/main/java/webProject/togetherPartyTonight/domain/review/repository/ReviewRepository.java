@@ -15,5 +15,5 @@ public interface ReviewRepository extends JpaRepository<Review,Long> {
     Optional<Review> findByClubClubIdAndMemberId (Long ClubId, Long memberId);
     Optional<Page<Review>> findByMemberId (Long memberId, Pageable pageable);
 
-    Optional<List<Review>> findByClubMasterId (Long masterId);
+    Optional<Page<Review>> findByClubMasterId (Long masterId, Pageable pageable);
 }
