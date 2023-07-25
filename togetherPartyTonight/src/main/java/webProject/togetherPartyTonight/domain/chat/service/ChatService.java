@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import webProject.togetherPartyTonight.domain.alert.service.AlertService;
 import webProject.togetherPartyTonight.domain.billing.exception.BillingException;
 import webProject.togetherPartyTonight.domain.chat.dto.*;
@@ -219,6 +220,7 @@ public class ChatService {
         return responseService.getSingleResponse(chatRoomResponseDto);
     }
 
+    @Transactional
     public SingleResponse<String> leaveChatRoom(ChatRoomLeaveRequest chatRoomLeaveRequest) {
 
         Member member = getMemberBySecurityContextHolder();
