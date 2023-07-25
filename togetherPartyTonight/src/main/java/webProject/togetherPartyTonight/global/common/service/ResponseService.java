@@ -25,7 +25,7 @@ public class ResponseService {
 
     public <T> ListResponse<T> getListResponse(List<T> dataList) {
         ListResponse<T> listResponse = new ListResponse<>();
-        listResponse.setDataList(dataList);
+        listResponse.setData(dataList);
         setSuccessResponse(listResponse);
         return listResponse;
     }
