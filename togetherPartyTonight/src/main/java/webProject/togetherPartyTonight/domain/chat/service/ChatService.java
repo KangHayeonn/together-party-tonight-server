@@ -36,6 +36,7 @@ import static webProject.togetherPartyTonight.domain.chat.exception.ChatErrorCod
 @Slf4j
 public class ChatService {
 
+    //배포 테스트
     private ChatRoomRepository chatRoomRepository;
     private MemberRepository memberRepository;
     private ResponseService responseService;
