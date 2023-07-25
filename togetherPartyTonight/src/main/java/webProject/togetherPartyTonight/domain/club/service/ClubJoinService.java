@@ -5,6 +5,7 @@ import org.locationtech.jts.geom.Point;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import webProject.togetherPartyTonight.domain.alert.service.AlertService;
 import webProject.togetherPartyTonight.domain.club.dto.request.ApproveRequestDto;
 import webProject.togetherPartyTonight.domain.club.dto.request.DeleteClubAndSignupRequestDto;
 import webProject.togetherPartyTonight.domain.club.dto.request.DeleteMyAppliedRequestDto;
@@ -43,6 +44,8 @@ public class ClubJoinService {
     private final ClubMemberRepository clubMemberRepository;
     private final ClubUtils clubUtils;
 
+    private final AlertService alertService;
+
 
     public void signup (DeleteClubAndSignupRequestDto requestDto, Member member) {
 
@@ -55,6 +58,7 @@ public class ClubJoinService {
         if(alreadySignup.isEmpty()) {
             ClubSignup clubSignup = requestDto.toClubSignup(club, member, club.getMaster());
             clubSignupRepository.save(clubSignup);
+            alertService.saveApplyAlertData(club,member); //모임장에게 알림 발송
         }
         else {
             throw new ClubException(ClubErrorCode.ALREADY_SIGNUP);
@@ -106,6 +110,8 @@ public class ClubJoinService {
             } else {
                 clubSignup.setClubSignupApprovalState(ApprovalState.REFUSE);
             }
+            alertService.saveApproveAlertData(clubSignup.getClub(), clubSignup.getClubMember(), requestDto.getApprove());
+            //승낙/거절 시 모임 멤버에게 알림 발송
         }
         else {
             throw new ClubException(ClubErrorCode.ALREADY_APPROVED);
@@ -165,7 +171,7 @@ public class ClubJoinService {
             list = clubs.get().stream()
                     .map(c -> new MyOwnedClubDto(c.getClubName(), c.getClubCategory(), c.getClubMaximum(),
                             c.getClubContent(), clubUtils.splitTags(c.getClubTags()), (float) c.getClubPoint().getX(), (float) c.getClubPoint().getY(),
-                            c.getAddress(), c.getMeetingDate(), c.getCreatedDate(), c.getModifiedDate()))
+                            c.getAddress(), c.getMeetingDate(), c.getImage(), c.getCreatedDate(), c.getModifiedDate()))
                     .collect(Collectors.toList());
         }
         return new MyOwnedClubListDto(list, pageable.getPageNumber(), pageable.getPageSize(), clubs.get().getTotalElements(), clubs.get().getTotalPages());

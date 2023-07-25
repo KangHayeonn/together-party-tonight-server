@@ -36,20 +36,22 @@ public interface SearchRepository extends JpaRepository<Club,Long> {
     @Query(nativeQuery = true, value = searchDefaultQuery+
             "JOIN member m ON c.club_master_id = m.member_id "
             +OptionWhere +
-            "ORDER BY m.member_rating_avg DESC ",
-            countQuery = "SELECT COUNT(club_id) FROM club")
+            "ORDER BY m.member_rating_avg DESC ")
     Optional<Page<Club>>  findByConditionsOrderByReviewScore (@Param("standard_point") String point, @Param("distance")Integer distance,
                                           @Param("state")String state, @Param("category")String category, @Param("memberNum")Integer memberNum,
                                           @Param("tags")String tags, Pageable pageable);
 
 
     @Query(nativeQuery = true, value = searchDefaultQuery+ OptionWhere +
-            "ORDER BY created_date DESC",
-            countQuery = "SELECT COUNT(club_id) FROM club")
+            "ORDER BY created_date DESC")
     Optional<Page<Club>> findByConditionsOrderByDate (@Param("standard_point") String point, @Param("distance")Integer distance,
                                                       @Param("state")String state, @Param("category")String category, @Param("memberNum")Integer memberNum,
                                                       @Param("tags")String tags, Pageable pageable);
 
     Optional<List<Club>> findByClubTagsLike (String partial) ;
+
+
+    @Query(nativeQuery = true, value = "SELECT club_tags from club ORDER BY rand() limit 30")
+    List<String> getRandomTags ();
 
 }

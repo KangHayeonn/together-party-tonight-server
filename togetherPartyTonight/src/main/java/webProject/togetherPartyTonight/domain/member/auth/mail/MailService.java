@@ -3,6 +3,7 @@ package webProject.togetherPartyTonight.domain.member.auth.mail;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,8 +14,10 @@ import webProject.togetherPartyTonight.domain.member.exception.errorCode.AuthErr
 import webProject.togetherPartyTonight.domain.member.exception.errorCode.MemberErrorCode;
 import webProject.togetherPartyTonight.domain.member.repository.MemberRepository;
 
+import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.io.UnsupportedEncodingException;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -57,8 +60,9 @@ public class MailService {
             log.info("레디스 저장 정보 - {}",redisTemplate.opsForValue().get(email));
 
 
-        }catch (Exception e){
+        }catch (MailException | MessagingException | UnsupportedEncodingException e){
             log.error("이메일 전송에 실패했습니다.");
+            e.printStackTrace();
             throw new MemberException(AuthErrorCode.NOT_EMAIL_SEND);
         }
 

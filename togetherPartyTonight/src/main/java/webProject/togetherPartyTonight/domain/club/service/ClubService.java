@@ -2,6 +2,7 @@ package webProject.togetherPartyTonight.domain.club.service;
 
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -35,6 +36,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ClubService {
     private final ClubRepository clubRepository;
     private final ClubSignupRepository clubSignupRepository;
@@ -49,7 +51,6 @@ public class ClubService {
 
     @Transactional
     public void addClub (CreateClubRequestDto clubRequest, MultipartFile image, Member member) {
-
         Point point = makePoint(clubRequest.getLatitude(), clubRequest.getLongitude());
 
         String url="";
@@ -59,6 +60,7 @@ public class ClubService {
         else {
             url = getDefaultImage(clubRequest.getClubCategory());
         }
+        log.info("[ClubService]: url : {}", url);
 
         Club club = clubRequest.toClub(member, point, url);
 
@@ -142,7 +144,8 @@ public class ClubService {
     }
 
     public String  getDefaultImage (String category) {
-        return s3Service.getImage(category+"_default.jpg");
+        ClubCategory categoryImage = ClubCategory.valueOf(category);
+        return s3Service.getImage(categoryImage+"_default.svg");
     }
 
     public void checkAuthority(Club club, Member member) {
