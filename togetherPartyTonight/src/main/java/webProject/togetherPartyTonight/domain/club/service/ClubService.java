@@ -144,8 +144,12 @@ public class ClubService {
     }
 
     public String  getDefaultImage (String category) {
-        ClubCategory categoryImage = ClubCategory.valueOf(category);
-        return s3Service.getImage(categoryImage+"_default.svg");
+        try {
+            ClubCategory categoryImage = ClubCategory.valueOf(category);
+            return s3Service.getImage(categoryImage+"_default.svg");
+        }catch (IllegalArgumentException e) {
+            throw new ClubException(ClubErrorCode.INVALID_CATEGORY);
+        }
     }
 
     public void checkAuthority(Club club, Member member) {
