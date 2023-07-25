@@ -36,7 +36,6 @@ import static webProject.togetherPartyTonight.domain.chat.exception.ChatErrorCod
 @Slf4j
 public class ChatService {
 
-    //배포 테스트
     private ChatRoomRepository chatRoomRepository;
     private MemberRepository memberRepository;
     private ResponseService responseService;
@@ -224,7 +223,10 @@ public class ChatService {
     @Transactional
     public SingleResponse<String> leaveChatRoom(ChatRoomLeaveRequest chatRoomLeaveRequest) {
 
+
         Member member = getMemberBySecurityContextHolder();
+
+        log.info("[ChatService] leaveChatRoom is call requestMemberId: {}, chatRoomId: {}", member.getId(), chatRoomLeaveRequest.getChatRoomId());
 
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomLeaveRequest.getChatRoomId())
                 .orElseThrow(() -> {
