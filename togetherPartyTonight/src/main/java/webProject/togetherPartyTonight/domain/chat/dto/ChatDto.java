@@ -19,4 +19,8 @@ public class ChatDto {
     String message;
     @ApiModelProperty(notes = "채팅 시간", dataType = "String", example = "2023-07-16T17:31:43.490118")
     String dateTime;
+    @ApiModelProperty(notes = "발송자 멤버 아이디", dataType = "Long", example = "33")
+    Long senderMemberId;
+    @ApiModelProperty(notes = "발송자 닉네임", dataType = "String", example = "만둘")
+    String senderNickname;
 }
