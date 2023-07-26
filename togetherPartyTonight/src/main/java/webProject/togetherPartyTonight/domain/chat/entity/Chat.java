@@ -15,6 +15,9 @@ import static javax.persistence.FetchType.LAZY;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "chat", indexes = {
+        @Index(name = "chat_room_id_chat_id_idx", columnList = "chat_room_id,chat_id")
+})
 public class Chat extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
