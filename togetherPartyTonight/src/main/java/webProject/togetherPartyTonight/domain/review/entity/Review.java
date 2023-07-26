@@ -13,7 +13,10 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "review")
+@Table(name = "review",
+        indexes = {
+                @Index(name="club_id_member_id_idx",columnList = "club_id, review_member_id"),
+                @Index(name="club_id_idx",columnList = "club_id")})
 public class Review extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

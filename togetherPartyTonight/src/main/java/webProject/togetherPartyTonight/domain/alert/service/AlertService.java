@@ -4,15 +4,15 @@ import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import webProject.togetherPartyTonight.domain.alert.dto.AlertDto;
-import webProject.togetherPartyTonight.domain.alert.dto.AlertUnreadCountDto;
-import webProject.togetherPartyTonight.domain.alert.dto.alertContent.*;
 import webProject.togetherPartyTonight.domain.alert.dto.AlertListRequestDto;
 import webProject.togetherPartyTonight.domain.alert.dto.AlertListResponseDto;
-import webProject.togetherPartyTonight.domain.alert.dto.alertSocketContent.*;
+import webProject.togetherPartyTonight.domain.alert.dto.AlertUnreadCountDto;
+import webProject.togetherPartyTonight.domain.alert.dto.alertContent.*;
 import webProject.togetherPartyTonight.domain.alert.dto.alertSocketMessage.SocketApplyData;
 import webProject.togetherPartyTonight.domain.alert.entity.Alert;
 import webProject.togetherPartyTonight.domain.alert.exception.AlertException;
@@ -27,8 +27,6 @@ import webProject.togetherPartyTonight.domain.member.repository.MemberRepository
 import webProject.togetherPartyTonight.global.common.response.SingleResponse;
 import webProject.togetherPartyTonight.global.common.service.ResponseService;
 import webProject.togetherPartyTonight.global.websocket.WebSocketService;
-
-import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -122,9 +120,7 @@ public class AlertService {
                 .build();
 
         Alert saveAlert = alertRepository.save(alert);
-
-        AlertApplySocketContent alertApplySocketContent = AlertApplySocketContent.toAlertApplySocketContent(alertApplyData);
-        String socketMessage = SocketApplyData.getMessage(alertApplySocketContent, APPLY.toString(), saveAlert);
+        String socketMessage = SocketApplyData.getMessage(alertApplyData, APPLY.toString(), saveAlert);
 
         //소켓에도 발송
         webSocketService.sendUser(club.getMaster().getId(), socketMessage);
@@ -134,16 +130,14 @@ public class AlertService {
     public void saveApproveAlertData(Club club, Member receiver, Boolean approve) {
         AlertApproveData alertApproveData = AlertApproveData.toAlertApproveData(club, approve);
         Alert alert = Alert.builder()
-                .member(club.getMaster())
+                .member(receiver)
                 .alertType(APPROVE)
                 .alertContent(new Gson().toJson(alertApproveData))
                 .alertCheckState(false)
                 .build();
 
         Alert saveAlert = alertRepository.save(alert);
-
-        AlertApproveSocketContent alertApplySocketContent = AlertApproveSocketContent.toAlertApproveSocketContent(alertApproveData);
-        String socketMessage = SocketApplyData.getMessage(alertApplySocketContent, APPROVE.toString(), saveAlert);
+        String socketMessage = SocketApplyData.getMessage(alertApproveData, APPROVE.toString(), saveAlert);
 
         //소켓에도 발송
         webSocketService.sendUser(receiver.getId(), socketMessage);
@@ -160,8 +154,7 @@ public class AlertService {
                 .build();
 
         Alert saveAlert = alertRepository.save(alert);
-        AlertBillingSocketContent alertBillingSocketContent = AlertBillingSocketContent.toAlertSocketBillingData(alertBillingData, saveAlert.getId());
-        String socketMessage = SocketApplyData.getMessage(alertBillingSocketContent, BILLING_REQUEST.toString(), saveAlert);
+        String socketMessage = SocketApplyData.getMessage(alertBillingData, BILLING_REQUEST.toString(), saveAlert);
 
         //소켓에도 발송
         webSocketService.sendUser(billingHistory.getClubMember().getMember().getId(), socketMessage);
@@ -178,9 +171,7 @@ public class AlertService {
                 .build();
 
         Alert saveAlert = alertRepository.save(alert);
-
-        AlertBillingPaySocketContent alertBillingSocketContent = AlertBillingPaySocketContent.toAlertBillingPaySocketContent(alertBillingPayData);
-        String socketMessage = SocketApplyData.getMessage(alertBillingSocketContent, BILLING_PAY.toString(), saveAlert);
+        String socketMessage = SocketApplyData.getMessage(alertBillingPayData, BILLING_PAY.toString(), saveAlert);
 
         //소켓에도 발송
         webSocketService.sendUser(billingHistory.getClubMember().getMember().getId(), socketMessage);
@@ -196,16 +187,32 @@ public class AlertService {
                 .alertContent(new Gson().toJson(alertChatData))
                 .alertCheckState(false)
                 .build();
-        Alert saveAlert = alertRepository.save(alert);
 
-        AlertChatSocketContent alertChatSocketContent = AlertChatSocketContent.toAlertChatSocketContent(alertChatData);
-        String socketMessage = SocketApplyData.getMessage(alertChatSocketContent, CHAT.toString(), saveAlert);
+        Alert saveAlert = alertRepository.save(alert);
+        String socketMessage = SocketApplyData.getMessage(alertChatData, CHAT.toString(), saveAlert);
 
         //소켓에도 발송
         webSocketService.sendUser(otherMember.getId(), socketMessage);
     }
 
+    //채팅 나가기 알림
+    public void saveLeaveChatRoomAlertDat(ChatRoom chatRoom, Member leaveMember) {
+        AlertChatRoomLeaveData alertChatRoomLeaveData = AlertChatRoomLeaveData.toAlertChatRoomLeaveData(chatRoom, leaveMember);
 
+        Member otherMember = chatRoom.getOtherMember(leaveMember);
+        Alert alert = Alert.builder()
+                .member(otherMember)
+                .alertType(CHAT)
+                .alertContent(new Gson().toJson(leaveMember))
+                .alertCheckState(false)
+                .build();
+        Alert saveAlert = alertRepository.save(alert);
+
+        String socketMessage = SocketApplyData.getMessage(alertChatRoomLeaveData, LEAVE_CHATROOM.toString(), saveAlert);
+
+        //소켓에도 발송
+        webSocketService.sendUser(otherMember.getId(), socketMessage);
+    }
 
     private List<Alert> getAlerts(long memberId, long lastSeq, int listCount, Boolean isAllOrNotRead) {
 

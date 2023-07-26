@@ -1,6 +1,5 @@
 package webProject.togetherPartyTonight.domain.billing.entity;
 
-import io.swagger.models.auth.In;
 import lombok.*;
 import webProject.togetherPartyTonight.domain.club.entity.Club;
 import webProject.togetherPartyTonight.global.common.BaseEntity;

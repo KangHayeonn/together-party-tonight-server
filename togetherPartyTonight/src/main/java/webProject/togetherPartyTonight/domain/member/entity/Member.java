@@ -20,6 +20,8 @@ import static javax.persistence.FetchType.LAZY;
 @Setter
 @DynamicInsert
 @NoArgsConstructor
+@Table(name= "member",
+        indexes = {@Index(name="email_idx",columnList = "member_email")})
 public class Member extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,7 +46,7 @@ public class Member extends BaseEntity {
     @Column(name = "member_details")
     private String details;
 
-    @Column(name = "member_profile_image")
+    @Column(name = "member_profile_image", columnDefinition = "varchar(255) default 'https://topato-github-actions-s3-bucket.s3.ap-northeast-2.amazonaws.com/member_default.png'")
     private String profileImage;
 
     @Enumerated(EnumType.STRING)

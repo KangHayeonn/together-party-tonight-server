@@ -12,7 +12,9 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "comment")
+@Table(name = "comment", indexes = {
+        @Index(name = "comment_club_id", columnList = "club_id")
+})
 @Builder
 public class Comment extends BaseEntity {
 

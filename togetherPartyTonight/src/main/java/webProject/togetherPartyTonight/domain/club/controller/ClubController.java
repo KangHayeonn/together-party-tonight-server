@@ -187,15 +187,14 @@ public class ClubController {
     /**
      * 사용자별 생성한 모임 조회 api
      */
-    @GetMapping("/myOwned")
+    @GetMapping("/myOwned/{memberId}")
     @ApiOperation(value = "사용자별 생성한 모임 조회")
     public  SingleResponse<MyOwnedClubListDto> getMyOwnedClub(HttpServletRequest request,@PageableDefault(size = 5, page = 0, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
                                                               @ApiParam(value = "필터 조건", allowableValues = "ALL,RECRUITING,RECRUIT_FINISHED", example = "ALL", required = true)
                                                               @Enum(enumClass = ClubStateFilterEnum.class, ignoreCase = true)
-                                                              @RequestParam String filter) {
+                                                              @RequestParam String filter, @ApiParam(value = "사용자 id", example = "1") @PathVariable Long memberId ) {
         log.info("[{}] {}",request.getMethod(),request.getRequestURI());
-        Member member = getMemberBySecurityContextHolder();
-        MyOwnedClubListDto ownedList = clubJoinService.getOwnedList( member, pageable, ApprovalState.valueOf(filter));
+        MyOwnedClubListDto ownedList = clubJoinService.getOwnedList( memberId, pageable, ClubStateFilterEnum.valueOf(filter));
         return responseService.getSingleResponse(ownedList);
     }
 
@@ -228,7 +227,6 @@ public class ClubController {
     public Member getMemberBySecurityContextHolder() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username = userDetails.getUsername();
-        System.out.println("username = " + username);
         return memberRepository.findById(Long.parseLong(username))
                 .orElseThrow(() -> {
                     throw new ClubException(MemberErrorCode.MEMBER_NOT_FOUND);

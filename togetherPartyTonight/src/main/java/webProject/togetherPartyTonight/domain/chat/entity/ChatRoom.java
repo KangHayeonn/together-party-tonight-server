@@ -5,9 +5,6 @@ import webProject.togetherPartyTonight.domain.member.entity.Member;
 import webProject.togetherPartyTonight.global.common.BaseEntity;
 
 import javax.persistence.*;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 import static javax.persistence.FetchType.LAZY;
@@ -59,5 +56,20 @@ public class ChatRoom extends BaseEntity {
             return true;
         }
         return Objects.equals(chatMemberB.getId(), sender.getId());
+    }
+
+    public void rename(Member member, String chatRoomName) {
+        if (Objects.equals(chatMemberA.getId(), member.getId())) {
+            setChatRoomAName(chatRoomName);
+            return;
+        }
+        setChatRoomBName(chatRoomName);
+    }
+
+    public String getChatRoomName(Member member) {
+        if (Objects.equals(chatMemberA.getId(), member.getId())) {
+            return getChatRoomAName();
+        }
+        return getChatRoomBName();
     }
 }

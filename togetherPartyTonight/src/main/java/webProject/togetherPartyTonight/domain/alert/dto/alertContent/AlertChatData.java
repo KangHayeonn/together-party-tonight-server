@@ -2,6 +2,7 @@ package webProject.togetherPartyTonight.domain.alert.dto.alertContent;
 
 import lombok.Builder;
 import lombok.Getter;
+import webProject.togetherPartyTonight.domain.alert.dto.alertSocketContent.AlertDataSocketContent;
 import webProject.togetherPartyTonight.domain.chat.entity.Chat;
 import webProject.togetherPartyTonight.domain.chat.entity.ChatRoom;
 import webProject.togetherPartyTonight.domain.member.entity.Member;
@@ -11,7 +12,7 @@ import webProject.togetherPartyTonight.domain.member.entity.Member;
  */
 @Getter
 @Builder
-public class AlertChatData {
+public class AlertChatData extends AlertDataSocketContent {
     private Long chatId; //채팅기록 아이디
     private Long chatRoomId; // 채팅방 아이디
     private Long sendMemberId; // 채팅을 보낸 사람의 아이디
