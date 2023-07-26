@@ -171,7 +171,7 @@ public class ClubJoinService {
                         .clubTags(splitTags)
                         .clubMaximum(clubSignup.getClub().getClubMaximum())
                         .approvalStatus(String.valueOf(clubSignup.getClubSignupApprovalState()))
-                        .nickName(clubSignup.getClubMember().getNickname())
+                        .nickName(clubSignup.getClub().getMaster().getNickname())
                         .signupDate(clubSignup.getClubSignupDate())
                         .build());
             }
