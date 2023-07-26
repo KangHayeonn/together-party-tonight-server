@@ -201,6 +201,7 @@ public class ClubJoinService {
 
                 list.add(MyOwnedClubDto.builder()
                         .clubName(c.getClubName())
+                        .clubId(c.getClubId())
                         .clubCategory(c.getClubCategory())
                         .clubContent(c.getClubContent())
                         .clubTags(splitTags)

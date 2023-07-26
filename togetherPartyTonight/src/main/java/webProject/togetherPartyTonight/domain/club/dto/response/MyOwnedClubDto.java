@@ -15,6 +15,8 @@ import java.util.List;
 @AllArgsConstructor
 @ApiModel("내가 만든 모임")
 public class MyOwnedClubDto {
+    @ApiModelProperty(value = "모임 id", example = "1")
+    private Long clubId;
     @ApiModelProperty(value = "모임 제목", example = "오늘 테니스 치실 분 구합니다")
     private String clubName;
     @ApiModelProperty(value = "모임 카테고리", example = "운동")
