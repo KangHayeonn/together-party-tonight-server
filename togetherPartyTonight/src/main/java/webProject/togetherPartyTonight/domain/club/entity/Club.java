@@ -24,7 +24,13 @@ import static javax.persistence.FetchType.LAZY;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "club")
+@Table(name = "club", indexes = {
+        @Index(name = "masterId_clubState", columnList = "club_master_id,club_state,club_id"),
+        @Index(name = "masterId_clubId", columnList = "club_master_id,club_id"),
+        @Index(name = "club_point_idx", columnList = "club_point"),
+        @Index(name = "club_state_club_maximum_idx", columnList = "club_state,club_maximum"),
+        @Index(name = "club_category_club_tags_idx", columnList = "club_category,club_tags")
+})
 public class Club extends BaseEntity {
     @Id
     @Column(name = "club_id")

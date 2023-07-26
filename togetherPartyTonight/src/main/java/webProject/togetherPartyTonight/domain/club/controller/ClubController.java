@@ -228,7 +228,6 @@ public class ClubController {
     public Member getMemberBySecurityContextHolder() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username = userDetails.getUsername();
-        System.out.println("username = " + username);
         return memberRepository.findById(Long.parseLong(username))
                 .orElseThrow(() -> {
                     throw new ClubException(MemberErrorCode.MEMBER_NOT_FOUND);
