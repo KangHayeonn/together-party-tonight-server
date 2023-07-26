@@ -7,9 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import webProject.togetherPartyTonight.domain.chat.dto.*;
 import webProject.togetherPartyTonight.domain.chat.service.ChatService;
-import webProject.togetherPartyTonight.global.websocket.WebSocketService;
-import webProject.togetherPartyTonight.global.common.response.ListResponse;
 import webProject.togetherPartyTonight.global.common.response.SingleResponse;
+import webProject.togetherPartyTonight.global.websocket.WebSocketService;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -86,11 +85,38 @@ public class ChatController {
             @ApiResponse(code = 409, message = "채팅방이 존재하지 않습니다\n채팅 회원이 존재하지 않습니다"),
             @ApiResponse(code =  500, message = "내부 서버 오류")
     })
-    @PostMapping("/")
+    @PostMapping("")
     public SingleResponse<ChatSendResponseDto> sendChat(@RequestBody ChatSendRequestDto chatLogRequestDto, HttpServletRequest request) {
         requestLog(request);
         return chatService.sendChat(chatLogRequestDto);
     }
+
+    @ApiOperation(value = "채팅방 이름 변경 요청")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "성공"),
+            @ApiResponse(code = 409, message = "채팅방이 존재하지 않습니다\n채팅 회원이 존재하지 않습니다"),
+            @ApiResponse(code =  500, message = "내부 서버 오류")
+    })
+    @PostMapping("/chatRoom/name")
+    public SingleResponse<ChatRoomResponseDto> renameChatRoom(@RequestBody ChatRoomRenameRequestDto chatRoomRenameRequestDto, HttpServletRequest request) {
+        requestLog(request);
+        return chatService.renameChatRoom(chatRoomRenameRequestDto);
+    }
+
+
+    @ApiOperation(value = "채팅방 나가기 요청")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "채팅방 나가기에 성공하였습니다"),
+            @ApiResponse(code = 409, message = "채팅방이 존재하지 않습니다\n채팅 회원이 존재하지 않습니다"),
+            @ApiResponse(code =  500, message = "내부 서버 오류")
+    })
+    @DeleteMapping("/chatRoom")
+    public SingleResponse<String> leaveChatRoom(@RequestBody ChatRoomLeaveRequest chatRoomLeaveRequest, HttpServletRequest request) {
+        requestLog(request);
+        return chatService.leaveChatRoom(chatRoomLeaveRequest);
+    }
+
+
 
     private void requestLog(HttpServletRequest request) {
         log.debug("{} {}", request.getMethod(), request.getRequestURI());

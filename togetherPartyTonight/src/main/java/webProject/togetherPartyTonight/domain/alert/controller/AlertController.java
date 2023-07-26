@@ -40,7 +40,7 @@ public class AlertController {
 
     @ApiOperation(value = "알림 읽음 요청")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "성공"),
+            @ApiResponse(code = 200, message = "알림 읽기에 성공하였습니다."),
             @ApiResponse(code = 400, message = "멤버를 찾을 수 없습니다\n알림이 없습니다\n이미 읽은 알림입니다"),
             @ApiResponse(code =  500, message = "내부 서버 오류")
     })
@@ -51,7 +51,7 @@ public class AlertController {
 
     @ApiOperation(value = "알림 삭제 요청")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "성공"),
+            @ApiResponse(code = 200, message = "알림 삭제에 성공하였습니다."),
             @ApiResponse(code = 400, message = "멤버를 찾을 수 없습니다\n알림이 없습니다\n이미 읽은 알림입니다"),
             @ApiResponse(code =  500, message = "내부 서버 오류")
     })

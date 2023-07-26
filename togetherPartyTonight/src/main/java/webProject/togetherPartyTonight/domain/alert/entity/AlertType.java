@@ -10,6 +10,7 @@ public enum AlertType {
     BILLING_REQUEST("BILLING_REQUEST"), //정산요청
     BILLING_PAY("BILLING_PAY"),     //정산 결제 알림
     CHAT("CHAT"),       //채팅 알림
+    LEAVE_CHATROOM("LEAVE_CHATROOM"),
     ;
 
 

@@ -2,6 +2,7 @@ package webProject.togetherPartyTonight.domain.alert.dto.alertContent;
 
 import lombok.Builder;
 import lombok.Getter;
+import webProject.togetherPartyTonight.domain.alert.dto.alertSocketContent.AlertDataSocketContent;
 import webProject.togetherPartyTonight.domain.club.entity.Club;
 
 /**
@@ -10,7 +11,7 @@ import webProject.togetherPartyTonight.domain.club.entity.Club;
  */
 @Getter
 @Builder
-public class AlertApproveData {
+public class AlertApproveData extends AlertDataSocketContent {
     private Long clubId; // 내가 신청한 모임 아이디
     private String clubName; // 내가 신청한 모임방 이름
     private Boolean approve;  // 모임 승인 여부
