@@ -67,7 +67,7 @@ public class ReviewService {
             }
             Review review = request.toEntity(club, clubMember.getMember(),imageUrl);
             reviewRepository.save(review);
-            addMasterReviewInfo(review);
+            addMasterReviewInfo(review.getRating(), club.getMaster());
         }
         else throw new ReviewException(ReviewErrorCode.INVALID_REVIEW_DATE);
     }
@@ -99,9 +99,9 @@ public class ReviewService {
         else {
             imageUrl= s3Service.getImage("review_default.jpg");
         }
-
+        updateMasterReviewInfo(review.getRating(), request.getRating(), review.getClub().getMaster());
         request.modify(review, imageUrl); //디비에 새로운 수정사항 반영
-        updateMasterReviewInfo(review);
+
     }
 
     @Transactional
@@ -114,8 +114,10 @@ public class ReviewService {
 
         if (!review.getImageUrl().contains("default"))
             s3Service.deleteImage(review.getImageUrl());
+
+        deleteMasterReviewInfo(review.getRating(), review.getClub().getMaster());
         reviewRepository.deleteById(reviewId);
-        deleteMasterReviewInfo(review);
+
 
     }
 
@@ -159,40 +161,40 @@ public class ReviewService {
     }
 
     @Transactional
-    public void addMasterReviewInfo (Review review) {
-        Member master = review.getClub().getMaster();
+    public void addMasterReviewInfo (Integer rating, Member master) {
         int reviewCount = master.getReviewCount();
         float avg = master.getRatingAvg();
 
         float total = avg * reviewCount;
-        total += review.getRating(); //새로운 합계
+        total += rating; //새로운 합계
         reviewCount += 1; //리뷰 갯수 증가
         avg = total/reviewCount; //새로운 평점
-
+        System.out.println("after add avg: "+ avg);
         master.setReviewCount(reviewCount);
         master.setRatingAvg(avg);
 
     }
 
     @Transactional
-    public void deleteMasterReviewInfo (Review review) {
-        Member master = review.getClub().getMaster();
-        Integer rating = review.getRating();
+    public void deleteMasterReviewInfo (Integer rating, Member master) {
         Integer reviewCount = master.getReviewCount();
-        float avg = master.getRatingAvg();
-
-        float total = avg*reviewCount;
+        float avg = master.getRatingAvg(); //평균평점
+        float total = avg*reviewCount; //합계
         total -=rating; //평점 삭제
         reviewCount-=1; //리뷰 갯수 감소
-        avg = total/reviewCount; //새로운 평점
 
+        if (total==0 || reviewCount==0) {
+            avg=0;
+        }
+
+        else avg = total/reviewCount; //새로운 평점
         master.setReviewCount(reviewCount);
         master.setRatingAvg(avg);
     }
 
     @Transactional
-    public void updateMasterReviewInfo (Review review) {
-        deleteMasterReviewInfo(review);
-        addMasterReviewInfo(review);
+    public void updateMasterReviewInfo (Integer previousRating,Integer newRating ,Member master) {
+        deleteMasterReviewInfo(previousRating, master);
+        addMasterReviewInfo(newRating, master);
     }
 }
