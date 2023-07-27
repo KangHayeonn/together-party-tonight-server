@@ -39,6 +39,9 @@ public class ApplicationDto {
     @ApiModelProperty(value = "모임 태그", example = "[\"테니스\",\"다이어트\",\"오운완\"]")
     private List<String> clubTags;
 
+    @ApiModelProperty(value = "모집 상태", example = "true")
+    private Boolean clubState;
+
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 }

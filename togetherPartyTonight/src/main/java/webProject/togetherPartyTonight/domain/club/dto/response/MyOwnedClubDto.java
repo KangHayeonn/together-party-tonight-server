@@ -41,6 +41,9 @@ public class MyOwnedClubDto {
     @ApiModelProperty(value = "현재 모집된 인원", example = "3")
     private Integer appliedCount;
 
+    @ApiModelProperty(value = "모집 상태", example = "true")
+    private Boolean clubState;
+
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 }

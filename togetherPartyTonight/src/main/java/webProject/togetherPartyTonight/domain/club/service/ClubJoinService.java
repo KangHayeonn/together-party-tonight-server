@@ -173,6 +173,7 @@ public class ClubJoinService {
                         .approvalStatus(String.valueOf(clubSignup.getClubSignupApprovalState()))
                         .nickName(clubSignup.getClub().getMaster().getNickname())
                         .signupDate(clubSignup.getClubSignupDate())
+                        .clubState(clubSignup.getClub().getClubState())
                         .build());
             }
         }
@@ -214,6 +215,7 @@ public class ClubJoinService {
                         .longitude((float) clubPoint.getY())
                         .createdDate(c.getCreatedDate())
                         .modifiedDate(c.getModifiedDate())
+                        .clubState(c.getClubState())
                         .build());
 
             }
