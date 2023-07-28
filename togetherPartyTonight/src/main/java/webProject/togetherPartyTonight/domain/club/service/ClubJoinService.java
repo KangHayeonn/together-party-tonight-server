@@ -141,7 +141,7 @@ public class ClubJoinService {
         List<ReceivedApplicationDto> list = clubSignups.stream()
                 .map(c -> new ReceivedApplicationDto(c.getClubSignupId(), c.getClub().getClubId(), c.getClub().getClubName(),
                         c.getClubMember().getId(), c.getClubMember().getNickname(), c.getClubSignupDate(), c.getClubSignupApprovalState().toString(),
-                        c.getCreatedDate(), c.getModifiedDate()))
+                        c.getClubMember().getProfileImage(), c.getCreatedDate(), c.getModifiedDate()))
                 .collect(Collectors.toList());
 
         return new ReceivedApplicationListDto(list);

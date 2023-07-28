@@ -23,12 +23,15 @@ public class ReceivedApplicationDto {
     private String clubName;
     @ApiModelProperty(value = "모임장 id", example = "1")
     private Long memberId;
-    @ApiModelProperty(value = "모임장 닉네임", example = "어피치")
+    @ApiModelProperty(value = "모임 신청한 사람 닉네임", example = "어피치")
     private String nickName;
     @ApiModelProperty(value = "모임 신청 일자", example = "2023-07-05T17:16")
     private LocalDateTime signupDate;
     @ApiModelProperty(value = "승인 여부", example = "PENDING", allowableValues = "PENDING, APPROVE, REFUSE, KICKOUT")
     private String approvalStatus;
+
+    @ApiModelProperty(value = "모임장 프로필 이미지")
+    private String profileImage;
 
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
