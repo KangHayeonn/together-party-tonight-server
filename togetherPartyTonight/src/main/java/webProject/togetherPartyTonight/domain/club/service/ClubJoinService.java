@@ -144,7 +144,7 @@ public class ClubJoinService {
             }
         }
 
-        if (hasAuthority==false || member.getId() != club.getMaster().getId()) {
+        if (hasAuthority==false && member.getId() != club.getMaster().getId()) {
             throw new ClubException(ErrorCode.FORBIDDEN);
         }
 
