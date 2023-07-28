@@ -134,10 +134,11 @@ public class ClubJoinService {
                 () -> new ClubException(ClubErrorCode.INVALID_CLUB_ID)
         );
 
-        List<ClubMember> clubMembers = club.getClubMembers();
+        List<ClubSignup> clubSignups = clubSignupRepository.findAllByClubClubId(clubId);
         boolean hasAuthority= false;
-        for (ClubMember cm : clubMembers) {
-            if (cm.getMember().getId() == member.getId()) {
+
+        for (ClubSignup cs : clubSignups) {
+            if (cs.getClubMember().getId() == member.getId()) {
                 hasAuthority= true;
                 break;
             }
@@ -146,7 +147,6 @@ public class ClubJoinService {
         if (hasAuthority==false || member.getId() != club.getMaster().getId()) {
             throw new ClubException(ErrorCode.FORBIDDEN);
         }
-        List<ClubSignup> clubSignups = clubSignupRepository.findAllByClubClubId(clubId);
 
         List<ReceivedApplicationDto> list = clubSignups.stream()
                 .map(c -> new ReceivedApplicationDto(c.getClubSignupId(), c.getClub().getClubId(), c.getClub().getClubName(),
