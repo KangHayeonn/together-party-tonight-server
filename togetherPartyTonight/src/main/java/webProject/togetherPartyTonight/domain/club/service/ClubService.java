@@ -180,7 +180,7 @@ public class ClubService {
     }
 
     public void checkAuthority(Club club, Member member) {
-        if(club.getMaster().getId() != member.getId()) throw new ClubException(ErrorCode.FORBIDDEN);
+        if(!club.getMaster().getId().equals(member.getId())) throw new ClubException(ErrorCode.FORBIDDEN);
     }
 
 }

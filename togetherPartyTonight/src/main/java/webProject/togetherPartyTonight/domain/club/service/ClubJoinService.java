@@ -58,7 +58,7 @@ public class ClubJoinService {
                 ()->new ClubException(ClubErrorCode.INVALID_CLUB_ID)
         ) ;
 
-        if(club.getMaster().getId() == member.getId()) throw new ClubException(ClubErrorCode.CANNOT_SIGNUP_TO_MY_CLUB);
+        if(club.getMaster().getId().equals(member.getId())) throw new ClubException(ClubErrorCode.CANNOT_SIGNUP_TO_MY_CLUB);
 
         Optional<ClubSignup> alreadySignup = clubSignupRepository.findByClubClubIdAndClubMemberId(requestDto.getClubId(), member.getId());
         if(alreadySignup.isEmpty()) {
@@ -141,7 +141,7 @@ public class ClubJoinService {
         boolean hasAuthority= false;
 
         for (ClubSignup cs : clubSignups) {
-            if (cs.getClubMember().getId() == member.getId()) {
+            if (cs.getClubMember().getId().equals(member.getId())) {
                 hasAuthority= true;
                 break;
             }
@@ -274,12 +274,12 @@ public class ClubJoinService {
         Club club = clubSignup.getClub();
         Integer memberCnt = clubMemberRepository.getMemberCnt(club.getClubId());
         Integer maximum = club.getClubMaximum();
-        if (memberCnt==maximum) club.setClubState(false);
+        if (memberCnt.equals(maximum)) club.setClubState(false);
         else club.setClubState(true);
     }
 
     public void checkAuthority(Long memberId, Member member) {
-        if(memberId != member.getId()) throw new ClubException(ErrorCode.FORBIDDEN);
+        if(!memberId.equals(member.getId())) throw new ClubException(ErrorCode.FORBIDDEN);
     }
 
     public String getBillingState (ClubSignup clubSignup) {

@@ -147,7 +147,7 @@ public class ReviewService {
 
 
     public void checkAuthority(Long memberId, Member member) {
-        if(memberId != member.getId()) throw new ClubException(ErrorCode.FORBIDDEN);
+        if(!memberId.equals(member.getId())) throw new ClubException(ErrorCode.FORBIDDEN);
     }
 
     public void setReviewList (Optional<? extends Iterable<Review>> reviews, ReviewListDto reviewListDto) {
@@ -177,7 +177,7 @@ public class ReviewService {
 
     @Transactional
     public void deleteMasterReviewInfo (Integer rating, Member master) {
-        Integer reviewCount = master.getReviewCount();
+        int reviewCount = master.getReviewCount();
         float avg = master.getRatingAvg(); //평균평점
         float total = avg*reviewCount; //합계
         total -=rating; //평점 삭제
