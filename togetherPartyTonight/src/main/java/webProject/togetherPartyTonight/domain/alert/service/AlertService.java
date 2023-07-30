@@ -203,7 +203,7 @@ public class AlertService {
         Alert alert = Alert.builder()
                 .member(otherMember)
                 .alertType(CHAT)
-                .alertContent(new Gson().toJson(leaveMember))
+                .alertContent(new Gson().toJson(alertChatRoomLeaveData))
                 .alertCheckState(false)
                 .build();
         Alert saveAlert = alertRepository.save(alert);

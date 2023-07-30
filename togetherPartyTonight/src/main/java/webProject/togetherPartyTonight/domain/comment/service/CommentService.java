@@ -22,6 +22,7 @@ import webProject.togetherPartyTonight.global.websocket.WebSocketService;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -84,7 +85,7 @@ public class CommentService {
         Long commentId = requestDto.getCommentId();
         Comment reference = commentRepository.getReferenceById(commentId);
         if (reference==null) throw new CommentException(CommentErrorCode.INVALID_COMMENT_ID);
-        else if(reference.getMember().getId() != member.getId()) throw new CommentException(ErrorCode.FORBIDDEN);
+        else if(!Objects.equals(reference.getMember().getId(), member.getId())) throw new CommentException(ErrorCode.FORBIDDEN);
 
         commentRepository.deleteById(commentId);
 

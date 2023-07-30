@@ -177,9 +177,16 @@ public class SearchService {
         Random random = new Random();
 
         for (int i = 0; i < 12; i++) {
-            int randomIndex = random.nextInt(listFromSet.size());
-            String randomElement = listFromSet.remove(randomIndex);
-            res.add(randomElement);
+
+            int randomIndex;
+            if (listFromSet.size() == 0) {
+                randomIndex = 0;
+            }else randomIndex = random.nextInt(listFromSet.size());
+
+            if (listFromSet.size() > 0) {
+                String randomElement = listFromSet.remove(randomIndex);
+                res.add(randomElement);
+            }
         }
 
         return res;
