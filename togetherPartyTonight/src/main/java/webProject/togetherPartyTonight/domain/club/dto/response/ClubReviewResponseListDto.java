@@ -22,4 +22,7 @@ public class ClubReviewResponseListDto {
     @ApiModelProperty(value = "검색된 총 응답 갯수", example = "95")
     Long totalCount;
 
+    @ApiModelProperty(value = "모든 리뷰의 평균 평점", example = "3.75")
+    Float avgRating;
+
 }

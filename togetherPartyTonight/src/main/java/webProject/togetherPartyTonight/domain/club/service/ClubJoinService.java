@@ -59,6 +59,7 @@ public class ClubJoinService {
         ) ;
 
         if(club.getMaster().getId().equals(member.getId())) throw new ClubException(ClubErrorCode.CANNOT_SIGNUP_TO_MY_CLUB);
+        if (club.getClubState()==false) throw new ClubException(ClubErrorCode.RECRUIT_FINISHED);
 
         Optional<ClubSignup> alreadySignup = clubSignupRepository.findByClubClubIdAndClubMemberId(requestDto.getClubId(), member.getId());
         if(alreadySignup.isEmpty()) {

@@ -113,11 +113,14 @@ public class ClubService {
                 () -> new ClubException(ClubErrorCode.INVALID_CLUB_ID)
         );
         Optional<Page<Review>> optionalReviews = reviewRepository.findByClubClubId(clubId, pageable);
+        Long sum = reviewRepository.getSumByClubId(clubId);
         List<GetReviewDetailResponseDto> reviewList = new ArrayList<>();
         ClubReviewResponseListDto res = new ClubReviewResponseListDto();
 
         res.setCount(optionalReviews.get().getNumberOfElements());
         res.setTotalCount(optionalReviews.get().getTotalElements());
+        res.setAvgRating(getAvgRating(sum,optionalReviews.get().getTotalElements()));
+
         if (!optionalReviews.isEmpty()) {
             Page<Review> reviews = optionalReviews.get();
             for (Review r : reviews) {
@@ -181,6 +184,15 @@ public class ClubService {
 
     public void checkAuthority(Club club, Member member) {
         if(!club.getMaster().getId().equals(member.getId())) throw new ClubException(ErrorCode.FORBIDDEN);
+    }
+
+    public Float getAvgRating (Long sum, Long div) {
+        if(div.equals(0)) {
+            return 0F;
+        }
+        else {
+            return (float)sum /div;
+        }
     }
 
 }
