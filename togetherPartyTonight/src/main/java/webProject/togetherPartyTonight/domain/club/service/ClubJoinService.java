@@ -161,12 +161,19 @@ public class ClubJoinService {
     }
 
     //내가 신청한 모임 조회
-    public MyAppliedClubListDto getAppliedList(Member member, Pageable pageable, ApprovalState filter) {
+    public MyAppliedClubListDto getAppliedList(Member member, Pageable pageable, String filter) {
         List<ApplicationDto> list = new ArrayList<>();
         Optional<Page<ClubSignup>> signupMemberId;
 
-        if(filter.equals(ApprovalState.ALL)) signupMemberId = clubSignupRepository.findAllByClubMemberId(member.getId(), pageable);
-        else signupMemberId= clubSignupRepository.findAllByClubMemberIdAndClubSignupApprovalStateLike(member.getId(),filter, pageable);
+        if(filter.equals("ALL")) signupMemberId = clubSignupRepository.findAllByClubMemberId(member.getId(), pageable);
+        else if((filter.equals("PENDING")) ||(filter.equals("APPROVE")) || (filter.equals("REFUSE")) || (filter.equals("KICKOUT"))){
+            signupMemberId= clubSignupRepository.findAllByClubMemberIdAndClubSignupApprovalStateLike(member.getId(), ApprovalState.valueOf(filter), pageable);
+        }
+        else if (filter.equals("NO_REQUEST"))
+            signupMemberId = clubSignupRepository.findByClubMemberIdAndBilling(member.getId(), pageable);
+        else if(filter.equals("WAIT") || filter.equals("COMPLETED"))
+            signupMemberId = clubSignupRepository.findByClubMemberIdAndBillingWait(member.getId(),filter,pageable);
+        else throw new ClubException(ClubErrorCode.INVALID_FILTER);
 
         if(signupMemberId.isPresent()) {
 
@@ -197,7 +204,7 @@ public class ClubJoinService {
     }
 
     //내가 만든 모임 조회
-    public MyOwnedClubListDto getOwnedList(Long memberId, Pageable pageable, ClubStateFilterEnum filter) {
+    public MyOwnedClubListDto getOwnedList(Long memberId, Pageable pageable, String filter) {
         List<MyOwnedClubDto> list = new ArrayList<>();
         Optional<Page<Club>> clubs;
 
@@ -206,9 +213,12 @@ public class ClubJoinService {
                 () -> new ClubException(MemberErrorCode.MEMBER_NOT_FOUND)
         );
 
-        if (filter.equals(ClubStateFilterEnum.ALL)) clubs= clubRepository.findClubByMasterId(member.getId(), pageable);
-        else if(filter.equals(ClubStateFilterEnum.RECRUITING)) clubs= clubRepository.findClubByMasterIdAndClubState(member.getId(), true, pageable);
-        else clubs=clubRepository.findClubByMasterIdAndClubState(member.getId(), false, pageable);
+        if (filter.equals("ALL")) clubs= clubRepository.findClubByMasterId(member.getId(), pageable);
+        else if(filter.equals("RECRUITING")) clubs= clubRepository.findClubByMasterIdAndClubState(member.getId(), true, pageable);
+        else if(filter.equals("RECRUIT_FINISHED")) clubs=clubRepository.findClubByMasterIdAndClubState(member.getId(), false, pageable);
+        else if (filter.equals("BILLING_NOT_STARTED")) clubs=clubRepository.findClubByMasterIdAndBillingNotStart(member.getId(), pageable) ;
+        else if (filter.equals("BILLING_IN_PROGRESS")) clubs = clubRepository.findClubByMasterIdAndBillingStart(member.getId(),pageable) ;
+        else throw new ClubException(ClubErrorCode.INVALID_FILTER);
 
         if (clubs.isPresent()) {
             for (Club c : clubs.get()) {
@@ -275,7 +285,7 @@ public class ClubJoinService {
     public String getBillingState (ClubSignup clubSignup) {
         Member member = clubSignup.getClubMember();
         Club club = clubSignup.getClub();
-        String result = "";
+        String result = "NO_REQUEST";
         Optional<ClubMember> optionalClubMember = clubMemberRepository.findByClubClubIdAndMemberId(club.getClubId(), member.getId());
         if (optionalClubMember.isPresent()) {
             BillingHistory billingHistory = optionalClubMember.get().getBillingHistory();
