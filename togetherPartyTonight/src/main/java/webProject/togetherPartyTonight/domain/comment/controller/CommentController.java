@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +40,7 @@ public class CommentController {
     private final CommentService commentService;
     private final ResponseService responseService;
     private final MemberRepository memberRepository;
+
 
     @ApiOperation(value = "댓글 조회(입장)")
     @GetMapping(value = "/{clubId}")

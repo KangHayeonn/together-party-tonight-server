@@ -7,6 +7,8 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +24,9 @@ import webProject.togetherPartyTonight.domain.member.entity.Member;
 import webProject.togetherPartyTonight.domain.member.exception.MemberException;
 import webProject.togetherPartyTonight.domain.member.exception.errorCode.MemberErrorCode;
 import webProject.togetherPartyTonight.domain.member.repository.MemberRepository;
+import webProject.togetherPartyTonight.domain.review.dto.response.GetReviewDetailResponseDto;
+import webProject.togetherPartyTonight.domain.review.entity.Review;
+import webProject.togetherPartyTonight.domain.review.repository.ReviewRepository;
 import webProject.togetherPartyTonight.global.error.ErrorCode;
 import webProject.togetherPartyTonight.global.util.ClubUtils;
 import webProject.togetherPartyTonight.infra.S3.S3Service;
@@ -32,6 +37,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,7 +47,7 @@ public class ClubService {
     private final ClubRepository clubRepository;
     private final ClubSignupRepository clubSignupRepository;
     private final ClubMemberRepository clubMemberRepository;
-    private final MemberRepository memberRepository;
+    private final ReviewRepository reviewRepository;
 
     private final S3Service s3Service;
 
@@ -100,6 +106,27 @@ public class ClubService {
        checkAuthority(club, member);
         compareChange(clubRequest, club, image, member);
 
+    }
+
+    public ClubReviewResponseListDto getReviewsByClub (Long clubId, Pageable pageable) {
+        clubRepository.findById(clubId).orElseThrow(
+                () -> new ClubException(ClubErrorCode.INVALID_CLUB_ID)
+        );
+        Optional<Page<Review>> optionalReviews = reviewRepository.findByClubClubId(clubId, pageable);
+        List<GetReviewDetailResponseDto> reviewList = new ArrayList<>();
+        ClubReviewResponseListDto res = new ClubReviewResponseListDto();
+
+        res.setCount(optionalReviews.get().getNumberOfElements());
+        res.setTotalCount(optionalReviews.get().getTotalElements());
+        if (!optionalReviews.isEmpty()) {
+            Page<Review> reviews = optionalReviews.get();
+            for (Review r : reviews) {
+                reviewList.add(new GetReviewDetailResponseDto().toDto(r));
+            }
+        }
+        res.setReviewList(reviewList);
+
+        return res;
     }
 
     @Transactional

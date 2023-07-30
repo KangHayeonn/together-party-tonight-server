@@ -153,7 +153,7 @@ public class WebSocketService {
     public void deleteMemberFromCommentSession(Long clubId, Member member) {
         String exitSessionId = (String)redisService.getStringKeyWithMap(userSessionName, member.getId());
         commentSessionMap.forEach((key,map)-> {
-            if (clubId == key) {
+            if (clubId.equals(key)) {
                 map.forEach((sessionId, value) -> {
                     if (sessionId.equals(exitSessionId)) {
                         map.remove(sessionId);
@@ -166,7 +166,7 @@ public class WebSocketService {
     public void broadcastComment(String message, Long clubId) {
         // 받은 메시지를 다른 클라이언트들에게 전달
         commentSessionMap.forEach((key,map)-> {
-            if (clubId == key) {
+            if (clubId.equals(key)) {
                 map.forEach((sessionId, value) -> {
                     try {
                         value.sendMessage(new TextMessage(message));

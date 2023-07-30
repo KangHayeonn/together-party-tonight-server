@@ -6,6 +6,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import webProject.togetherPartyTonight.domain.alert.service.AlertService;
+import webProject.togetherPartyTonight.domain.billing.entity.Billing;
+import webProject.togetherPartyTonight.domain.billing.entity.BillingHistory;
+import webProject.togetherPartyTonight.domain.billing.entity.BillingState;
 import webProject.togetherPartyTonight.domain.club.dto.request.ApproveRequestDto;
 import webProject.togetherPartyTonight.domain.club.dto.request.ClubStateFilterEnum;
 import webProject.togetherPartyTonight.domain.club.dto.request.DeleteClubAndSignupRequestDto;
@@ -107,7 +110,7 @@ public class ClubJoinService {
             if (requestDto.getApprove()) {
                 int memberCnt = clubMemberRepository.getMemberCnt(clubSignup.getClub().getClubId());
                 int clubMaximum = clubSignup.getClub().getClubMaximum();
-                if (clubMaximum>= memberCnt) {
+                if (clubMaximum<= memberCnt) {
                     throw new ClubException(ClubErrorCode.EXCEED_CLUB_MAXIMUM);
                 }
                 clubSignup.setClubSignupApprovalState(ApprovalState.APPROVE);
@@ -170,6 +173,7 @@ public class ClubJoinService {
             for (ClubSignup clubSignup : signupMemberId.get()) {
                 int appliedCount = clubMemberRepository.getMemberCnt(clubSignup.getClub().getClubId());
                 List<String> splitTags = clubUtils.splitTags(clubSignup.getClub().getClubTags());
+                boolean billingState = getBillingState(clubSignup);
                 list.add(ApplicationDto.builder()
                         .clubSignupId(clubSignup.getClubSignupId())
                         .clubId(clubSignup.getClub().getClubId())
@@ -184,6 +188,7 @@ public class ClubJoinService {
                         .nickName(clubSignup.getClub().getMaster().getNickname())
                         .signupDate(clubSignup.getClubSignupDate())
                         .clubState(clubSignup.getClub().getClubState())
+                        .billingState(billingState)
                         .build());
             }
         }
@@ -195,6 +200,7 @@ public class ClubJoinService {
     public MyOwnedClubListDto getOwnedList(Long memberId, Pageable pageable, ClubStateFilterEnum filter) {
         List<MyOwnedClubDto> list = new ArrayList<>();
         Optional<Page<Club>> clubs;
+
 
         Member member = memberRepository.findById(memberId).orElseThrow(
                 () -> new ClubException(MemberErrorCode.MEMBER_NOT_FOUND)
@@ -209,6 +215,9 @@ public class ClubJoinService {
                 int appliedCount = clubMemberRepository.getMemberCnt(c.getClubId());
                 Point clubPoint = c.getClubPoint();
                 List<String> splitTags = clubUtils.splitTags(c.getClubTags());
+                Billing billing = c.getBilling();
+                Boolean billingRequest = false;
+                if (billing != null) billingRequest = true;
 
                 list.add(MyOwnedClubDto.builder()
                         .clubName(c.getClubName())
@@ -226,6 +235,7 @@ public class ClubJoinService {
                         .createdDate(c.getCreatedDate())
                         .modifiedDate(c.getModifiedDate())
                         .clubState(c.getClubState())
+                        .billingRequest(billingRequest)
                         .build());
 
             }
@@ -260,5 +270,18 @@ public class ClubJoinService {
 
     public void checkAuthority(Long memberId, Member member) {
         if(memberId != member.getId()) throw new ClubException(ErrorCode.FORBIDDEN);
+    }
+
+    public boolean getBillingState (ClubSignup clubSignup) {
+        Member member = clubSignup.getClubMember();
+        Club club = clubSignup.getClub();
+        Boolean result = false;
+        Optional<ClubMember> optionalClubMember = clubMemberRepository.findByClubClubIdAndMemberId(club.getClubId(), member.getId());
+        if (optionalClubMember.isPresent()) {
+            BillingHistory billingHistory = optionalClubMember.get().getBillingHistory();
+            if (billingHistory.getBillingState().equals(BillingState.COMPLETED))
+                result = true;
+        }
+        return result;
     }
 }

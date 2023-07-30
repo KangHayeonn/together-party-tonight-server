@@ -44,6 +44,9 @@ public class MyOwnedClubDto {
     @ApiModelProperty(value = "모집 상태", example = "true")
     private Boolean clubState;
 
+    @ApiModelProperty(value = "정산 요청 여부", example = "true")
+    private Boolean billingRequest;
+
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 }

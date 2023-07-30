@@ -13,6 +13,7 @@ import java.util.Optional;
 public interface ReviewRepository extends JpaRepository<Review,Long> {
 
     Optional<Review> findByClubClubIdAndMemberId (Long ClubId, Long memberId);
+    Optional<Page<Review>> findByClubClubId (Long ClubId, Pageable pageable);
     Optional<Page<Review>> findByMemberId (Long memberId, Pageable pageable);
 
     Optional<Page<Review>> findByClubMasterId (Long masterId, Pageable pageable);

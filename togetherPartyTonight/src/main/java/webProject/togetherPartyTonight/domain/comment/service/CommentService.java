@@ -39,8 +39,11 @@ public class CommentService {
                 res.add(new GetCommentResponseDto().toDto(c));
             }
         }
-        //소켓에 세션 저장
-        webSocketService.addMemberToCommentSession(clubId,member);
+
+        if (member!=null) {
+            //소켓에 세션 저장
+            webSocketService.addMemberToCommentSession(clubId, member);
+        }
         return res;
     }
 

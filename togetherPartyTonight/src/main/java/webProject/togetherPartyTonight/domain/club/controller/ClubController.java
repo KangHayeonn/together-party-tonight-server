@@ -224,6 +224,15 @@ public class ClubController {
         return responseService.getCommonResponse();
     }
 
+    @GetMapping("/reviews/{clubId}")
+    @ApiOperation(value = "모임별 리뷰 조회")
+    public SingleResponse<ClubReviewResponseListDto> getReviewsByClub (@PathVariable @ApiParam(name = "모임 id", required = true) Long clubId, Pageable pageable,
+                                                                       HttpServletRequest request) {
+        log.info("[{}] {}",request.getMethod(),request.getRequestURI());
+        ClubReviewResponseListDto res = clubService.getReviewsByClub(clubId, pageable);
+        return responseService.getSingleResponse(res);
+    }
+
     public Member getMemberBySecurityContextHolder() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username = userDetails.getUsername();

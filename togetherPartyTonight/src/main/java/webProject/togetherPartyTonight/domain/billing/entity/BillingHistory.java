@@ -24,7 +24,7 @@ public class BillingHistory extends BaseEntity {
     @JoinColumn(name = "billing_id")
     Billing billing;
 
-    @ManyToOne(fetch = LAZY)
+    @OneToOne(fetch = LAZY)
     @JoinColumn(name = "club_member_id")
     ClubMember clubMember;
 
