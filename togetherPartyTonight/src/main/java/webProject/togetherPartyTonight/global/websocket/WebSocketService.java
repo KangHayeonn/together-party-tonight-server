@@ -9,8 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import webProject.togetherPartyTonight.domain.comment.dto.response.CreateCommentResponseDto;
-import webProject.togetherPartyTonight.domain.comment.dto.response.GetCommentResponseDto;
 import webProject.togetherPartyTonight.domain.comment.exception.CommentErrorCode;
 import webProject.togetherPartyTonight.domain.comment.exception.CommentException;
 import webProject.togetherPartyTonight.domain.member.entity.Member;
@@ -45,7 +43,7 @@ public class WebSocketService {
 
     //멀티 쓰레드에서 사용 가능한 해시맵
     private Map<String, WebSocketSession> sessionMap = new ConcurrentHashMap<>();
-    private Map<Long,Map<String, WebSocketSession>> commentSessionMap = new ConcurrentHashMap<>();
+    private Map<Long, Map<String, WebSocketSession>> commentSessionMap = new ConcurrentHashMap<>();
 
     //command 수행 manager 해시맵
     private HashMap<String/**command*/, WebSocketHandler /** commandHandler*/> commandHandler = new HashMap<>();
@@ -70,19 +68,19 @@ public class WebSocketService {
 
     public void removeMember(WebSocketSession session) {
         sessionMap.remove(session.getId());
-        logOut(session.getId());
+        logout(session.getId());
     }
 
     //모든 세션에 전체 발송
     public void broadcastAll(String message, String sessionId) {
 
         // 받은 메시지를 다른 클라이언트들에게 전달
-        sessionMap.forEach((key,session)-> {
+        sessionMap.forEach((key, session) -> {
             try {
                 if (!session.isOpen()) {
                     removeMember(session);
                 } else {
-                    session.sendMessage(new TextMessage("sender :"+sessionId+", message: "+message));
+                    session.sendMessage(new TextMessage("sender :" + sessionId + ", message: " + message));
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -91,8 +89,9 @@ public class WebSocketService {
     }
 
     public void login(long userId, String sessionId) {
+        log.info("[WebSocketService] login is call memberId: {}, sessionId: {}", userId, sessionId);
         memberRepository.findById(userId)
-                .orElseThrow(()->{
+                .orElseThrow(() -> {
                     log.info("[WebSocketService] login error user is Empty userId: {}", userId);
                     throw new RuntimeException();
                 });
@@ -101,10 +100,23 @@ public class WebSocketService {
         redisService.addStringKeyWithMap(userSessionName, userId, sessionId);
     }
 
-    public void logOut(String sessionId) {
+    public void logout(String sessionId) {
         Long userId = (Long) redisService.getStringKeyWithMap(sessionUserName, sessionId);
+        log.info("[WebSocketService] logout is call memberId: {}, sessionId: {}", userId, sessionId);
         redisService.removeStringKeyWithMapKey(sessionUserName, sessionId);
         redisService.removeStringKeyWithMapKey(userSessionName, userId);
+    }
+
+    public void logoutByMemberId(Long memberId) {
+        String sessionId = (String) redisService.getStringKeyWithMap(userSessionName, memberId);
+        log.info("[WebSocketService] logoutByMemberId is call memberId: {}, sessionId: {}", memberId, sessionId);
+
+        if (sessionMap.containsKey(sessionId)) {
+            sessionMap.remove(sessionId);
+        }
+        redisService.removeStringKeyWithMapKey(sessionUserName, sessionId);
+        redisService.removeStringKeyWithMapKey(userSessionName, memberId);
+
     }
 
     public void executeCommand(String receivedMessage, String sessionId) {
@@ -133,27 +145,32 @@ public class WebSocketService {
         }
     }
 
-        public void addMemberToCommentSession(Long clubId, Member member)  {
+    public void addMemberToCommentSession(Long clubId, Member member) {
 
-            String sessionId = (String)redisService.getStringKeyWithMap(userSessionName, member.getId());
-            WebSocketSession webSocketSession = sessionMap.get(sessionId);
+        String sessionId = (String) redisService.getStringKeyWithMap(userSessionName, member.getId());
+        if (StringUtils.isEmpty(sessionId)) {
+            return;
+        }
+        if (!sessionMap.containsKey(sessionId)) {
+            return;
+        }
+        WebSocketSession webSocketSession = sessionMap.get(sessionId);
 
-            //sessionMap 에 없다면 삽입
+        //sessionMap 에 없다면 삽입
         if (!commentSessionMap.containsKey(clubId)) {
             ConcurrentHashMap<String, WebSocketSession> webSocketSessionMap = new ConcurrentHashMap<>();
             webSocketSessionMap.put(sessionId, webSocketSession);
             commentSessionMap.put(clubId, webSocketSessionMap);
-        }
-        else {
+        } else {
             Map<String, WebSocketSession> getSessionMap = commentSessionMap.get(clubId);
             getSessionMap.put(sessionId, webSocketSession);
         }
     }
 
     public void deleteMemberFromCommentSession(Long clubId, Member member) {
-        String exitSessionId = (String)redisService.getStringKeyWithMap(userSessionName, member.getId());
-        commentSessionMap.forEach((key,map)-> {
-            if (clubId.equals(key)) {
+        String exitSessionId = (String) redisService.getStringKeyWithMap(userSessionName, member.getId());
+        commentSessionMap.forEach((key, map) -> {
+            if (Objects.equals(clubId, key)) {
                 map.forEach((sessionId, value) -> {
                     if (sessionId.equals(exitSessionId)) {
                         map.remove(sessionId);
@@ -165,11 +182,12 @@ public class WebSocketService {
 
     public void broadcastComment(String message, Long clubId) {
         // 받은 메시지를 다른 클라이언트들에게 전달
-        commentSessionMap.forEach((key,map)-> {
-            if (clubId.equals(key)) {
+        commentSessionMap.forEach((key, map) -> {
+            if (Objects.equals(clubId, key)) {
                 map.forEach((sessionId, value) -> {
                     try {
-                        value.sendMessage(new TextMessage(message));
+                        if (value.isOpen())
+                            value.sendMessage(new TextMessage(message));
                     } catch (IOException e) {
                         throw new CommentException(CommentErrorCode.SOCKET_MESSAGE_PUB_FAIL);
                     }
@@ -177,5 +195,4 @@ public class WebSocketService {
             }
         });
     }
-
 }
