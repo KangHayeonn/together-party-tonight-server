@@ -43,7 +43,7 @@ public class ApplicationDto {
     private Boolean clubState;
 
     @ApiModelProperty(value = "정산 완료 여부", example = "true")
-    private Boolean billingState;
+    private String billingState;
 
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;

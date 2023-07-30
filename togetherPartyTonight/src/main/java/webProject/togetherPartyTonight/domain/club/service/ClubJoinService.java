@@ -173,7 +173,7 @@ public class ClubJoinService {
             for (ClubSignup clubSignup : signupMemberId.get()) {
                 int appliedCount = clubMemberRepository.getMemberCnt(clubSignup.getClub().getClubId());
                 List<String> splitTags = clubUtils.splitTags(clubSignup.getClub().getClubTags());
-                boolean billingState = getBillingState(clubSignup);
+                String billingState = getBillingState(clubSignup);
                 list.add(ApplicationDto.builder()
                         .clubSignupId(clubSignup.getClubSignupId())
                         .clubId(clubSignup.getClub().getClubId())
@@ -272,15 +272,17 @@ public class ClubJoinService {
         if(memberId != member.getId()) throw new ClubException(ErrorCode.FORBIDDEN);
     }
 
-    public boolean getBillingState (ClubSignup clubSignup) {
+    public String getBillingState (ClubSignup clubSignup) {
         Member member = clubSignup.getClubMember();
         Club club = clubSignup.getClub();
-        Boolean result = false;
+        String result = "";
         Optional<ClubMember> optionalClubMember = clubMemberRepository.findByClubClubIdAndMemberId(club.getClubId(), member.getId());
         if (optionalClubMember.isPresent()) {
             BillingHistory billingHistory = optionalClubMember.get().getBillingHistory();
-            if (billingHistory.getBillingState().equals(BillingState.COMPLETED))
-                result = true;
+            if (billingHistory==null) result= "NO_REQUEST";
+            else if (billingHistory.getBillingState().equals(BillingState.COMPLETED))
+                result = "COMPLETED";
+            else result = "WAIT";
         }
         return result;
     }

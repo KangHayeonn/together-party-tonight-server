@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.geolatte.geom.M;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -92,11 +93,16 @@ public class CommentController {
     }
 
     public Member getMemberBySecurityContextHolder() {
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username = userDetails.getUsername();
-        return memberRepository.findById(Long.parseLong(username))
-                .orElseThrow(() -> {
-                    throw new ClubException(MemberErrorCode.MEMBER_NOT_FOUND);
-                });
+        Object principle = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principle.equals("anonymousUser")) {
+            return null;
+        } else {
+            UserDetails userDetails = (UserDetails) principle;
+            String username = userDetails.getUsername();
+            return memberRepository.findById(Long.parseLong(username))
+                    .orElseThrow(() -> {
+                        throw new ClubException(MemberErrorCode.MEMBER_NOT_FOUND);
+                    });
+        }
     }
 }
