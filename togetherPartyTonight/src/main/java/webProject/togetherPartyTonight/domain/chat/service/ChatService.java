@@ -99,6 +99,7 @@ public class ChatService {
         chatRooms.addAll(member.getBChatRooms());
 
         chatRooms.sort(Comparator.comparing(BaseEntity::getModifiedDate));
+        Collections.reverse(chatRooms);
 
         List<ChatRoomListResponseDto> chatRoomList = new ArrayList<>();
 

@@ -27,7 +27,7 @@ public class RedisConfig {
         redisStandaloneConfiguration.setHostName(host);
         redisStandaloneConfiguration.setPort(port);
         redisStandaloneConfiguration.setPassword(password);
-        LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(host, port);
+        LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(redisStandaloneConfiguration);
         // LettuceConnectionFactory를 구성하는 추가 설정 작성
         connectionFactory.afterPropertiesSet(); // 초기화 수행
         return connectionFactory;

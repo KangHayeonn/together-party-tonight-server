@@ -14,6 +14,7 @@ import webProject.togetherPartyTonight.domain.member.service.AuthService;
 import webProject.togetherPartyTonight.global.common.ResponseWithData;
 import webProject.togetherPartyTonight.global.common.response.CommonResponse;
 import webProject.togetherPartyTonight.global.common.service.ResponseService;
+import webProject.togetherPartyTonight.global.websocket.WebSocketService;
 
 import javax.validation.Valid;
 
@@ -31,6 +32,7 @@ public class AuthController {
     private final ResponseService responseService;
 
     private final MailService mailService;
+    private final WebSocketService webSocketService;
 
     @PostMapping("/signup")
     @ApiOperation(value = "회원가입", notes = "회원가입 API 입니다.")
@@ -100,6 +102,7 @@ public class AuthController {
     @ApiOperation(value = "로그아웃", notes = "로그아웃 API입니다.")
     public CommonResponse logout(@PathVariable Long userId){
         authService.logout(userId);
+        webSocketService.logoutByMemberId(userId);
         return responseService.getCommonResponse();
     }
 

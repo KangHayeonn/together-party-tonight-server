@@ -33,7 +33,7 @@ public class AlertController {
             @ApiResponse(code = 400, message = "멤버를 찾을 수 없습니다"),
             @ApiResponse(code =  500, message = "내부 서버 오류")
     })
-    @GetMapping("/")
+    @PostMapping("")
     public SingleResponse<AlertListResponseDto> getAlertList(@RequestBody AlertListRequestDto alertListRequestDto, HttpServletRequest httpServletRequest) {
         return alertService.getAlertList(alertListRequestDto);
     }
