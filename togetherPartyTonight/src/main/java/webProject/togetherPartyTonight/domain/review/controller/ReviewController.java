@@ -16,6 +16,7 @@ import webProject.togetherPartyTonight.domain.member.exception.errorCode.MemberE
 import webProject.togetherPartyTonight.domain.member.repository.MemberRepository;
 import webProject.togetherPartyTonight.domain.review.dto.request.CreateReviewRequestDto;
 import webProject.togetherPartyTonight.domain.review.dto.request.UpdateReviewRequestDto;
+import webProject.togetherPartyTonight.domain.review.dto.response.CreateReviewResponseDto;
 import webProject.togetherPartyTonight.domain.review.dto.response.GetReviewDetailResponseDto;
 import webProject.togetherPartyTonight.domain.review.dto.response.ReviewListDto;
 import webProject.togetherPartyTonight.domain.review.service.ReviewService;
@@ -48,13 +49,13 @@ public class ReviewController {
                     "\t\"reviewContent\": \"리뷰입니다 리뷰입니다\",\n" +
                     "}")
     })
-    public CommonResponse addReview (@RequestPart(name = "data") @Valid CreateReviewRequestDto createReviewRequestDto,
+    public SingleResponse addReview (@RequestPart(name = "data") @Valid CreateReviewRequestDto createReviewRequestDto,
                                                      @RequestPart(required = false)MultipartFile image, HttpServletRequest request) {
         log.info("[{}] {}",request.getMethod(),request.getRequestURI());
         Member member = getMemberBySecurityContextHolder();
 
-        reviewService.addReview(createReviewRequestDto, image, member);
-        return responseService.getCommonResponse();
+        CreateReviewResponseDto res = reviewService.addReview(createReviewRequestDto, image, member);
+        return responseService.getSingleResponse(res);
     }
 
     @GetMapping("/{reviewId}")

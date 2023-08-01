@@ -18,6 +18,8 @@ import java.time.LocalDateTime;
 @ApiModel("댓글 조회에 대한 응답")
 public class GetCommentResponseDto {
     @ApiModelProperty(value = "요청 종류", example = "READ")
+    private String method;
+    @ApiModelProperty(value = "댓글 id", example = "1")
     private Long commentId;
     @ApiModelProperty(value = "댓글 작성자 id", example = "1")
     private Long memberId;
@@ -34,6 +36,7 @@ public class GetCommentResponseDto {
 
     public GetCommentResponseDto toDto (Comment comment) {
         return GetCommentResponseDto.builder()
+                .method("READ")
                 .commentId(comment.getId())
                 .memberId(comment.getMember().getId())
                 .nickName(comment.getMember().getNickname())

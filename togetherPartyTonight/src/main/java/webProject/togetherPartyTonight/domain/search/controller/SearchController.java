@@ -79,11 +79,11 @@ public class SearchController {
         return responseService.getListResponse(res);
     }
 
-    @GetMapping("/tags/random")
-    @ApiOperation(value = "태그 랜덤 반환", notes = "기존에 있는 태그 중 12개 반환")
-    public ListResponse<String> randomTags (HttpServletRequest request) {
+    @GetMapping("/tags/popular")
+    @ApiOperation(value = "자주 사용된 태그 반환", notes = "기존에 있는 태그 중 12개 반환")
+    public ListResponse<String> popularTags (HttpServletRequest request) {
         log.info("[{}] {}",request.getMethod(),request.getRequestURI());
-        return responseService.getListResponse(searchService.getRandomTags());
+        return responseService.getListResponse(searchService.getPopularTags());
     }
 
 }

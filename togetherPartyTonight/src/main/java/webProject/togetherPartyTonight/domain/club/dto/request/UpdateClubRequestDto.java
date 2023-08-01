@@ -31,10 +31,10 @@ public class UpdateClubRequestDto extends CreateClubRequestDto {
         club.setClubPoint(point);
         club.setImage(image);
 
-        if (flag ==-1) {
+        if (flag.equals(-1)) {
             throw new ClubException(ClubErrorCode.INVALID_CLUB_MAXIMUM);
         }
-        else if (flag ==0) {
+        else if (flag.equals(0)) {
             club.setClubMaximum(this.getClubMaximum());
             club.setClubState(false);
         }

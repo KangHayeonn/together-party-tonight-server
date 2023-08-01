@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.ColumnTransformer;
 import org.hibernate.annotations.DynamicInsert;
 import org.locationtech.jts.geom.Point;
+import webProject.togetherPartyTonight.domain.billing.entity.Billing;
 import webProject.togetherPartyTonight.domain.chat.entity.ChatRoom;
 import webProject.togetherPartyTonight.domain.member.entity.Member;
 import webProject.togetherPartyTonight.global.common.BaseEntity;
@@ -74,8 +75,11 @@ public class Club extends BaseEntity {
     @Column(name = "club_image", nullable = false)
     private String image;
 
-    @OneToMany(mappedBy = "clubMemberId", fetch = LAZY)
+    @OneToMany(mappedBy = "club", fetch = LAZY)
     private List<ClubMember> clubMembers = new ArrayList<>();
+
+    @OneToOne(mappedBy = "club", fetch = LAZY)
+    private Billing billing;
 
 
 
