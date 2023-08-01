@@ -45,6 +45,9 @@ public class ApplicationDto {
     @ApiModelProperty(value = "모집 날짜와 시간")
     private String meetingDate;
 
+    @ApiModelProperty(value = "리뷰 작성 여부")
+    private Boolean isReviewWritten;
+
     @ApiModelProperty(value = "정산 완료 여부", example = "COMPLETED,WAIT,NO_REQUEST")
     private String billingState;
 
