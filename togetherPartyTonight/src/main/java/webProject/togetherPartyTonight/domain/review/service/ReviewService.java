@@ -11,9 +11,11 @@ import webProject.togetherPartyTonight.domain.club.exception.ClubErrorCode;
 import webProject.togetherPartyTonight.domain.club.exception.ClubException;
 import webProject.togetherPartyTonight.domain.club.repository.ClubMemberRepository;
 import webProject.togetherPartyTonight.domain.club.repository.ClubRepository;
+import webProject.togetherPartyTonight.domain.comment.dto.response.CreateCommentResponseDto;
 import webProject.togetherPartyTonight.domain.member.entity.Member;
 import webProject.togetherPartyTonight.domain.review.dto.request.CreateReviewRequestDto;
 import webProject.togetherPartyTonight.domain.review.dto.request.UpdateReviewRequestDto;
+import webProject.togetherPartyTonight.domain.review.dto.response.CreateReviewResponseDto;
 import webProject.togetherPartyTonight.domain.review.dto.response.GetReviewDetailResponseDto;
 import webProject.togetherPartyTonight.domain.review.dto.response.MyPageReviewResponseDto;
 import webProject.togetherPartyTonight.domain.review.dto.response.ReviewListDto;
@@ -42,7 +44,7 @@ public class ReviewService {
     private final String directory = "review/";
 
     @Transactional
-    public void addReview(CreateReviewRequestDto request, MultipartFile image, Member member) {
+    public CreateReviewResponseDto addReview(CreateReviewRequestDto request, MultipartFile image, Member member) {
         Long clubId = request.getClubId();
 
         Club club = clubRepository.findById(clubId).orElseThrow(
@@ -68,6 +70,7 @@ public class ReviewService {
             Review review = request.toEntity(club, clubMember.getMember(),imageUrl);
             reviewRepository.save(review);
             addMasterReviewInfo(review.getRating(), club.getMaster());
+            return new CreateReviewResponseDto(review.getReviewId());
         }
         else throw new ReviewException(ReviewErrorCode.INVALID_REVIEW_DATE);
     }

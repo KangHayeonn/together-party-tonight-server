@@ -30,8 +30,20 @@ public class ReceivedApplicationDto {
     @ApiModelProperty(value = "승인 여부", example = "PENDING", allowableValues = "PENDING, APPROVE, REFUSE, KICKOUT")
     private String approvalStatus;
 
-    @ApiModelProperty(value = "모임장 프로필 이미지")
+    @ApiModelProperty(value = "신청한 사람 프로필 이미지")
     private String profileImage;
+
+    @ApiModelProperty(value = "모임장 id")
+    private Long masterId;
+
+    @ApiModelProperty(value = "모임장 프로필 이미지")
+    private String masterProfileImage;
+
+    @ApiModelProperty(value = "모임장 닉네임")
+    private String masterNickname;
+
+    @ApiModelProperty(value = "모임장 여부")
+    private Boolean isMaster;
 
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;

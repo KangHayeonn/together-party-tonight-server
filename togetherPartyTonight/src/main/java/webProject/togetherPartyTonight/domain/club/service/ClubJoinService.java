@@ -148,14 +148,15 @@ public class ClubJoinService {
             }
         }
 
-        if (hasAuthority==false && member.getId() != club.getMaster().getId()) {
+        if (hasAuthority==false && !member.getId().equals(club.getMaster().getId())) {
             throw new ClubException(ErrorCode.FORBIDDEN);
         }
 
         List<ReceivedApplicationDto> list = clubSignups.stream()
                 .map(c -> new ReceivedApplicationDto(c.getClubSignupId(), c.getClub().getClubId(), c.getClub().getClubName(),
                         c.getClubMember().getId(), c.getClubMember().getNickname(), c.getClubSignupDate(), c.getClubSignupApprovalState().toString(),
-                        c.getClubMember().getProfileImage(), c.getCreatedDate(), c.getModifiedDate()))
+                        c.getClubMember().getProfileImage(),c.getClubMaster().getId(), c.getClubMaster().getProfileImage(),
+                        c.getClubMaster().getNickname(), member.getId().equals(club.getMaster().getId()), c.getCreatedDate(), c.getModifiedDate() ))
                 .collect(Collectors.toList());
 
         return new ReceivedApplicationListDto(list);
@@ -191,6 +192,7 @@ public class ClubJoinService {
                         .modifiedDate(clubSignup.getModifiedDate())
                         .appliedCount(appliedCount)
                         .clubTags(splitTags)
+                        .meetingDate(String.valueOf(clubSignup.getClub().getMeetingDate()))
                         .clubMaximum(clubSignup.getClub().getClubMaximum())
                         .approvalStatus(String.valueOf(clubSignup.getClubSignupApprovalState()))
                         .nickName(clubSignup.getClub().getMaster().getNickname())
