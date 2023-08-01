@@ -111,9 +111,10 @@ public class WebSocketService {
         String sessionId = (String) redisService.getStringKeyWithMap(userSessionName, memberId);
         log.info("[WebSocketService] logoutByMemberId is call memberId: {}, sessionId: {}", memberId, sessionId);
 
-        if (sessionMap.containsKey(sessionId)) {
+        if (sessionId != null) {
             sessionMap.remove(sessionId);
         }
+
         redisService.removeStringKeyWithMapKey(sessionUserName, sessionId);
         redisService.removeStringKeyWithMapKey(userSessionName, memberId);
 
