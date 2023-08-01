@@ -18,7 +18,8 @@ public interface ReviewRepository extends JpaRepository<Review,Long> {
     Optional<Page<Review>> findByClubClubId (Long ClubId, Pageable pageable);
     Optional<Page<Review>> findByMemberId (Long memberId, Pageable pageable);
 
-    @Query(nativeQuery = true, value = "SELECT SUM(review_rating) FROM review WHERE club_id=:clubId")
+    @Query(nativeQuery = true, value = "SELECT CASE WHEN SUM(review_rating) IS NULL THEN 0 ELSE SUM(review_rating) END " +
+            "FROM review WHERE club_id=:clubId")
     Long getSumByClubId (@Param(value = "clubId") Long clubId);
 
     Optional<Page<Review>> findByClubMasterId (Long masterId, Pageable pageable);

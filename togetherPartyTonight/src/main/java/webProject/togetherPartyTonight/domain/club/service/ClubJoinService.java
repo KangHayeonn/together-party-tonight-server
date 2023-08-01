@@ -28,6 +28,7 @@ import webProject.togetherPartyTonight.domain.member.entity.Member;
 import webProject.togetherPartyTonight.domain.member.exception.MemberException;
 import webProject.togetherPartyTonight.domain.member.exception.errorCode.MemberErrorCode;
 import webProject.togetherPartyTonight.domain.member.repository.MemberRepository;
+import webProject.togetherPartyTonight.domain.review.repository.ReviewRepository;
 import webProject.togetherPartyTonight.global.error.ErrorCode;
 import webProject.togetherPartyTonight.global.util.ClubUtils;
 
@@ -48,6 +49,8 @@ public class ClubJoinService {
     private final ClubSignupRepository clubSignupRepository;
     private final ClubMemberRepository clubMemberRepository;
     private final ClubUtils clubUtils;
+
+    private final ReviewRepository reviewRepository;
 
     private final AlertService alertService;
 
@@ -183,6 +186,13 @@ public class ClubJoinService {
                 int appliedCount = clubMemberRepository.getMemberCnt(clubSignup.getClub().getClubId());
                 List<String> splitTags = clubUtils.splitTags(clubSignup.getClub().getClubTags());
                 String billingState = getBillingState(clubSignup);
+
+                Boolean isReviewWritten;
+
+                if (reviewRepository.findByClubClubIdAndMemberId(clubSignup.getClub().getClubId(), clubSignup.getClubMember().getId()).isPresent())
+                    isReviewWritten=true;
+                else isReviewWritten=false;
+
                 list.add(ApplicationDto.builder()
                         .clubSignupId(clubSignup.getClubSignupId())
                         .clubId(clubSignup.getClub().getClubId())
@@ -192,6 +202,7 @@ public class ClubJoinService {
                         .modifiedDate(clubSignup.getModifiedDate())
                         .appliedCount(appliedCount)
                         .clubTags(splitTags)
+                        .isReviewWritten(isReviewWritten)
                         .meetingDate(String.valueOf(clubSignup.getClub().getMeetingDate()))
                         .clubMaximum(clubSignup.getClub().getClubMaximum())
                         .approvalStatus(String.valueOf(clubSignup.getClubSignupApprovalState()))

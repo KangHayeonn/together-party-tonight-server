@@ -27,6 +27,7 @@ import webProject.togetherPartyTonight.domain.member.repository.MemberRepository
 import webProject.togetherPartyTonight.domain.review.dto.response.GetReviewDetailResponseDto;
 import webProject.togetherPartyTonight.domain.review.entity.Review;
 import webProject.togetherPartyTonight.domain.review.repository.ReviewRepository;
+import webProject.togetherPartyTonight.domain.search.repository.TagRepository;
 import webProject.togetherPartyTonight.global.error.ErrorCode;
 import webProject.togetherPartyTonight.global.util.ClubUtils;
 import webProject.togetherPartyTonight.infra.S3.S3Service;
@@ -51,6 +52,8 @@ public class ClubService {
 
     private final S3Service s3Service;
 
+    private final TagRepository tagRepository;
+
     private final String directory = "club/";
     private final ClubUtils clubUtils;
 
@@ -71,6 +74,9 @@ public class ClubService {
         Club club = clubRequest.toClub(member, point, url);
 
         clubRepository.save(club);
+
+        addTagCount(clubUtils.splitTags(club.getClubTags()));
+
 
     }
 
@@ -96,6 +102,9 @@ public class ClubService {
 
         clubMemberRepository.deleteByClubClubId(clubId);
         clubSignupRepository.deleteByClubClubId(clubId);
+
+        deleteTagCount(clubUtils.splitTags(club.getClubTags()));
+
         }
 
     @Transactional
@@ -104,7 +113,9 @@ public class ClubService {
         Club club = clubRepository.findByClubIdAndMasterId(clubId, member.getId())
                 .orElseThrow(()-> new ClubException(ClubErrorCode.INVALID_CLUB_ID));
        checkAuthority(club, member);
-        compareChange(clubRequest, club, image, member);
+       deleteTagCount(clubUtils.splitTags(club.getClubTags()));
+       addTagCount(clubUtils.splitTags(clubRequest.getClubTags()));
+       compareChange(clubRequest, club, image, member);
 
     }
 
@@ -187,11 +198,23 @@ public class ClubService {
     }
 
     public Float getAvgRating (Long sum, Long div) {
-        if(div.equals(0)) {
+        if(div.equals(0L)) {
             return 0F;
         }
         else {
             return (float)sum /div;
+        }
+    }
+
+    public void addTagCount (List<String> tags) {
+        for (String t : tags) {
+            tagRepository.saveTagNameAndTagCount(t);
+        }
+    }
+
+    public void deleteTagCount (List<String> tags) {
+        for (String t : tags) {
+            tagRepository.deleteTagCount(t);
         }
     }
 
