@@ -198,7 +198,7 @@ public class ClubService {
     }
 
     public Float getAvgRating (Long sum, Long div) {
-        if(div.equals(0)) {
+        if(div.equals(0L)) {
             return 0F;
         }
         else {
