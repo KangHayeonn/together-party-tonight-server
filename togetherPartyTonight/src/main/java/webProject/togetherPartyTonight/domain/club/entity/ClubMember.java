@@ -1,6 +1,8 @@
 package webProject.togetherPartyTonight.domain.club.entity;
 
 import lombok.*;
+import webProject.togetherPartyTonight.domain.billing.entity.Billing;
+import webProject.togetherPartyTonight.domain.billing.entity.BillingHistory;
 import webProject.togetherPartyTonight.domain.member.entity.Member;
 import webProject.togetherPartyTonight.global.common.BaseEntity;
 
@@ -35,6 +37,9 @@ public class ClubMember extends BaseEntity {
 
     @Column(name = "club_join_date", nullable = false)
     private LocalDateTime clubJoinDate;
+
+    @OneToOne(mappedBy = "clubMember", fetch = LAZY)
+    private BillingHistory billingHistory;
 
     public ClubMember (Club club, Member member) {
         this.club= club;

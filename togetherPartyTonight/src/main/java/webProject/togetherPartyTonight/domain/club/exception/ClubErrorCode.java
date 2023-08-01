@@ -16,7 +16,8 @@ public enum ClubErrorCode implements ErrorInterface {
     CANNOT_SIGNUP_TO_MY_CLUB(HttpStatus.BAD_REQUEST,"내가 만든 모임에는 신청할 수 없습니다."),
     ALREADY_SIGNUP(HttpStatus.BAD_REQUEST, "이미 가입 신청을 했습니다."),
     EXCEED_CLUB_MAXIMUM(HttpStatus.NOT_ACCEPTABLE, "최대 모임 인원을 초과하여 더이상 수락할 수 없습니다."),
-
+    INVALID_FILTER(HttpStatus.BAD_REQUEST, "잘못된 이름의 필터입니다."),
+    RECRUIT_FINISHED(HttpStatus.BAD_REQUEST,"모집 완료된 모임에는 더이상 신청을 할 수 없습니다."),
     INVALID_CATEGORY (HttpStatus.BAD_REQUEST,"잘못된 카테고리입니다.");
 
     private final HttpStatus httpStatus;

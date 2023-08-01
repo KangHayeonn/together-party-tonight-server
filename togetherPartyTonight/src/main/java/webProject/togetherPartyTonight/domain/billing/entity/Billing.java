@@ -21,7 +21,7 @@ public class Billing extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = LAZY)
+    @OneToOne(fetch = LAZY)
     @JoinColumn(name = "club_id", nullable = false)
     private Club club;
 
