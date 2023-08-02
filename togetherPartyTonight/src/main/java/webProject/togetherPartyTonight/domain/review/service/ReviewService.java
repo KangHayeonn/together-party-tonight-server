@@ -11,9 +11,11 @@ import webProject.togetherPartyTonight.domain.club.exception.ClubErrorCode;
 import webProject.togetherPartyTonight.domain.club.exception.ClubException;
 import webProject.togetherPartyTonight.domain.club.repository.ClubMemberRepository;
 import webProject.togetherPartyTonight.domain.club.repository.ClubRepository;
+import webProject.togetherPartyTonight.domain.comment.dto.response.CreateCommentResponseDto;
 import webProject.togetherPartyTonight.domain.member.entity.Member;
 import webProject.togetherPartyTonight.domain.review.dto.request.CreateReviewRequestDto;
 import webProject.togetherPartyTonight.domain.review.dto.request.UpdateReviewRequestDto;
+import webProject.togetherPartyTonight.domain.review.dto.response.CreateReviewResponseDto;
 import webProject.togetherPartyTonight.domain.review.dto.response.GetReviewDetailResponseDto;
 import webProject.togetherPartyTonight.domain.review.dto.response.MyPageReviewResponseDto;
 import webProject.togetherPartyTonight.domain.review.dto.response.ReviewListDto;
@@ -42,7 +44,7 @@ public class ReviewService {
     private final String directory = "review/";
 
     @Transactional
-    public void addReview(CreateReviewRequestDto request, MultipartFile image, Member member) {
+    public CreateReviewResponseDto addReview(CreateReviewRequestDto request, MultipartFile image, Member member) {
         Long clubId = request.getClubId();
 
         Club club = clubRepository.findById(clubId).orElseThrow(
@@ -67,6 +69,8 @@ public class ReviewService {
             }
             Review review = request.toEntity(club, clubMember.getMember(),imageUrl);
             reviewRepository.save(review);
+            addMasterReviewInfo(review.getRating(), club.getMaster());
+            return new CreateReviewResponseDto(review.getReviewId());
         }
         else throw new ReviewException(ReviewErrorCode.INVALID_REVIEW_DATE);
     }
@@ -98,8 +102,9 @@ public class ReviewService {
         else {
             imageUrl= s3Service.getImage("review_default.jpg");
         }
-
+        updateMasterReviewInfo(review.getRating(), request.getRating(), review.getClub().getMaster());
         request.modify(review, imageUrl); //디비에 새로운 수정사항 반영
+
     }
 
     @Transactional
@@ -112,7 +117,10 @@ public class ReviewService {
 
         if (!review.getImageUrl().contains("default"))
             s3Service.deleteImage(review.getImageUrl());
+
+        deleteMasterReviewInfo(review.getRating(), review.getClub().getMaster());
         reviewRepository.deleteById(reviewId);
+
 
     }
 
@@ -125,10 +133,11 @@ public class ReviewService {
 
     }
 
-    public ReviewListDto getOthersReviews (Long memberId ) {
-        Optional<List<Review>> optionalReviews = reviewRepository.findByClubMasterId(memberId);
+    public ReviewListDto getOthersReviews (Long memberId , Pageable pageable) {
+        Optional<Page<Review>> optionalReviews = reviewRepository.findByClubMasterId(memberId, pageable);
         ReviewListDto reviewListDto = new ReviewListDto();
         setReviewList(optionalReviews, reviewListDto);
+        setPageable(reviewListDto, optionalReviews.get());
         return reviewListDto;
     }
 
@@ -141,7 +150,7 @@ public class ReviewService {
 
 
     public void checkAuthority(Long memberId, Member member) {
-        if(memberId != member.getId()) throw new ClubException(ErrorCode.FORBIDDEN);
+        if(!memberId.equals(member.getId())) throw new ClubException(ErrorCode.FORBIDDEN);
     }
 
     public void setReviewList (Optional<? extends Iterable<Review>> reviews, ReviewListDto reviewListDto) {
@@ -152,5 +161,43 @@ public class ReviewService {
             }
         }
         reviewListDto.setReviewList(list);
+    }
+
+    @Transactional
+    public void addMasterReviewInfo (Integer rating, Member master) {
+        int reviewCount = master.getReviewCount();
+        float avg = master.getRatingAvg();
+
+        float total = avg * reviewCount;
+        total += rating; //새로운 합계
+        reviewCount += 1; //리뷰 갯수 증가
+        avg = total/reviewCount; //새로운 평점
+        System.out.println("after add avg: "+ avg);
+        master.setReviewCount(reviewCount);
+        master.setRatingAvg(avg);
+
+    }
+
+    @Transactional
+    public void deleteMasterReviewInfo (Integer rating, Member master) {
+        int reviewCount = master.getReviewCount();
+        float avg = master.getRatingAvg(); //평균평점
+        float total = avg*reviewCount; //합계
+        total -=rating; //평점 삭제
+        reviewCount-=1; //리뷰 갯수 감소
+
+        if (total==0 || reviewCount==0) {
+            avg=0;
+        }
+
+        else avg = total/reviewCount; //새로운 평점
+        master.setReviewCount(reviewCount);
+        master.setRatingAvg(avg);
+    }
+
+    @Transactional
+    public void updateMasterReviewInfo (Integer previousRating,Integer newRating ,Member master) {
+        deleteMasterReviewInfo(previousRating, master);
+        addMasterReviewInfo(newRating, master);
     }
 }

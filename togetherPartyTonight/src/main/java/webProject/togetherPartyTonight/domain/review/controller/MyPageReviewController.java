@@ -47,16 +47,16 @@ public class MyPageReviewController {
 
     @GetMapping("/reviews/{memberId}")
     @ApiOperation(value = "마이페이지에서 사용자별 받은 리뷰 조회")
-    public SingleResponse<ReviewListDto> getOthersReviews (@PathVariable @ApiParam(name = "조회할 사용자 id", example = "1", required = true) Long memberId, HttpServletRequest request) {
+    public SingleResponse<ReviewListDto> getOthersReviews (@PageableDefault(size = 5, page = 0, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
+                                                           @PathVariable @ApiParam(name = "조회할 사용자 id", example = "1", required = true) Long memberId, HttpServletRequest request) {
         log.info("[{}] {}",request.getMethod(),request.getRequestURI());
-        ReviewListDto review = reviewService.getOthersReviews(memberId);
+        ReviewListDto review = reviewService.getOthersReviews(memberId, pageable);
         return responseService.getSingleResponse(review);
     }
 
     public Member getMemberBySecurityContextHolder() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username = userDetails.getUsername();
-        System.out.println("username = " + username);
         return memberRepository.findById(Long.parseLong(username))
                 .orElseThrow(() -> {
                     throw new ClubException(MemberErrorCode.MEMBER_NOT_FOUND);

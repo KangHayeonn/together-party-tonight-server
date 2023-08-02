@@ -1,9 +1,6 @@
 package webProject.togetherPartyTonight.domain.billing.entity;
 
-import io.swagger.models.auth.In;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import webProject.togetherPartyTonight.domain.club.entity.Club;
 import webProject.togetherPartyTonight.global.common.BaseEntity;
 
@@ -14,6 +11,8 @@ import static javax.persistence.FetchType.LAZY;
 @Entity
 @Setter
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class Billing extends BaseEntity {
 
@@ -22,7 +21,7 @@ public class Billing extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = LAZY)
+    @OneToOne(fetch = LAZY)
     @JoinColumn(name = "club_id", nullable = false)
     private Club club;
 

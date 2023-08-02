@@ -1,15 +1,15 @@
 package webProject.togetherPartyTonight.domain.billing.exception;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import webProject.togetherPartyTonight.global.error.ErrorCode;
+import webProject.togetherPartyTonight.global.error.CommonException;
+import webProject.togetherPartyTonight.global.error.ErrorInterface;
 
 @Getter
-public class BillingException extends RuntimeException{
-    private ErrorCode errorCode;
+public class BillingException extends CommonException {
+    private ErrorInterface errorCode;
 
-    public BillingException(ErrorCode errorCode) {
-        super(errorCode.getMessage());
+    public BillingException(ErrorInterface errorCode) {
+        super(errorCode);
         this.errorCode= errorCode;
     }
 }

@@ -22,6 +22,8 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -55,7 +57,7 @@ public class SearchController {
     public SingleResponse<SearchListDto> searchByConditions (@RequestParam @ApiParam(required = true, value = "위도", example = "37.55920", allowableValues = "range[-90,90]")  @Min(value = -90, message = "유효한 위도 범위를 벗어났습니다.")  @Max(value = 90, message = "유효한 위도 범위를 벗어났습니다.")Float lat,
                                             @RequestParam @ApiParam(required = true, value = "경도", example = "126.942310", allowableValues = "range[-180,180]")  @Min(value = -180, message = "유효한 경도 범위를 벗어났습니다.") @Max(value = 180, message = "유효한 경도 범위를 벗어났습니다.")Float lng,
                                             @RequestParam  @ApiParam(required = true, value = "검색할 거리 반경", example = "5", allowableValues = "range[0,10]") @Min (value = 0, message = "검색 가능 최소 거리는 0km입니다.") @Max(value = 10, message = "검색 가능 최대 거리는 10km입니다.") Integer distance,
-                                            @RequestParam @ApiParam(required = true, value = "모임 카테고리", example = "취미", allowableValues = "취미,봉사,운동,스터디,맛집,여행,친목,전체") @Enum(enumClass = ClubCategory.class, ignoreCase = true) String category,
+                                            @RequestParam @ApiParam(required = true, value = "모임 카테고리", example = "취미", allowableValues = "취미,봉사,운동,스터디,맛집,여행,친목,모두")  String category,
                                             @RequestParam @ApiParam(required = true, value = "모임 상태", example = "all", allowableValues = "recruit,all") @Enum(enumClass = SearchState.class, ignoreCase = true, message = "검색할 수 없는 모임 상태입니다.") String status,
                                             @RequestParam @ApiParam(required = true, value = "검색할 모임 최대 인원", example = "7" ,allowableValues = "range[1,20]") @Min(value = 1, message = "최대 1명이상의 모임만 검색할 수 있습니다.") @Max(value = 20, message = "최대 20명까지의 모임만 검색할 수 있습니다.") Integer memberNum,
                                             @RequestParam(required = false) @ApiParam(required = false, value = "모임 태그", example = "테니스,다이어트,오운완") String tags,
@@ -67,4 +69,21 @@ public class SearchController {
 
         return responseService.getSingleResponse(searchListDto);
     }
+
+    @GetMapping("/tags")
+    @ApiOperation(value = "태그 검색", notes = "기존에 있는 태그 목록들을 검색한다.")
+    public ListResponse<String> findTags (@RequestParam(name = "word") @ApiParam(value = "태그로 검색할 글자", example = "강") String partial, HttpServletRequest request) {
+        log.info("[{}] {}",request.getMethod(),request.getRequestURI());
+        List<String> list = new ArrayList<>(searchService.findTags(partial));
+        List<String> res = searchService.sortBySimilarity(partial, list);
+        return responseService.getListResponse(res);
+    }
+
+    @GetMapping("/tags/popular")
+    @ApiOperation(value = "자주 사용된 태그 반환", notes = "기존에 있는 태그 중 12개 반환")
+    public ListResponse<String> popularTags (HttpServletRequest request) {
+        log.info("[{}] {}",request.getMethod(),request.getRequestURI());
+        return responseService.getListResponse(searchService.getPopularTags());
+    }
+
 }

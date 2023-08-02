@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 public class ResponseService {
 
-    private static final String SUCCESS = "success";
+    private static final String SUCCESS = "true";
     private static final String FAIL = "fail";
 
     public <T> SingleResponse<T> getSingleResponse(T data) {
@@ -25,7 +25,7 @@ public class ResponseService {
 
     public <T> ListResponse<T> getListResponse(List<T> dataList) {
         ListResponse<T> listResponse = new ListResponse<>();
-        listResponse.setDataList(dataList);
+        listResponse.setData(dataList);
         setSuccessResponse(listResponse);
         return listResponse;
     }

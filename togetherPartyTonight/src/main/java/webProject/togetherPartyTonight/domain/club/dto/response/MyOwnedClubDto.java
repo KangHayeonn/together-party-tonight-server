@@ -15,6 +15,8 @@ import java.util.List;
 @AllArgsConstructor
 @ApiModel("내가 만든 모임")
 public class MyOwnedClubDto {
+    @ApiModelProperty(value = "모임 id", example = "1")
+    private Long clubId;
     @ApiModelProperty(value = "모임 제목", example = "오늘 테니스 치실 분 구합니다")
     private String clubName;
     @ApiModelProperty(value = "모임 카테고리", example = "운동")
@@ -33,6 +35,18 @@ public class MyOwnedClubDto {
     private String address;
     @ApiModelProperty(value = "모임 날짜와 시간", example = "2023-07-05:12:30")
     private LocalDateTime meetingDate;
+    @ApiModelProperty(value = "첨부 이미지")
+    private String image;
+
+    @ApiModelProperty(value = "현재 모집된 인원", example = "3")
+    private Integer appliedCount;
+
+    @ApiModelProperty(value = "모집 상태", example = "true")
+    private Boolean clubState;
+
+    @ApiModelProperty(value = "정산 요청 여부", example = "true")
+    private Boolean billingRequest;
+
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 }

@@ -33,7 +33,7 @@ public class SecurityConfig {
 
     private final JwtAuthenticationEntryPoint authenticationEntryPoint;
 
-    private static final String[] PUBLIC_GET = {"/reviews/{reviewId:^[0-9]*$}","/clubs/{clubId:^[0-9]*$}","/members/reviews/**","/search/**"};
+    private static final String[] PUBLIC_GET = {"/reviews/{reviewId:^[0-9]*$}","/clubs/{clubId:^[0-9]*$}","/members/reviews/**","/search/**", "/comment/**", "/clubs/reviews/{clubId:^[0-9]*$}"};
 
     private static final String[] PUBLIC_POST = {"/members/emailCheck","/members/login","/members/reissue","/members/oauth/**","/members/signup/**","/members/password/**"};
 
@@ -73,7 +73,7 @@ public class SecurityConfig {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring().antMatchers("/v2/api-docs", "/swagger-resources/**", "/swagger-ui/index.html", "/swagger-ui.html","/webjars/**", "/swagger/**",
-                "/h2-console/**","/configuration/security");
+                "/h2-console/**","/configuration/security","/chatting/**","/**/chatting/","/");
     }
 
 

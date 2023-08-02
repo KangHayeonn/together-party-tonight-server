@@ -8,12 +8,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@ApiModel("모임 신청 내역")
+@ApiModel("내가 신청한 모임 내역")
 public class ApplicationDto {
     @ApiModelProperty(value = "모임 신청 id", example = "1")
     private Long clubSignupId;
@@ -29,6 +30,27 @@ public class ApplicationDto {
     private LocalDateTime signupDate;
     @ApiModelProperty(value = "승인 여부", example = "PENDING", allowableValues = "PENDING, APPROVE, REFUSE, KICKOUT")
     private String approvalStatus;
+    @ApiModelProperty(value = "현재 모집된 인원", example = "3")
+    private Integer appliedCount;
+
+    @ApiModelProperty(value = "최대 모집 인원", example = "5")
+    private Integer clubMaximum;
+
+    @ApiModelProperty(value = "모임 태그", example = "[\"테니스\",\"다이어트\",\"오운완\"]")
+    private List<String> clubTags;
+
+    @ApiModelProperty(value = "모집 상태", example = "true")
+    private Boolean clubState;
+
+    @ApiModelProperty(value = "모집 날짜와 시간")
+    private String meetingDate;
+
+    @ApiModelProperty(value = "리뷰 작성 여부")
+    private Boolean isReviewWritten;
+
+    @ApiModelProperty(value = "정산 완료 여부", example = "COMPLETED,WAIT,NO_REQUEST")
+    private String billingState;
+
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 }

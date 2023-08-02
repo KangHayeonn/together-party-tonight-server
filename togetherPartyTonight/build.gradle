@@ -54,7 +54,10 @@ dependencies {
 
 	//소켓 추가
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
-  
+
+	//test 로깅 오류 해결
+	testCompileOnly 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
 }
 
 tasks.named('test') {

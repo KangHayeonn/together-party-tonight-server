@@ -8,5 +8,5 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class ReceivedApplicationListDto {
-    private List<ApplicationDto> applicationList;
+    private List<ReceivedApplicationDto> applicationList;
 }

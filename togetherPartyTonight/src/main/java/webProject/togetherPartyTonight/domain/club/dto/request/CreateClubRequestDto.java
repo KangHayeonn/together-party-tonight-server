@@ -25,11 +25,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class CreateClubRequestDto {
     @NotEmpty(message = "clubName은 필수 입력 값입니다.")
+    @Size(max = 11, message = "clubName은 최대 11자를 넘을 수 없습니다.")
     private String clubName;
 
     @NotEmpty (message = "clubCategory는 필수 입력 값입니다.")
     @Size(max = 255 )
-    @Enum(enumClass = ClubCategory.class, ignoreCase = true)
     private String clubCategory;
 
     @NotNull (message = "clubMaximum은 필수 입력 값입니다.")
@@ -60,8 +60,8 @@ public class CreateClubRequestDto {
     private Float longitude; //경도
 
     @NotNull (message = "meetingDate는 필수 입력 값입니다.")
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm", timezone = "Asia/Seoul")
-    @Future(message = "모임 날짜가 현재 날짜와 시각보다 미래여야 합니다.")
+//    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm", timezone = "Asia/Seoul")
+//    @Future(message = "모임 날짜가 현재 날짜와 시각보다 미래여야 합니다.")
     private LocalDateTime meetingDate;
 
     public Club toClub (Member master, Point point, String url) {

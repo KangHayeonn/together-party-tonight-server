@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.ColumnTransformer;
 import org.hibernate.annotations.DynamicInsert;
 import org.locationtech.jts.geom.Point;
+import webProject.togetherPartyTonight.domain.billing.entity.Billing;
 import webProject.togetherPartyTonight.domain.chat.entity.ChatRoom;
 import webProject.togetherPartyTonight.domain.member.entity.Member;
 import webProject.togetherPartyTonight.global.common.BaseEntity;
@@ -24,7 +25,13 @@ import static javax.persistence.FetchType.LAZY;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "club")
+@Table(name = "club", indexes = {
+        @Index(name = "masterId_clubState", columnList = "club_master_id,club_state,club_id"),
+        @Index(name = "masterId_clubId", columnList = "club_master_id,club_id"),
+        @Index(name = "club_point_idx", columnList = "club_point"),
+        @Index(name = "club_state_club_maximum_idx", columnList = "club_state,club_maximum"),
+        @Index(name = "club_category_club_tags_idx", columnList = "club_category,club_tags")
+})
 public class Club extends BaseEntity {
     @Id
     @Column(name = "club_id")
@@ -51,7 +58,7 @@ public class Club extends BaseEntity {
     @Column(name = "club_tags", nullable = false)
     private String clubTags;
 
-    @Column(name = "club_point", columnDefinition = "GEOMETRY")
+    @Column(name = "club_point", columnDefinition = "GEOMETRY", nullable = false)
     @ColumnTransformer(read = "ST_AsText(club_point)",write = "ST_GeomFromText(?, 4326)")
     @Convert(converter = PointConverter.class)
     private Point clubPoint;
@@ -68,8 +75,11 @@ public class Club extends BaseEntity {
     @Column(name = "club_image", nullable = false)
     private String image;
 
-    @OneToMany(mappedBy = "clubMemberId", fetch = LAZY)
+    @OneToMany(mappedBy = "club", fetch = LAZY)
     private List<ClubMember> clubMembers = new ArrayList<>();
+
+    @OneToOne(mappedBy = "club", fetch = LAZY)
+    private Billing billing;
 
 
 
