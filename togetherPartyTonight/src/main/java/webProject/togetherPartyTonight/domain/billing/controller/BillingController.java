@@ -34,7 +34,7 @@ public class BillingController {
             @ApiResponse(code = 400, message = "모임을 찾을 수 없습니다\n모임장만이 정산 요청을 할 수 있습니다\n모임의 멤버가 모임장 이외에 없습니다\n클럽에 해당 멤버가 없습니다"),
             @ApiResponse(code = 500, message = "내부 서버 오류")
     })
-    @PostMapping("/")
+    @PostMapping("")
     public SingleResponse<CreateBillingResponseDto> createBilling(@RequestBody CreateBillingRequestDto createBillingRequestDto , HttpServletRequest request) {
         return billingService.createBilling(createBillingRequestDto);
     }
@@ -45,7 +45,7 @@ public class BillingController {
             @ApiResponse(code = 400, message = "모임을 찾을 수 없습니다\n클럽에 해당 멤버가 없습니다\n정산에 해당하는 정산내역이 없습니다"),
             @ApiResponse(code = 500, message = "내부 서버 오류")
     })
-    @GetMapping("/club")
+    @PostMapping("/club")
     public SingleResponse<ClubBillingHistoryResponseDto> getClubBilling(@RequestBody ClubBillingHistoryRequestDto clubBillingHistoryRequestDto, HttpServletRequest request) {
         return billingService.getClubBillingHistory(clubBillingHistoryRequestDto);
     }
@@ -67,7 +67,7 @@ public class BillingController {
             @ApiResponse(code = 500, message = "내부 서버 오류")
     })
     @PostMapping("/payment")
-    public SingleResponse<BillingPaymentResponseDto> processPayment(BillingPaymentRequestDto billingPaymentRequestDto, HttpServletRequest request) {
+    public SingleResponse<BillingPaymentResponseDto> processPayment(@RequestBody BillingPaymentRequestDto billingPaymentRequestDto, HttpServletRequest request) {
         return billingService.processPayment(billingPaymentRequestDto);
     }
 }
