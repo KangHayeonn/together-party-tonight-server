@@ -159,7 +159,8 @@ public class ClubJoinService {
                 .map(c -> new ReceivedApplicationDto(c.getClubSignupId(), c.getClub().getClubId(), c.getClub().getClubName(),
                         c.getClubMember().getId(), c.getClubMember().getNickname(), c.getClubSignupDate(), c.getClubSignupApprovalState().toString(),
                         c.getClubMember().getProfileImage(),c.getClubMaster().getId(), c.getClubMaster().getProfileImage(),
-                        c.getClubMaster().getNickname(), member.getId().equals(club.getMaster().getId()), c.getCreatedDate(), c.getModifiedDate() ))
+                        c.getClubMaster().getNickname(), member.getId().equals(club.getMaster().getId()), String.valueOf(c.getClub().getMeetingDate()),
+                        c.getCreatedDate(), c.getModifiedDate() ))
                 .collect(Collectors.toList());
 
         return new ReceivedApplicationListDto(list);

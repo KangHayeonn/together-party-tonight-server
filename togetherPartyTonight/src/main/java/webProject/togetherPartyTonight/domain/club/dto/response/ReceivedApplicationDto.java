@@ -45,6 +45,9 @@ public class ReceivedApplicationDto {
     @ApiModelProperty(value = "모임장 여부")
     private Boolean isMaster;
 
+    @ApiModelProperty(value = "모집 날짜와 시간")
+    private String meetingDate;
+
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 }
