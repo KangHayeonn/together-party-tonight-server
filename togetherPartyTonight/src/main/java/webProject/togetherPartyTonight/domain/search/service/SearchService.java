@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 import webProject.togetherPartyTonight.domain.club.entity.Club;
 import webProject.togetherPartyTonight.domain.search.dto.SearchListDto;
 import webProject.togetherPartyTonight.domain.search.dto.SearchResponseDto;
+import webProject.togetherPartyTonight.domain.search.entity.Tag;
 import webProject.togetherPartyTonight.domain.search.repository.SearchRepository;
+import webProject.togetherPartyTonight.domain.search.repository.TagRepository;
 import webProject.togetherPartyTonight.global.util.ClubUtils;
 
 import java.time.LocalDateTime;
@@ -22,6 +24,8 @@ import java.util.stream.Collectors;
 public class SearchService {
     private final SearchRepository searchRepository;
     private final ClubUtils clubUtils;
+
+    private final TagRepository tagRepository;
 
     public SearchListDto searchByAddress(Float lat, Float lng, Pageable pageable) {
         String pointWKT = makePointWKT(lat, lng);
@@ -162,31 +166,13 @@ public class SearchService {
         return searchListDto;
     }
 
-    public List<String> getRandomTags () {
-        List<String> tagList = searchRepository.getRandomTags();
-        Set<String> set = new HashSet<>();
-        for (String t : tagList) {
-            List<String> splitTags = clubUtils.splitTags(t);
-            for (String st : splitTags) {
-                set.add(st);
-            }
-        }
-
-        List<String> listFromSet = new ArrayList<>(set);
+    public List<String> getPopularTags () {
+        List<Tag> tagList = tagRepository.findTop12ByOrderByTagCountDesc();
         List<String> res = new ArrayList<>();
-        Random random = new Random();
-
-        for (int i = 0; i < 12; i++) {
-            int randomIndex = random.nextInt(listFromSet.size());
-            String randomElement = listFromSet.remove(randomIndex);
-            res.add(randomElement);
+        for (Tag t : tagList) {
+            res.add(t.getTagName());
         }
-
         return res;
-
     }
-
-
-
 
 }

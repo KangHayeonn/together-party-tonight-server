@@ -17,6 +17,8 @@ import java.util.List;
 @AllArgsConstructor
 @ApiModel("모임 상세 조회")
 public class GetClubResponseDto {
+    @ApiModelProperty(value = "모임 id", example = "1")
+    private Long clubId;
     @ApiModelProperty(value = "모임장 닉네임", example = "어피치")
     private String nickName;
     @ApiModelProperty(value = "모임장 id", example = "1")

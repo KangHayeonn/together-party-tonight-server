@@ -40,7 +40,9 @@ public class RedisService {
     // redis key 에 맵 형식으로 데이터를 삭제하는것.
     public void removeStringKeyWithMapKey(String key, Object mapKey) {
         HashOperations<String, Object, Object> hashOperations = redisTemplate.opsForHash();
-        hashOperations.delete(key, mapKey);
+        if (hashOperations.hasKey(key, mapKey)) {
+            hashOperations.delete(key, mapKey);
+        }
     }
 
     // String key 로 object 를 가져옴.  일반적인 Value

@@ -33,7 +33,7 @@ public class AlertController {
             @ApiResponse(code = 400, message = "멤버를 찾을 수 없습니다"),
             @ApiResponse(code =  500, message = "내부 서버 오류")
     })
-    @GetMapping("/")
+    @PostMapping("")
     public SingleResponse<AlertListResponseDto> getAlertList(@RequestBody AlertListRequestDto alertListRequestDto, HttpServletRequest httpServletRequest) {
         return alertService.getAlertList(alertListRequestDto);
     }
@@ -55,7 +55,7 @@ public class AlertController {
             @ApiResponse(code = 400, message = "멤버를 찾을 수 없습니다\n알림이 없습니다\n이미 읽은 알림입니다"),
             @ApiResponse(code =  500, message = "내부 서버 오류")
     })
-    @DeleteMapping("/")
+    @DeleteMapping("")
     public SingleResponse<String> deleteAlert(@ApiParam(value = "알림 아이디", required = true) @RequestParam long alertId, HttpServletRequest httpServletRequest) {
         return alertService.deleteAlert(alertId);
     }

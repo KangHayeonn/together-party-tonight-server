@@ -22,6 +22,7 @@ import webProject.togetherPartyTonight.global.websocket.WebSocketService;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -39,8 +40,11 @@ public class CommentService {
                 res.add(new GetCommentResponseDto().toDto(c));
             }
         }
-        //소켓에 세션 저장
-        webSocketService.addMemberToCommentSession(clubId,member);
+
+        if (member!=null) {
+            //소켓에 세션 저장
+            webSocketService.addMemberToCommentSession(clubId, member);
+        }
         return res;
     }
 
@@ -82,16 +86,17 @@ public class CommentService {
     @Transactional
     public DeleteCommentResponseDto deleteComment (Member member, DeleteCommentRequestDto requestDto) {
         Long commentId = requestDto.getCommentId();
-        Comment reference = commentRepository.getReferenceById(commentId);
-        if (reference==null) throw new CommentException(CommentErrorCode.INVALID_COMMENT_ID);
-        else if(reference.getMember().getId() != member.getId()) throw new CommentException(ErrorCode.FORBIDDEN);
+        Comment comment = commentRepository.findById(commentId).orElseThrow(
+                () -> new CommentException(CommentErrorCode.INVALID_COMMENT_ID)
+        );
+        if(!comment.getMember().getId().equals(member.getId())) throw new CommentException(ErrorCode.FORBIDDEN);
 
         commentRepository.deleteById(commentId);
 
         DeleteCommentResponseDto responseDto = new DeleteCommentResponseDto().toDto(requestDto.getCommentId());
         String message = responseDto.toSocketMessage();
 
-        webSocketService.broadcastComment(message, reference.getClub().getClubId());
+        webSocketService.broadcastComment(message, comment.getClub().getClubId());
         return responseDto;
     }
 

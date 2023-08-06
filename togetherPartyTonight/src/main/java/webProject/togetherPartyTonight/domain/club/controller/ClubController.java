@@ -174,13 +174,12 @@ public class ClubController {
      */
     @GetMapping("/myApplied")
     @ApiOperation(value = "사용자별 신청한 모임 조회")
-    public  SingleResponse<MyAppliedClubListDto> getMyAppliedList(HttpServletRequest request,@PageableDefault(size = 5, page = 0, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
-                                                                  @ApiParam(value = "필터 조건", allowableValues = "ALL,PENDING,APPROVE,KICKOUT,REFUSE", example = "PENDING", required = true)
-                                                                  @Enum(enumClass = ApprovalState.class, ignoreCase = true, message = "허용되지 않은 상태입니다.")
+    public  SingleResponse<MyAppliedClubListDto> getMyAppliedList(HttpServletRequest request, Pageable pageable,
+                                                                  @ApiParam(value = "필터 조건", allowableValues = "ALL,PENDING,APPROVE,KICKOUT,REFUSE,NO_REQUEST,WAIT,COMPLETED", example = "PENDING", required = true)
                                                                   @RequestParam String filter) {
         log.info("[{}] {}",request.getMethod(),request.getRequestURI());
         Member member = getMemberBySecurityContextHolder();
-        MyAppliedClubListDto appliedList = clubJoinService.getAppliedList( member, pageable, ApprovalState.valueOf(filter));
+        MyAppliedClubListDto appliedList = clubJoinService.getAppliedList( member, pageable, filter);
         return responseService.getSingleResponse(appliedList);
     }
 
@@ -189,12 +188,11 @@ public class ClubController {
      */
     @GetMapping("/myOwned/{memberId}")
     @ApiOperation(value = "사용자별 생성한 모임 조회")
-    public  SingleResponse<MyOwnedClubListDto> getMyOwnedClub(HttpServletRequest request,@PageableDefault(size = 5, page = 0, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
-                                                              @ApiParam(value = "필터 조건", allowableValues = "ALL,RECRUITING,RECRUIT_FINISHED", example = "ALL", required = true)
-                                                              @Enum(enumClass = ClubStateFilterEnum.class, ignoreCase = true)
+    public  SingleResponse<MyOwnedClubListDto> getMyOwnedClub(HttpServletRequest request, Pageable pageable,
+                                                              @ApiParam(value = "필터 조건", allowableValues = "ALL,RECRUITING,RECRUIT_FINISHED,BILLING_NOT_STARTED,BILLING_IN_PROGRESS", example = "ALL", required = true)
                                                               @RequestParam String filter, @ApiParam(value = "사용자 id", example = "1") @PathVariable Long memberId ) {
         log.info("[{}] {}",request.getMethod(),request.getRequestURI());
-        MyOwnedClubListDto ownedList = clubJoinService.getOwnedList( memberId, pageable, ClubStateFilterEnum.valueOf(filter));
+        MyOwnedClubListDto ownedList = clubJoinService.getOwnedList( memberId, pageable, filter);
         return responseService.getSingleResponse(ownedList);
     }
 
@@ -222,6 +220,15 @@ public class ClubController {
         Member member = getMemberBySecurityContextHolder();
         clubJoinService.kickout(deleteMyAppliedRequestDto, member);
         return responseService.getCommonResponse();
+    }
+
+    @GetMapping("/reviews/{clubId}")
+    @ApiOperation(value = "모임별 리뷰 조회")
+    public SingleResponse<ClubReviewResponseListDto> getReviewsByClub (@PathVariable @ApiParam(name = "모임 id", required = true) Long clubId, Pageable pageable,
+                                                                       HttpServletRequest request) {
+        log.info("[{}] {}",request.getMethod(),request.getRequestURI());
+        ClubReviewResponseListDto res = clubService.getReviewsByClub(clubId, pageable);
+        return responseService.getSingleResponse(res);
     }
 
     public Member getMemberBySecurityContextHolder() {

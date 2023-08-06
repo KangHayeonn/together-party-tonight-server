@@ -39,6 +39,18 @@ public class ApplicationDto {
     @ApiModelProperty(value = "모임 태그", example = "[\"테니스\",\"다이어트\",\"오운완\"]")
     private List<String> clubTags;
 
+    @ApiModelProperty(value = "모집 상태", example = "true")
+    private Boolean clubState;
+
+    @ApiModelProperty(value = "모집 날짜와 시간")
+    private String meetingDate;
+
+    @ApiModelProperty(value = "리뷰 작성 여부")
+    private Boolean isReviewWritten;
+
+    @ApiModelProperty(value = "정산 완료 여부", example = "COMPLETED,WAIT,NO_REQUEST")
+    private String billingState;
+
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 }

@@ -70,8 +70,8 @@ public class BillingService {
         List<ClubMember> clubMembers = club.getClubMembers();
         int totalMember = clubMembers.size();
 
-        if (totalMember <= 1) {
-            log.error("[BillingService] createBilling club member size <= 1, totalMember: {}, clubId: {}, memberId: {}", totalMember, club.getClubId(), member.getId());
+        if (totalMember < 1) {
+            log.error("[BillingService] createBilling club member size < 1, totalMember: {}, clubId: {}, memberId: {}", totalMember, club.getClubId(), member.getId());
             throw new BillingException(BILLING_MINIMUM_MEMBERS_NOT_MET_ERROR);
         }
 
@@ -82,25 +82,18 @@ public class BillingService {
 
         Billing saveBilling = billingRepository.save(billing);
 
-        ClubMember masterClubMember = clubMemberRepository.findByClubClubIdAndMemberId(club.getClubId(), member.getId())
-                .orElseThrow(() -> {
-                    log.error("[BillingService] createBilling club member doesn't exist clubId: {}, memberId: {}", club.getClubId(), member.getId());
-                    throw new BillingException(MEMBER_NOT_CLUB_MEMBER);
-                });
-
         int divPrice = getDivPrice(saveBilling, totalMember);
 
-        clubMembers.stream().filter(clubMember->!isClubMemberMaster(masterClubMember, clubMember))
-                        .forEach(clubMember ->{
-                            webProject.togetherPartyTonight.domain.billing.entity.BillingHistory billinghistory = webProject.togetherPartyTonight.domain.billing.entity.BillingHistory.builder()
-                                    .billing(saveBilling)
-                                    .billingState(WAIT)
-                                    .clubMember(clubMember)
-                                    .price(divPrice)
-                                    .build();
-                            BillingHistory billingHistory = billingHistoryRepository.save(billinghistory);
-                            alertService.savaBillingAlertData(billingHistory);
-                        });
+        clubMembers.forEach(clubMember -> {
+            webProject.togetherPartyTonight.domain.billing.entity.BillingHistory billinghistory = webProject.togetherPartyTonight.domain.billing.entity.BillingHistory.builder()
+                    .billing(saveBilling)
+                    .billingState(WAIT)
+                    .clubMember(clubMember)
+                    .price(divPrice)
+                    .build();
+            BillingHistory billingHistory = billingHistoryRepository.save(billinghistory);
+            alertService.savaBillingAlertData(billingHistory);
+        });
 
         CreateBillingResponseDto createBillingResponseDto = CreateBillingResponseDto.builder()
                 .BillingId(saveBilling.getId())
