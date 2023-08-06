@@ -78,6 +78,17 @@ public class MemberService {
         String url = member.getProfileImage();
         log.info("바꾸는 유저 - {}", member.getEmail());
 
+        if (profileImage == null && !url.contains("default")){
+
+            url = BASIC_PROFILE;
+            member.setProfileImage(url);
+            return new MemberModifyProfileImageDto(url);
+        }
+
+        if (profileImage == null && url.contains("default")){
+            return new MemberModifyProfileImageDto(url);
+        }
+        assert profileImage != null;
         log.info("프로필 이미지 - {}",profileImage.getBytes());
 
         //파일의 크기가 0이 아니면 s3업로드
