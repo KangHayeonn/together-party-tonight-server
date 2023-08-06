@@ -133,7 +133,9 @@ public class SearchService {
 
         List<SearchResponseDto> list = new ArrayList<>();
         for (Club c : clubs) {
-            List<String> tags = clubUtils.splitTags(c.getClubTags());
+            List<String> tags= new ArrayList<>();
+            if(c.getClubTags()!=null)
+             tags = clubUtils.splitTags(c.getClubTags());
             Point point= c.getClubPoint();
             list.add(new SearchResponseDto().toDto(c, tags, point));
         }

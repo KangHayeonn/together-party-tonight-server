@@ -120,17 +120,17 @@ public class ClubService {
     }
 
     public ClubReviewResponseListDto getReviewsByClub (Long clubId, Pageable pageable) {
-        clubRepository.findById(clubId).orElseThrow(
+        Club club = clubRepository.findById(clubId).orElseThrow(
                 () -> new ClubException(ClubErrorCode.INVALID_CLUB_ID)
         );
-        Optional<Page<Review>> optionalReviews = reviewRepository.findByClubClubId(clubId, pageable);
-        Long sum = reviewRepository.getSumByClubId(clubId);
+        Optional<Page<Review>> optionalReviews = reviewRepository.findByClubMasterId(club.getMaster().getId(),pageable);
+
         List<GetReviewDetailResponseDto> reviewList = new ArrayList<>();
         ClubReviewResponseListDto res = new ClubReviewResponseListDto();
 
         res.setCount(optionalReviews.get().getNumberOfElements());
         res.setTotalCount(optionalReviews.get().getTotalElements());
-        res.setAvgRating(getAvgRating(sum,optionalReviews.get().getTotalElements()));
+        res.setAvgRating(club.getMaster().getRatingAvg());
 
         if (!optionalReviews.isEmpty()) {
             Page<Review> reviews = optionalReviews.get();
@@ -197,14 +197,6 @@ public class ClubService {
         if(!club.getMaster().getId().equals(member.getId())) throw new ClubException(ErrorCode.FORBIDDEN);
     }
 
-    public Float getAvgRating (Long sum, Long div) {
-        if(div.equals(0L) || sum.equals(0L)) {
-            return 0F;
-        }
-        else {
-            return (float)sum /div;
-        }
-    }
 
     public void addTagCount (List<String> tags) {
         for (String t : tags) {

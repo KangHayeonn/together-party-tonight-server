@@ -40,6 +40,9 @@ public class GetReviewDetailResponseDto {
     @ApiModelProperty(name = "리뷰 이미지")
     String image;
 
+    @ApiModelProperty(name = "유저 프로필 이미지")
+    String profileImage;
+
     public GetReviewDetailResponseDto toDto(Review review) {
         Club club = review.getClub();
         return GetReviewDetailResponseDto.builder()
@@ -53,6 +56,7 @@ public class GetReviewDetailResponseDto {
                 .createdDate(club.getCreatedDate())
                 .modifiedDate(review.getModifiedDate())
                 .image(review.getImageUrl())
+                .profileImage(review.getMember().getProfileImage())
                 .build();
     }
 }
