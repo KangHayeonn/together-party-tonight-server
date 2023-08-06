@@ -15,13 +15,4 @@ public class ErrorResponse extends CommonResponse {
         this.errorMessage= errorMessage;
     }
 
-    /**
-     *
-     * @param success FAIL
-     * @param validation request dto의 validation default error message
-     */
-    public ErrorResponse(String success, String validation) {
-        super(success, 400);
-        this.errorMessage= validation;
-    }
 }
