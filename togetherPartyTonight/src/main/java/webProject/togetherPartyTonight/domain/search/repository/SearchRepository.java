@@ -21,13 +21,13 @@ public interface SearchRepository extends JpaRepository<Club,Long> {
             "club_category, club_content, club_maximum, club_name,club_state," +
             "club_tags, club_image, club_meeting_date, club_master_id, ST_AsText(club_point) AS club_point " +
             "FROM club c ";
-    String OptionWhere = "WHERE ST_DISTANCE_SPHERE(ST_GEOMFROMTEXT(:standard_point,4326), club_point) <= :distance " +
+    String OptionWhere = "WHERE ST_CONTAINS((ST_Buffer(ST_GeomFromText(:standard_point,4326), :distance)),club_point) "+
             "AND club_maximum <= :memberNum " +
             "AND :category LIKE CONCAT('%', club_category , '%') " +
             "AND club_tags REGEXP CONCAT('\\\\b',:tags,'\\\\b') " +
             "AND ((:state = 'recruit' AND club_state = 1) OR (:state = 'all')) ";
 
-    String noOptionWhere = "WHERE ST_DISTANCE_SPHERE(ST_GEOMFROMTEXT(:standard_point,4326), club_point) <= 5000 ";
+    String noOptionWhere = "WHERE ST_CONTAINS((ST_Buffer(ST_GeomFromText(:standard_point,4326), 5000)),club_point) ";
 
     @Query(nativeQuery = true, value = searchDefaultQuery+ noOptionWhere)
     Optional<Page<Club>> findByAddress(@Param("standard_point") String point, Pageable pageable);
