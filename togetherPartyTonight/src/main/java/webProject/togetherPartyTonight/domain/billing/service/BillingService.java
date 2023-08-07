@@ -112,13 +112,16 @@ public class BillingService {
 
         Member member = getMemberBySecurityContextHolder();
 
-        //클럽 멤버의 요청이 아니라면 throw
-        club.getClubMembers().stream().filter(clubMember -> clubMember.getMember().getId().equals(member.getId()))
-                .findAny()
-                .orElseThrow(() -> {
-                    log.error("[BillingService] getClubBillingDetail member is not in club, clubId: {}, memberId: {}", clubBillingHistoryRequestDto.getClubId(), member.getId());
-                    throw new BillingException(MEMBER_NOT_CLUB_MEMBER);
-                });
+        //모임장이면 pass
+        if (!club.getMaster().getId().equals(member.getId())) {
+            //클럽 멤버의 요청이 아니라면 throw
+            club.getClubMembers().stream().filter(clubMember -> clubMember.getMember().getId().equals(member.getId()))
+                    .findAny()
+                    .orElseThrow(() -> {
+                        log.error("[BillingService] getClubBillingDetail member is not in club, clubId: {}, memberId: {}", clubBillingHistoryRequestDto.getClubId(), member.getId());
+                        throw new BillingException(MEMBER_NOT_CLUB_MEMBER);
+                    });
+        }
 
         List<BillingHistoryDto> clubBillingHistoryList = new ArrayList<>();
         Optional<Billing> billingOptional = billingRepository.findByClubClubId(club.getClubId());

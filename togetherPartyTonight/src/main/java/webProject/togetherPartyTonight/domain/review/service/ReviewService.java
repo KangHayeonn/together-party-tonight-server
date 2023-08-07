@@ -79,7 +79,8 @@ public class ReviewService {
         Review review = reviewRepository.findById(reviewId).orElseThrow(
                 () -> new ReviewException(ReviewErrorCode.INVALID_REVIEW_ID)
         );
-        return new GetReviewDetailResponseDto().toDto(review);
+        GetReviewDetailResponseDto res = new GetReviewDetailResponseDto().toDto(review);
+        return res;
 
     }
 
