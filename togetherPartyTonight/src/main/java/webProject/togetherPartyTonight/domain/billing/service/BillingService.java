@@ -184,7 +184,7 @@ public class BillingService {
                     throw new BillingException(BILLING_HISTORY_NOT_FOUNT);
                 });
 
-        if (isBillingHistoryMemberSame(member, billingHistory)) {
+        if (!isBillingHistoryMemberSame(member, billingHistory)) {
             log.error("[BillingService] processPayment billingHistory member id different memberId: {}, billingHistoryId: {}", member.getId(), billingPaymentRequestDto.getBillingHistoryId());
             throw new BillingException(BILLING_HISTORY_MEMBER_DIFFERENT);
         }
