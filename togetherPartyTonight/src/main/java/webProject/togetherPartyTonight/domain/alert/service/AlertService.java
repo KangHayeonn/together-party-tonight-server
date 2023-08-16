@@ -202,7 +202,7 @@ public class AlertService {
         Member otherMember = chatRoom.getOtherMember(leaveMember);
         Alert alert = Alert.builder()
                 .member(otherMember)
-                .alertType(CHAT)
+                .alertType(LEAVE_CHATROOM)
                 .alertContent(new Gson().toJson(alertChatRoomLeaveData))
                 .alertCheckState(false)
                 .build();

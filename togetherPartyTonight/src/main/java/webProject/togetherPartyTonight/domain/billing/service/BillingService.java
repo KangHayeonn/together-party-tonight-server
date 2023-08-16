@@ -68,10 +68,10 @@ public class BillingService {
             throw new BillingException(NOT_MASTER);
         }
         List<ClubMember> clubMembers = club.getClubMembers();
-        int totalMember = clubMembers.size();
+        int totalMember = clubMembers.size() + 1;
 
-        if (totalMember < 1) {
-            log.error("[BillingService] createBilling club member size < 1, totalMember: {}, clubId: {}, memberId: {}", totalMember, club.getClubId(), member.getId());
+        if (totalMember <= 1) {
+            log.error("[BillingService] createBilling club member size <= 1, totalMember: {}, clubId: {}, memberId: {}", totalMember, club.getClubId(), member.getId());
             throw new BillingException(BILLING_MINIMUM_MEMBERS_NOT_MET_ERROR);
         }
 
@@ -140,13 +140,7 @@ public class BillingService {
         billingHistoryList.forEach(billingHistory -> {
             Member billingMember = billingHistory.getClubMember().getMember();
 
-            BillingHistoryDto clubBillingHistory = BillingHistoryDto.builder()
-                    .id(billingHistory.getId())
-                    .memberId(billingMember.getId())
-                    .nickname(billingMember.getNickname())
-                    .price(billingHistory.getPrice())
-                    .billingState(billingHistory.getBillingState().getStateString())
-                    .build();
+            BillingHistoryDto clubBillingHistory = BillingHistoryDto.toDto(billingHistory, billingMember);
 
             clubBillingHistoryList.add(clubBillingHistory);
         });
@@ -168,7 +162,7 @@ public class BillingService {
         clubMemberList.forEach(clubMember -> {
             billingHistoryRepository.findByClubMemberClubMemberId(clubMember.getClubMemberId())
                     .ifPresent(billingHistory->{
-                        BillingHistoryDto billingHistoryDto = BillingHistoryDto.toDto(billingHistory);
+                        BillingHistoryDto billingHistoryDto = BillingHistoryDto.toDto(billingHistory, clubMember.getMember());
                         billingHistoryDtoList.add(billingHistoryDto);
                     });
         });
