@@ -263,7 +263,7 @@ public class ChatService {
         if (isFirstPage(latestSeq)) {
             chats = chatRepository.findByChatRoomIdOrderByIdDesc(chatRoomId, pageable);
         } else {
-            chats = chatRepository.findByChatRoomIdAndIdLessThanEqualOrderByIdDesc(chatRoomId, latestSeq, pageable);
+            chats = chatRepository.findByChatRoomIdAndIdLessThanOrderByIdDesc(chatRoomId, latestSeq, pageable);
         }
         return chats.orElse(new ArrayList<>());
     }
